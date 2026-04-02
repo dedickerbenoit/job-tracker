@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,10 +8,96 @@
 </head>
 <body>
   <div id="app">
-    <h1>JobTracker</h1>
-    <p>Track your job applications</p>
-    <div id="status"></div>
+
+    <!-- Header -->
+    <header class="header">
+      <h1>JobTracker</h1>
+      <button id="btn-settings" class="btn-icon" title="Paramètres">⚙</button>
+    </header>
+
+    <!-- Auth section (placeholder - disabled for now) -->
+    <section id="section-auth" class="section hidden">
+      <p class="text-muted">Connexion requise pour envoyer les données au serveur.</p>
+      <button id="btn-login" class="btn btn-primary btn-block" disabled>Se connecter (bientôt)</button>
+    </section>
+
+    <!-- Job detection section -->
+    <section id="section-job" class="section">
+      <div id="job-status" class="status-bar">
+        <span id="status-icon" class="status-icon">○</span>
+        <span id="status-text">Chargement...</span>
+      </div>
+
+      <form id="job-form" class="hidden">
+        <div class="form-group">
+          <label for="field-title">Titre du poste</label>
+          <input type="text" id="field-title" placeholder="Ex: Développeur Full Stack">
+        </div>
+        <div class="form-group">
+          <label for="field-company">Entreprise</label>
+          <input type="text" id="field-company" placeholder="Ex: Acme Corp">
+        </div>
+        <div class="form-group">
+          <label for="field-location">Localisation</label>
+          <input type="text" id="field-location" placeholder="Ex: Paris, France">
+        </div>
+        <div class="form-group">
+          <label for="field-url">URL de l'offre</label>
+          <input type="url" id="field-url" placeholder="https://...">
+        </div>
+        <div class="form-group">
+          <label for="field-source">Source</label>
+          <select id="field-source">
+            <option value="linkedin">LinkedIn</option>
+            <option value="indeed">Indeed</option>
+            <option value="hellowork">HelloWork</option>
+            <option value="other">Autre</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="field-description">Description</label>
+          <textarea id="field-description" rows="4" placeholder="Description du poste..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="field-notes">Notes personnelles</label>
+          <textarea id="field-notes" rows="2" placeholder="Vos notes..."></textarea>
+        </div>
+        <button type="submit" id="btn-submit" class="btn btn-primary btn-block" disabled>
+          Sauvegarder (connexion requise)
+        </button>
+      </form>
+    </section>
+
+    <!-- Manual entry -->
+    <section id="section-manual" class="section">
+      <button id="btn-manual" class="btn btn-secondary btn-block">Saisie manuelle</button>
+    </section>
+
+    <!-- Settings panel -->
+    <section id="section-settings" class="section hidden">
+      <h2>Paramètres</h2>
+      <div class="settings-group">
+        <h3>Sites activés</h3>
+        <label class="checkbox-label">
+          <input type="checkbox" id="setting-linkedin" checked>
+          LinkedIn
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="setting-indeed" checked>
+          Indeed
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="setting-hellowork" checked>
+          HelloWork
+        </label>
+      </div>
+      <button id="btn-settings-back" class="btn btn-secondary btn-block">Retour</button>
+    </section>
+
+    <!-- Toast notification -->
+    <div id="toast" class="toast hidden"></div>
   </div>
-  <script src="popup.js"></script>
+
+  <script type="module" src="popup.js"></script>
 </body>
 </html>
