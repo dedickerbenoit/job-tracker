@@ -17,10 +17,10 @@
 | Epic | Titre | User Stories | Story Points | Priorite |
 |------|-------|-------------|--------------|----------|
 | **EPIC 01** | Authentification et gestion de compte | 7 US (US-001 a US-007) | 36 SP | P0 |
-| **EPIC 02** | Extension Chrome - Capture d'offres | 7 US (US-101 a US-107) | 48 SP | P0 |
+| **EPIC 02** | Extension Chrome - Capture d'offres | 9 US (US-101 a US-109) | 48 SP | P0 |
 | **EPIC 03** | API Backend Laravel - Gestion des candidatures | 8 US (US-201 a US-208) | 38 SP | P0 |
 | **EPIC 04** | Dashboard React - Interface utilisateur | 10 US (US-301 a US-310) | 67 SP | P0 |
-| **TOTAL MVP** | | **32 User Stories** | **189 SP** | |
+| **TOTAL MVP** | | **34 User Stories** | **189 SP** | |
 
 **Estimation de charge** : 189 story points ~ **6-8 semaines** pour 1 developpeur full-stack
 
@@ -89,8 +89,10 @@
 - [ ] **US-105** : Envoi des donnees vers l'API
 - [ ] **US-106** : Feedback visuel de confirmation
 - [ ] **US-107** : Gestion des erreurs et retry
+- [ ] **US-108** : Mode manuel de saisie (fallback scraping)
+- [ ] **US-109** : Configuration des sites a surveiller
 
-**Livrable** : Extension fonctionnelle de bout en bout avec gestion offline
+**Livrable** : Extension fonctionnelle de bout en bout avec gestion offline et fallbacks
 
 ---
 
