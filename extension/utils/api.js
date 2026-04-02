@@ -12,6 +12,9 @@ async function apiRequest(endpoint, options = {}) {
   };
 
   const response = await fetch(url, config);
+  if (!response.ok) {
+    throw new Error(`API error: ${response.status} ${response.statusText}`);
+  }
   return response.json();
 }
 
