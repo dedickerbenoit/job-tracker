@@ -1,0 +1,78 @@
+// Shared scraper helpers
+// Loaded before site-specific scrapers via manifest content_scripts order
+
+(function () {
+  'use strict';
+
+  /**
+   * Try multiple CSS selectors and return the first non-empty match.
+   * @param {string[]} selectors - Array of CSS selectors to try
+   * @param {string} property - Property to extract (default: 'textContent')
+   * @returns {{ value: string|null, selector: string|null }}
+   */
+  window.extractField = function (selectors, property = 'textContent') {
+    for (const selector of selectors) {
+      try {
+        const el = document.querySelector(selector);
+        if (el) {
+          const raw = property === 'href' ? el.href : el[property] || el.getAttribute(property);
+          const value = typeof raw === 'string' ? window.cleanText(raw) : raw;
+          if (value) return { value, selector };
+        }
+      } catch (e) {
+        // Invalid selector, skip
+      }
+    }
+    return { value: null, selector: null };
+  };
+
+  /**
+   * Clean whitespace: trim + collapse multiple spaces/newlines.
+   */
+  window.cleanText = function (text) {
+    if (!text) return '';
+    return text.replace(/\s+/g, ' ').trim();
+  };
+
+  /**
+   * Clean a URL by removing tracking parameters.
+   * @param {string} url - The URL to clean
+   * @param {string[]} paramsToKeep - Query params to preserve (empty = remove all)
+   */
+  window.cleanUrl = function (url, paramsToKeep = []) {
+    try {
+      const parsed = new URL(url);
+      if (paramsToKeep.length === 0) {
+        parsed.search = '';
+      } else {
+        const keep = new URLSearchParams();
+        for (const key of paramsToKeep) {
+          if (parsed.searchParams.has(key)) {
+            keep.set(key, parsed.searchParams.get(key));
+          }
+        }
+        parsed.search = keep.toString() ? '?' + keep.toString() : '';
+      }
+      parsed.hash = '';
+      return parsed.toString();
+    } catch (e) {
+      return url;
+    }
+  };
+
+  /**
+   * Log scraping results for debugging.
+   */
+  window.logScrapingResult = function (site, data, failedFields) {
+    console.group(`[JobTracker] ${site} scraping result`);
+    if (data) {
+      console.log('Data:', data);
+    } else {
+      console.warn('Scraping failed - no data extracted');
+    }
+    if (failedFields && failedFields.length > 0) {
+      console.warn('Failed fields:', failedFields);
+    }
+    console.groupEnd();
+  };
+})();
