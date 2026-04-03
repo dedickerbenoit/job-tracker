@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SearchBar } from "@/components/layout/SearchBar";
+import { useAuthStore } from "@/stores/authStore";
 
 interface HeaderProps {
   sidebarCollapsed: boolean;
@@ -16,7 +17,9 @@ interface HeaderProps {
 }
 
 export function Header({ sidebarCollapsed, onToggleSidebar }: HeaderProps) {
-  const userName = t.header.defaultUser; // TODO EPIC-01: real user
+  const user = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
+  const userName = user ? `${user.first_name} ${user.last_name}` : t.header.defaultUser;
 
   return (
     <header className="flex h-14 items-center justify-between border-b bg-background px-4">
@@ -49,7 +52,7 @@ export function Header({ sidebarCollapsed, onToggleSidebar }: HeaderProps) {
             {t.header.profile}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={logout}>
             <LogOut className="mr-2 h-4 w-4" />
             {t.header.logout}
           </DropdownMenuItem>
