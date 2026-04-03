@@ -1,0 +1,103 @@
+// ── Enums (string literals matching backend) ──
+
+export type ApplicationStatus = 'to_apply' | 'applied' | 'follow_up' | 'interview' | 'offer' | 'rejected';
+
+export type ApplicationSource = 'linkedin' | 'indeed' | 'hellowork' | 'manual';
+
+export type ApplicationEventType = 'created' | 'status_changed' | 'updated' | 'deleted';
+
+// ── Models ──
+
+export interface Application {
+  id: number;
+  title: string;
+  company: string;
+  location: string;
+  url: string;
+  description?: string | null;
+  source: ApplicationSource;
+  status: ApplicationStatus;
+  status_label: string;
+  notes?: string | null;
+  applied_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ApplicationEvent {
+  id: number;
+  application_id: number | null;
+  type: ApplicationEventType;
+  description: string;
+  metadata: Record<string, unknown> | null;
+  created_at: string;
+}
+
+export interface StatsData {
+  total: number;
+  by_status: Record<ApplicationStatus, number>;
+  by_source: Record<ApplicationSource, number>;
+  recent_activity: Record<string, number>;
+}
+
+// ── API Types ──
+
+export interface PaginationMeta {
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+  from: number | null;
+  to: number | null;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  meta: PaginationMeta;
+}
+
+export interface DuplicateWarning {
+  type: 'duplicate_url';
+  message: string;
+  duplicates: Application[];
+}
+
+export interface CreateApplicationResponse {
+  data: Application;
+  warning?: DuplicateWarning;
+}
+
+export interface ApplicationFilters {
+  status?: ApplicationStatus;
+  source?: ApplicationSource;
+  search?: string;
+  from_date?: string;
+  to_date?: string;
+  sort?: string;
+  direction?: 'asc' | 'desc';
+  per_page?: number;
+  page?: number;
+}
+
+export interface TimelineFilters {
+  application_id?: number;
+  type?: ApplicationEventType;
+  from_date?: string;
+  to_date?: string;
+  per_page?: number;
+  page?: number;
+}
+
+export interface CreateApplicationData {
+  title: string;
+  company: string;
+  location: string;
+  url: string;
+  description?: string;
+  source: ApplicationSource;
+  status?: ApplicationStatus;
+  notes?: string;
+  applied_at?: string;
+}
+
+export type UpdateApplicationData = Partial<CreateApplicationData>;
