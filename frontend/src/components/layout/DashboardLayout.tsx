@@ -6,7 +6,7 @@ import { FloatingAddButton } from "@/components/applications/FloatingAddButton";
 import { ApplicationModal } from "@/components/applications/ApplicationModal";
 import { ApplicationDetailModal } from "@/components/applications/ApplicationDetailModal";
 import { useApplicationStore } from "@/stores/applicationStore";
-import { Toaster } from "@/components/ui/sonner";
+
 
 export function DashboardLayout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -46,7 +46,6 @@ export function DashboardLayout() {
         />
       )}
 
-      <Toaster richColors position="bottom-right" />
     </div>
   );
 }

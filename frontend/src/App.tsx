@@ -1,7 +1,11 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { Toaster } from '@/components/ui/sonner';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { AuthModal } from '@/components/auth/AuthModal';
+import { useAuthStore } from '@/stores/authStore';
 
 const KanbanView = lazy(() => import('@/pages/KanbanView'));
 const ListView = lazy(() => import('@/pages/ListView'));
@@ -17,19 +21,29 @@ function PageLoader() {
 }
 
 function App() {
+  const initialize = useAuthStore((s) => s.initialize);
+
+  useEffect(() => {
+    initialize();
+  }, [initialize]);
+
   return (
     <BrowserRouter>
       <TooltipProvider>
         <Routes>
-          <Route path="/dashboard" element={<DashboardLayout />}>
-            <Route index element={<Navigate to="/dashboard/kanban" replace />} />
-            <Route path="kanban" element={<Suspense fallback={<PageLoader />}><KanbanView /></Suspense>} />
-            <Route path="list" element={<Suspense fallback={<PageLoader />}><ListView /></Suspense>} />
-            <Route path="timeline" element={<Suspense fallback={<PageLoader />}><TimelineView /></Suspense>} />
-            <Route path="stats" element={<Suspense fallback={<PageLoader />}><StatsView /></Suspense>} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard" element={<DashboardLayout />}>
+              <Route index element={<Navigate to="/dashboard/kanban" replace />} />
+              <Route path="kanban" element={<Suspense fallback={<PageLoader />}><KanbanView /></Suspense>} />
+              <Route path="list" element={<Suspense fallback={<PageLoader />}><ListView /></Suspense>} />
+              <Route path="timeline" element={<Suspense fallback={<PageLoader />}><TimelineView /></Suspense>} />
+              <Route path="stats" element={<Suspense fallback={<PageLoader />}><StatsView /></Suspense>} />
+            </Route>
           </Route>
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
+        <AuthModal />
+        <Toaster richColors position="bottom-right" />
       </TooltipProvider>
     </BrowserRouter>
   );
