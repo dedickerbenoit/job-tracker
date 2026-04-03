@@ -24,9 +24,8 @@ const api = axios.create({
 });
 
 // Auth interceptor — injects token from localStorage
-// Placeholder for EPIC-01: will be replaced by real auth flow
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('auth_token') || import.meta.env.VITE_DEV_TOKEN;
+  const token = localStorage.getItem('auth_token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -38,7 +37,6 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('auth_token');
       // Lazy import to avoid circular dependency at module level
       import('@/stores/authStore').then(({ useAuthStore }) => {
         const { clearAuth, openAuthModal } = useAuthStore.getState();
