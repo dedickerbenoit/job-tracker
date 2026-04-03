@@ -3,13 +3,17 @@ import type {
   Application,
   ApplicationEvent,
   ApplicationFilters,
+  AuthResponse,
   CreateApplicationData,
   CreateApplicationResponse,
+  LoginData,
   PaginatedResponse,
+  RegisterData,
   StatsData,
   TimelineFilters,
   UpdateApplicationData,
   ApplicationStatus,
+  User,
 } from '@/types';
 
 // ── Axios instance ──
@@ -29,13 +33,18 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Error interceptor
+// Error interceptor — clear auth on 401 and open login modal
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('auth_token');
-      // TODO EPIC-01: redirect to login
+      // Lazy import to avoid circular dependency at module level
+      import('@/stores/authStore').then(({ useAuthStore }) => {
+        const { clearAuth, openAuthModal } = useAuthStore.getState();
+        clearAuth();
+        openAuthModal('login');
+      });
     }
     return Promise.reject(error);
   },
@@ -88,5 +97,25 @@ export const applicationApi = {
 
   stats(): Promise<StatsData> {
     return api.get('/applications/stats').then((r) => r.data.data ?? r.data);
+  },
+};
+
+// ── Auth API ──
+
+export const authApi = {
+  login(data: LoginData): Promise<AuthResponse> {
+    return api.post('/auth/login', data).then((r) => r.data);
+  },
+
+  register(data: RegisterData): Promise<AuthResponse> {
+    return api.post('/auth/register', data).then((r) => r.data);
+  },
+
+  logout(): Promise<void> {
+    return api.post('/auth/logout').then(() => undefined);
+  },
+
+  me(): Promise<User> {
+    return api.get('/auth/me').then((r) => r.data.data);
   },
 };
