@@ -2,61 +2,189 @@
 (function () {
   'use strict';
 
-  window.scrapeLinkedIn = function () {
-    const failedFields = [];
+  // Strategy 1: Extract from JSON-LD structured data (most reliable)
+  function tryJsonLd() {
+    try {
+      const scripts = document.querySelectorAll('script[type="application/ld+json"]');
+      for (const script of scripts) {
+        const json = JSON.parse(script.textContent);
+        if (json['@type'] === 'JobPosting') {
+          return {
+            title: json.title || '',
+            company: json.hiringOrganization?.name || '',
+            location: json.jobLocation?.address?.addressLocality
+              || json.jobLocation?.name || '',
+            description: json.description || '',
+          };
+        }
+      }
+    } catch (e) {
+      console.log('[JobTracker] JSON-LD parsing failed:', e.message);
+    }
+    return null;
+  }
 
-    const title = window.extractField([
-      'h1.t-24.t-bold.inline',
-      'h1.topcard__title',
+  // Strategy 2: Heuristic extraction (resilient to hashed CSS classes)
+  function tryHeuristic() {
+    let title = '';
+    let company = '';
+    let location = '';
+    let description = '';
+
+    // Company: first visible link pointing to /company/ with text
+    const companyLink = [...document.querySelectorAll('a[href*="/company/"]')]
+      .find(function (a) {
+        var t = a.textContent.trim();
+        return t.length > 1 && t.length < 80;
+      });
+    if (companyLink) {
+      company = window.cleanText(companyLink.textContent);
+    }
+
+    // Title: extract from document.title
+    // LinkedIn formats: "(N) Job Title | Company | LinkedIn"
+    if (document.title) {
+      var raw = document.title
+        .replace(/^\(\d+\)\s*/, '')          // remove notification count
+        .replace(/\s*[|]\s*LinkedIn\s*$/i, ''); // remove "| LinkedIn"
+      var parts = raw.split(/\s*[|–]\s*/);
+      title = window.cleanText(parts[0]);
+      // If company wasn't found via link, use second part
+      if (!company && parts.length > 1) {
+        company = window.cleanText(parts[1]);
+      }
+    }
+
+    // Location: <p> containing · near the company link
+    var anchor = companyLink || document.querySelector('[data-display-contents]');
+    if (anchor) {
+      var section = anchor.closest('div');
+      // Walk up a few levels to get the job info container
+      for (var i = 0; i < 4 && section; i++) section = section.parentElement;
+      if (section) {
+        var paragraphs = section.querySelectorAll('p');
+        for (var j = 0; j < paragraphs.length; j++) {
+          var text = window.cleanText(paragraphs[j].textContent);
+          if (text.includes('\u00B7') && text.length < 200) {
+            location = text.split('\u00B7')[0].trim();
+            break;
+          }
+        }
+      }
+    }
+
+    // Description: content after "À propos de l'offre" / "About the job" heading
+    var headings = document.querySelectorAll('h2');
+    for (var k = 0; k < headings.length; k++) {
+      var hText = headings[k].textContent.toLowerCase();
+      if (hText.includes('propos de l') || hText.includes('about the job')) {
+        var descEl = headings[k].nextElementSibling;
+        if (!descEl) descEl = headings[k].parentElement?.nextElementSibling;
+        if (descEl) {
+          description = window.cleanText(descEl.textContent);
+        }
+        break;
+      }
+    }
+
+    return { title: title, company: company, location: location, description: description };
+  }
+
+  window.scrapeLinkedIn = function () {
+    var failedFields = [];
+
+    // Strategy 1: JSON-LD
+    var jsonLd = tryJsonLd();
+    if (jsonLd && jsonLd.title && jsonLd.company) {
+      var data = {
+        title: window.cleanText(jsonLd.title),
+        company: window.cleanText(jsonLd.company),
+        location: window.cleanText(jsonLd.location),
+        description: window.cleanText(jsonLd.description),
+        url: window.cleanUrl(window.location.href, ['currentJobId']),
+        source: 'linkedin',
+      };
+      window.logScrapingResult('LinkedIn', data, []);
+      return data;
+    }
+
+    // Strategy 2: Heuristic
+    var h = tryHeuristic();
+    if (h.title && h.company) {
+      var hFailedFields = [];
+      if (!h.location) hFailedFields.push('location');
+      if (!h.description) hFailedFields.push('description');
+      var data2 = {
+        title: h.title,
+        company: h.company,
+        location: h.location,
+        description: h.description,
+        url: window.cleanUrl(window.location.href, ['currentJobId']),
+        source: 'linkedin',
+      };
+      window.logScrapingResult('LinkedIn', data2, hFailedFields);
+      return data2;
+    }
+
+    // Strategy 3: Classic CSS selectors (older LinkedIn layouts / public pages)
+    var title = window.extractField([
       'h1.job-details-jobs-unified-top-card__job-title',
-      '.jobs-unified-top-card__job-title',
+      'h1.top-card-layout__title',
+      'h1.topcard__title',
       'h1',
     ]);
     if (!title.value) failedFields.push('title');
 
-    const company = window.extractField([
+    var company = window.extractField([
       '.job-details-jobs-unified-top-card__company-name a',
       '.job-details-jobs-unified-top-card__company-name',
-      '.topcard__org-name-link',
       'a.topcard__org-name-link',
-      '.jobs-unified-top-card__company-name a',
-      '.jobs-unified-top-card__company-name',
+      'span.topcard__flavor a',
     ]);
     if (!company.value) failedFields.push('company');
 
-    // If both title and company are missing, scraping failed
     if (!title.value && !company.value) {
+      // Use partial heuristic results as last resort
+      if (h.title || h.company) {
+        var data3 = {
+          title: h.title || '',
+          company: h.company || '',
+          location: h.location || '',
+          description: h.description || '',
+          url: window.cleanUrl(window.location.href, ['currentJobId']),
+          source: 'linkedin',
+        };
+        window.logScrapingResult('LinkedIn', data3, failedFields);
+        return data3;
+      }
       window.logScrapingResult('LinkedIn', null, failedFields);
       return null;
     }
 
-    const location = window.extractField([
+    var loc = window.extractField([
       '.job-details-jobs-unified-top-card__bullet',
-      '.topcard__flavor--bullet',
-      '.jobs-unified-top-card__bullet',
-      '.job-details-jobs-unified-top-card__primary-description-container .tvm__text',
+      'span.topcard__flavor--bullet',
     ]);
-    if (!location.value) failedFields.push('location');
+    if (!loc.value) failedFields.push('location');
 
-    const description = window.extractField([
+    var desc = window.extractField([
       '.jobs-description__content .jobs-box__html-content',
-      '.jobs-description-content__text',
       '.show-more-less-html__markup',
       '#job-details > span',
-      '.description__text',
+      '#job-details',
     ]);
-    if (!description.value) failedFields.push('description');
+    if (!desc.value) failedFields.push('description');
 
-    const data = {
-      title: title.value || '',
-      company: company.value || '',
-      location: location.value || '',
-      description: description.value || '',
+    var data4 = {
+      title: title.value || h.title || '',
+      company: company.value || h.company || '',
+      location: loc.value || h.location || '',
+      description: desc.value || h.description || '',
       url: window.cleanUrl(window.location.href, ['currentJobId']),
       source: 'linkedin',
     };
 
-    window.logScrapingResult('LinkedIn', data, failedFields);
-    return data;
+    window.logScrapingResult('LinkedIn', data4, failedFields);
+    return data4;
   };
 })();
