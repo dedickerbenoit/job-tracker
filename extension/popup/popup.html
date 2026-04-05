@@ -12,17 +12,34 @@
     <!-- Header -->
     <header class="header">
       <h1>JobTracker</h1>
-      <button id="btn-settings" class="btn-icon" title="Paramètres">⚙</button>
+      <div class="header-actions">
+        <span id="user-info" class="user-info hidden">
+          <span id="user-name" class="user-name"></span>
+          <button id="btn-logout" class="btn-icon" title="Déconnexion">✕</button>
+        </span>
+        <button id="btn-settings" class="btn-icon" title="Paramètres">⚙</button>
+      </div>
     </header>
 
-    <!-- Auth section (placeholder - disabled for now) -->
+    <!-- Auth section -->
     <section id="section-auth" class="section hidden">
-      <p class="text-muted">Connexion requise pour envoyer les données au serveur.</p>
-      <button id="btn-login" class="btn btn-primary btn-block" disabled>Se connecter (bientôt)</button>
+      <p class="text-muted">Connectez-vous pour sauvegarder vos candidatures.</p>
+      <form id="auth-form">
+        <div class="form-group">
+          <label for="auth-email">Email</label>
+          <input type="email" id="auth-email" required placeholder="votre@email.com">
+        </div>
+        <div class="form-group">
+          <label for="auth-password">Mot de passe</label>
+          <input type="password" id="auth-password" required placeholder="Mot de passe">
+        </div>
+        <p id="auth-error" class="text-error hidden"></p>
+        <button type="submit" id="btn-login" class="btn btn-primary btn-block">Se connecter</button>
+      </form>
     </section>
 
     <!-- Job detection section -->
-    <section id="section-job" class="section">
+    <section id="section-job" class="section hidden">
       <div id="job-status" class="status-bar">
         <span id="status-icon" class="status-icon">○</span>
         <span id="status-text">Chargement...</span>
@@ -31,11 +48,11 @@
       <form id="job-form" class="hidden">
         <div class="form-group">
           <label for="field-title">Titre du poste</label>
-          <input type="text" id="field-title" placeholder="Ex: Développeur Full Stack">
+          <input type="text" id="field-title" placeholder="Ex: Développeur Full Stack" required>
         </div>
         <div class="form-group">
           <label for="field-company">Entreprise</label>
-          <input type="text" id="field-company" placeholder="Ex: Acme Corp">
+          <input type="text" id="field-company" placeholder="Ex: Acme Corp" required>
         </div>
         <div class="form-group">
           <label for="field-location">Localisation</label>
@@ -55,6 +72,16 @@
           </select>
         </div>
         <div class="form-group">
+          <label for="field-status">Statut</label>
+          <select id="field-status">
+            <option value="applied">Candidaté</option>
+            <option value="interview">Entretien</option>
+            <option value="offer">Offre</option>
+            <option value="rejected">Refusé</option>
+            <option value="withdrawn">Retiré</option>
+          </select>
+        </div>
+        <div class="form-group">
           <label for="field-description">Description</label>
           <textarea id="field-description" rows="4" placeholder="Description du poste..."></textarea>
         </div>
@@ -62,14 +89,14 @@
           <label for="field-notes">Notes personnelles</label>
           <textarea id="field-notes" rows="2" placeholder="Vos notes..."></textarea>
         </div>
-        <button type="submit" id="btn-submit" class="btn btn-primary btn-block" disabled>
-          Sauvegarder (connexion requise)
+        <button type="submit" id="btn-submit" class="btn btn-primary btn-block">
+          Sauvegarder
         </button>
       </form>
     </section>
 
     <!-- Manual entry -->
-    <section id="section-manual" class="section">
+    <section id="section-manual" class="section hidden">
       <button id="btn-manual" class="btn btn-secondary btn-block">Saisie manuelle</button>
     </section>
 
