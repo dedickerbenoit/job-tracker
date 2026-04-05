@@ -12,15 +12,30 @@
 
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'SCRAPE_JOB_DATA') {
-      const data = scrapeCurrentSite(message.site);
-      if (data) {
-        chrome.runtime.sendMessage({ type: 'SCRAPED_DATA', data });
-        sendResponse({ scraped: true });
-      } else {
-        sendResponse({ scraped: false, reason: 'No data found' });
-      }
+      scrapeWithRetry(message.site, 5, 800).then((data) => {
+        if (data) {
+          chrome.runtime.sendMessage({ type: 'SCRAPED_DATA', data });
+          sendResponse({ scraped: true });
+        } else {
+          sendResponse({ scraped: false, reason: 'No data found after retries' });
+        }
+      });
+      return true; // async sendResponse
     }
   });
+
+  // --- Scrape with retry (waits for SPA DOM to render) ---
+
+  async function scrapeWithRetry(site, maxRetries, delayMs) {
+    for (let i = 0; i < maxRetries; i++) {
+      const data = scrapeCurrentSite(site);
+      if (data && data.title && data.company) return data;
+      console.log(`[JobTracker] Scrape attempt ${i + 1}/${maxRetries} - DOM not ready, retrying...`);
+      await new Promise((r) => setTimeout(r, delayMs));
+    }
+    const lastAttempt = scrapeCurrentSite(site);
+    return (lastAttempt && lastAttempt.title && lastAttempt.company) ? lastAttempt : null;
+  }
 
   // --- Scrape dispatcher ---
 
