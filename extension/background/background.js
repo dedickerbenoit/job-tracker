@@ -80,6 +80,7 @@ async function _handleTabUrlChangeInner(tabId, url) {
     await chrome.tabs.sendMessage(tabId, {
       type: 'SCRAPE_JOB_DATA',
       site: detection.site,
+      listing: detection.listing,
     });
   } catch (e) {
     console.log('[JobTracker] Content script not ready yet, will retry on message');
