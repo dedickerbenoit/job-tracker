@@ -1,38 +1,62 @@
-import { useEffect, useState, useCallback, useRef } from 'react';
-import { formatDistanceToNow } from 'date-fns';
-import { fr } from 'date-fns/locale';
-import { ChevronUp, ChevronDown, ChevronsUpDown, Pencil, Trash2, Eye, RotateCcw } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { useEffect, useState, useCallback, useRef } from "react";
+import { formatDistanceToNow } from "date-fns";
+import { fr } from "date-fns/locale";
+import {
+  ChevronUp,
+  ChevronDown,
+  ChevronsUpDown,
+  Pencil,
+  Trash2,
+  Eye,
+  RotateCcw,
+} from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Skeleton } from '@/components/ui/skeleton';
-import { StatusBadge } from '@/components/applications/StatusBadge';
-import { SourceBadge } from '@/components/applications/SourceBadge';
-import { ApplicationModal } from '@/components/applications/ApplicationModal';
-import { DeleteConfirmModal } from '@/components/applications/DeleteConfirmModal';
-import { useApplicationStore } from '@/stores/applicationStore';
-import { useDebounce } from '@/hooks/useDebounce';
-import { STATUS_CONFIG, SOURCE_CONFIG } from '@/lib/constants';
-import { cn } from '@/lib/utils';
-import { t } from '@/lib/i18n';
-import type { Application, ApplicationFilters, ApplicationStatus, ApplicationSource } from '@/types';
+} from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import { StatusBadge } from "@/components/applications/StatusBadge";
+import { SourceBadge } from "@/components/applications/SourceBadge";
+import { ApplicationModal } from "@/components/applications/ApplicationModal";
+import { DeleteConfirmModal } from "@/components/applications/DeleteConfirmModal";
+import { useApplicationStore } from "@/stores/applicationStore";
+import { useDebounce } from "@/hooks/useDebounce";
+import { STATUS_CONFIG, SOURCE_CONFIG } from "@/lib/constants";
+import { cn } from "@/lib/utils";
+import { t } from "@/lib/i18n";
+import type {
+  Application,
+  ApplicationFilters,
+  ApplicationStatus,
+  ApplicationSource,
+} from "@/types";
 
 const SORTABLE_COLUMNS = [
-  { key: 'title', label: t.list.columns.title },
-  { key: 'company', label: t.list.columns.company },
-  { key: 'status', label: t.list.columns.status },
-  { key: 'created_at', label: t.list.columns.date },
+  { key: "title", label: t.list.columns.title },
+  { key: "company", label: t.list.columns.company },
+  { key: "status", label: t.list.columns.status },
+  { key: "created_at", label: t.list.columns.date },
 ] as const;
 
-function SortIcon({ column, sort, direction }: { column: string; sort?: string; direction?: string }) {
+function SortIcon({
+  column,
+  sort,
+  direction,
+}: {
+  column: string;
+  sort?: string;
+  direction?: string;
+}) {
   if (sort !== column) return <ChevronsUpDown className="h-3 w-3 opacity-40" />;
-  return direction === 'asc' ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />;
+  return direction === "asc" ? (
+    <ChevronUp className="h-3 w-3" />
+  ) : (
+    <ChevronDown className="h-3 w-3" />
+  );
 }
 
 export default function ListView() {
@@ -40,10 +64,15 @@ export default function ListView() {
   const pagination = useApplicationStore((s) => s.pagination);
   const loading = useApplicationStore((s) => s.loading);
   const fetchApplications = useApplicationStore((s) => s.fetchApplications);
-  const setSelectedApplication = useApplicationStore((s) => s.setSelectedApplication);
+  const setSelectedApplication = useApplicationStore(
+    (s) => s.setSelectedApplication,
+  );
 
-  const [filters, setFilters] = useState<ApplicationFilters>({ sort: 'created_at', direction: 'desc' });
-  const [searchInput, setSearchInput] = useState('');
+  const [filters, setFilters] = useState<ApplicationFilters>({
+    sort: "created_at",
+    direction: "desc",
+  });
+  const [searchInput, setSearchInput] = useState("");
   const debouncedSearch = useDebounce(searchInput, 500);
   const isInitialMount = useRef(true);
 
@@ -77,7 +106,8 @@ export default function ListView() {
   }, [debouncedSearch, doFetch]);
 
   const handleSort = (key: string) => {
-    const newDirection = filters.sort === key && filters.direction === 'asc' ? 'desc' : 'asc';
+    const newDirection =
+      filters.sort === key && filters.direction === "asc" ? "desc" : "asc";
     doFetch({ sort: key, direction: newDirection, page: 1 });
   };
 
@@ -86,8 +116,12 @@ export default function ListView() {
   };
 
   const handleReset = () => {
-    setSearchInput('');
-    const reset: ApplicationFilters = { sort: 'created_at', direction: 'desc', page: 1 };
+    setSearchInput("");
+    const reset: ApplicationFilters = {
+      sort: "created_at",
+      direction: "desc",
+      page: 1,
+    };
     setFilters(reset);
     fetchApplications(reset);
   };
@@ -104,31 +138,53 @@ export default function ListView() {
         />
 
         <Select
-          value={filters.status ?? 'all'}
-          onValueChange={(v) => doFetch({ status: v === 'all' ? undefined : v as ApplicationStatus, page: 1 })}
+          value={filters.status ?? "all"}
+          onValueChange={(v) =>
+            doFetch({
+              status: v === "all" ? undefined : (v as ApplicationStatus),
+              page: 1,
+            })
+          }
         >
           <SelectTrigger className="w-40">
-            <SelectValue placeholder={t.list.columns.status} />
+            <span>
+              {filters.status
+                ? STATUS_CONFIG[filters.status]?.label
+                : t.status.allStatuses}
+            </span>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{t.status.allStatuses}</SelectItem>
             {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
-              <SelectItem key={key} value={key}>{cfg.label}</SelectItem>
+              <SelectItem key={key} value={key}>
+                {cfg.label}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
 
         <Select
-          value={filters.source ?? 'all'}
-          onValueChange={(v) => doFetch({ source: v === 'all' ? undefined : v as ApplicationSource, page: 1 })}
+          value={filters.source ?? "all"}
+          onValueChange={(v) =>
+            doFetch({
+              source: v === "all" ? undefined : (v as ApplicationSource),
+              page: 1,
+            })
+          }
         >
           <SelectTrigger className="w-40">
-            <SelectValue placeholder={t.list.columns.source} />
+            <span>
+              {filters.source
+                ? SOURCE_CONFIG[filters.source]?.label
+                : t.source.allSources}
+            </span>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{t.source.allSources}</SelectItem>
             {Object.entries(SOURCE_CONFIG).map(([key, cfg]) => (
-              <SelectItem key={key} value={key}>{cfg.label}</SelectItem>
+              <SelectItem key={key} value={key}>
+                {cfg.label}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -140,7 +196,10 @@ export default function ListView() {
 
         {pagination && (
           <span className="ml-auto text-sm text-muted-foreground">
-            {pagination.total} {pagination.total > 1 ? t.application.plural : t.application.singular}
+            {pagination.total}{" "}
+            {pagination.total > 1
+              ? t.application.plural
+              : t.application.singular}
           </span>
         )}
       </div>
@@ -158,13 +217,23 @@ export default function ListView() {
                 >
                   <span className="inline-flex items-center gap-1">
                     {col.label}
-                    <SortIcon column={col.key} sort={filters.sort} direction={filters.direction} />
+                    <SortIcon
+                      column={col.key}
+                      sort={filters.sort}
+                      direction={filters.direction}
+                    />
                   </span>
                 </th>
               ))}
-              <th className="px-4 py-2.5 text-left font-medium">{t.list.columns.location}</th>
-              <th className="px-4 py-2.5 text-left font-medium">{t.list.columns.source}</th>
-              <th className="px-4 py-2.5 text-right font-medium">{t.common.actions}</th>
+              <th className="px-4 py-2.5 text-left font-medium">
+                {t.list.columns.location}
+              </th>
+              <th className="px-4 py-2.5 text-left font-medium">
+                {t.list.columns.source}
+              </th>
+              <th className="px-4 py-2.5 text-right font-medium">
+                {t.common.actions}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -172,13 +241,18 @@ export default function ListView() {
               Array.from({ length: 5 }).map((_, i) => (
                 <tr key={i} className="border-b">
                   {Array.from({ length: 7 }).map((_, j) => (
-                    <td key={j} className="px-4 py-3"><Skeleton className="h-4 w-full" /></td>
+                    <td key={j} className="px-4 py-3">
+                      <Skeleton className="h-4 w-full" />
+                    </td>
                   ))}
                 </tr>
               ))
             ) : applications.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
+                <td
+                  colSpan={7}
+                  className="px-4 py-8 text-center text-muted-foreground"
+                >
                   {t.application.noneFound}
                 </td>
               </tr>
@@ -187,25 +261,55 @@ export default function ListView() {
                 <tr
                   key={app.id}
                   onClick={() => setSelectedApplication(app)}
-                  className={cn('cursor-pointer border-b transition-colors hover:bg-muted/50', loading && 'opacity-60')}
+                  className={cn(
+                    "cursor-pointer border-b transition-colors hover:bg-muted/50",
+                    loading && "opacity-60",
+                  )}
                 >
                   <td className="px-4 py-3 font-medium">{app.title}</td>
                   <td className="px-4 py-3">{app.company}</td>
-                  <td className="px-4 py-3"><StatusBadge status={app.status} /></td>
-                  <td className="px-4 py-3 text-muted-foreground">
-                    {formatDistanceToNow(new Date(app.created_at), { addSuffix: true, locale: fr })}
-                  </td>
-                  <td className="px-4 py-3 text-muted-foreground">{app.location}</td>
-                  <td className="px-4 py-3"><SourceBadge source={app.source} /></td>
                   <td className="px-4 py-3">
-                    <div className="flex justify-end gap-1" onClick={(e) => e.stopPropagation()}>
-                      <Button variant="ghost" size="icon-xs" aria-label={t.list.viewDetail} onClick={() => setSelectedApplication(app)}>
+                    <StatusBadge status={app.status} />
+                  </td>
+                  <td className="px-4 py-3 text-muted-foreground">
+                    {formatDistanceToNow(new Date(app.created_at), {
+                      addSuffix: true,
+                      locale: fr,
+                    })}
+                  </td>
+                  <td className="px-4 py-3 text-muted-foreground">
+                    {app.location}
+                  </td>
+                  <td className="px-4 py-3">
+                    <SourceBadge source={app.source} />
+                  </td>
+                  <td className="px-4 py-3">
+                    <div
+                      className="flex justify-end gap-1"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Button
+                        variant="ghost"
+                        size="icon-xs"
+                        aria-label={t.list.viewDetail}
+                        onClick={() => setSelectedApplication(app)}
+                      >
                         <Eye className="h-3.5 w-3.5" />
                       </Button>
-                      <Button variant="ghost" size="icon-xs" aria-label={t.common.edit} onClick={() => setEditApp(app)}>
+                      <Button
+                        variant="ghost"
+                        size="icon-xs"
+                        aria-label={t.common.edit}
+                        onClick={() => setEditApp(app)}
+                      >
                         <Pencil className="h-3.5 w-3.5" />
                       </Button>
-                      <Button variant="ghost" size="icon-xs" aria-label={t.common.delete} onClick={() => setDeleteApp(app)}>
+                      <Button
+                        variant="ghost"
+                        size="icon-xs"
+                        aria-label={t.common.delete}
+                        onClick={() => setDeleteApp(app)}
+                      >
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>
                     </div>
@@ -244,12 +348,20 @@ export default function ListView() {
 
       {/* Edit modal */}
       {editApp && (
-        <ApplicationModal open={!!editApp} onClose={() => setEditApp(null)} application={editApp} />
+        <ApplicationModal
+          open={!!editApp}
+          onClose={() => setEditApp(null)}
+          application={editApp}
+        />
       )}
 
       {/* Delete modal */}
       {deleteApp && (
-        <DeleteConfirmModal open={!!deleteApp} onClose={() => setDeleteApp(null)} application={deleteApp} />
+        <DeleteConfirmModal
+          open={!!deleteApp}
+          onClose={() => setDeleteApp(null)}
+          application={deleteApp}
+        />
       )}
     </div>
   );

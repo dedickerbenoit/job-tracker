@@ -63,6 +63,8 @@ const fr = {
     addedAgo: 'Ajoutée',
     appliedOn: 'Postulée le',
     location: 'Localisation',
+    emptyState: 'Aucune candidature ici.',
+    emptyStateAction: 'Ajoutez votre première offre !',
   },
 
   form: {
@@ -101,6 +103,20 @@ const fr = {
     confirmRejectDescription: (title: string, company: string) =>
       `Voulez-vous marquer ${title} chez ${company} comme refusée ?`,
     confirmReject: 'Confirmer le refus',
+    showRejected: 'Voir les refusés',
+    hideRejected: 'Masquer les refusés',
+    followUpBadge: 'Relance',
+    rejectedCount: (count: number) => `${count} refusée${count > 1 ? 's' : ''}`,
+  },
+
+  quickActions: {
+    changeStatus: 'Changer le statut',
+    openLink: "Ouvrir l'offre",
+    addNote: 'Ajouter une note',
+    edit: 'Modifier',
+    delete: 'Supprimer',
+    notePlaceholder: 'Votre note...',
+    noteSaved: 'Note enregistrée',
   },
 
   deleteModal: {
@@ -152,12 +168,11 @@ const fr = {
 
   stats: {
     totalApplications: 'Total candidatures',
-    thisMonth: 'Ce mois-ci',
+    activePipeline: 'Pipeline active',
     ongoingInterviews: 'Entretiens en cours',
     responseRate: 'Taux de réponse',
     byStatus: 'Répartition par statut',
     bySource: 'Répartition par source',
-    recentActivity: 'Activité récente (30 derniers jours)',
     applications: 'Candidatures',
   },
 
