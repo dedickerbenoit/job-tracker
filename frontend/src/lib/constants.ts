@@ -7,14 +7,16 @@ export const STATUS_CONFIG: Record<ApplicationStatus, { label: string; color: st
   to_apply: { label: t.status.to_apply, color: 'text-slate-700', bgColor: 'bg-slate-100' },
   applied: { label: t.status.applied, color: 'text-blue-700', bgColor: 'bg-blue-100' },
   follow_up: { label: t.status.follow_up, color: 'text-amber-700', bgColor: 'bg-amber-100' },
-  interview: { label: t.status.interview, color: 'text-purple-700', bgColor: 'bg-purple-100' },
+  interview: { label: t.status.interview, color: 'text-blue-600', bgColor: 'bg-blue-50' },
   offer: { label: t.status.offer, color: 'text-green-700', bgColor: 'bg-green-100' },
-  rejected: { label: t.status.rejected, color: 'text-red-700', bgColor: 'bg-red-100' },
+  rejected: { label: t.status.rejected, color: 'text-red-400', bgColor: 'bg-red-50' },
 };
 
 export const STATUS_ORDER: ApplicationStatus[] = [
   'to_apply', 'applied', 'follow_up', 'interview', 'offer', 'rejected',
 ];
+
+export const KANBAN_COLUMNS: ApplicationStatus[] = ['to_apply', 'applied', 'interview', 'offer'];
 
 // ── Source configuration ──
 
@@ -41,9 +43,9 @@ export const CHART_COLORS = {
     to_apply: '#64748b',
     applied: '#3b82f6',
     follow_up: '#f59e0b',
-    interview: '#a855f7',
+    interview: '#2563eb',
     offer: '#22c55e',
-    rejected: '#ef4444',
+    rejected: '#f87171',
   },
   source: {
     linkedin: '#0a66c2',
