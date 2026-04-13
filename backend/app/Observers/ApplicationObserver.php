@@ -8,13 +8,26 @@ use App\Models\ApplicationEvent;
 
 class ApplicationObserver
 {
+    private const FIELD_LABELS = [
+        'title' => 'Intitulé',
+        'company' => 'Entreprise',
+        'location' => 'Localisation',
+        'url' => 'URL',
+        'description' => 'Description',
+        'source' => 'Source',
+        'notes' => 'Notes',
+        'applied_at' => 'Date de candidature',
+        'salary_min' => 'Salaire min',
+        'salary_max' => 'Salaire max',
+    ];
+
     public function created(Application $application): void
     {
         $event = new ApplicationEvent();
         $event->user_id = $application->user_id;
         $event->application_id = $application->id;
         $event->type = ApplicationEventType::Created;
-        $event->description = "Candidature creee pour {$application->title} chez {$application->company}";
+        $event->description = "Candidature créée pour {$application->title} chez {$application->company}";
         $event->metadata = ['source' => $application->source->value];
         $event->save();
     }
@@ -29,9 +42,12 @@ class ApplicationObserver
             $event->user_id = $application->user_id;
             $event->application_id = $application->id;
             $event->type = ApplicationEventType::StatusChanged;
-            $oldStatus = $original['status'] instanceof \App\Enums\ApplicationStatus ? $original['status']->value : $original['status'];
-            $newStatus = $changes['status'] instanceof \App\Enums\ApplicationStatus ? $changes['status']->value : $changes['status'];
-            $event->description = "Statut change de '{$oldStatus}' a '{$newStatus}'";
+            $oldEnum = $original['status'] instanceof \App\Enums\ApplicationStatus ? $original['status'] : \App\Enums\ApplicationStatus::from($original['status']);
+            $newEnum = $changes['status'] instanceof \App\Enums\ApplicationStatus ? $changes['status'] : \App\Enums\ApplicationStatus::from($changes['status']);
+            $event->description = "Statut modifié de '{$oldEnum->label()}' à '{$newEnum->label()}'";
+
+            $oldStatus = $oldEnum->value;
+            $newStatus = $newEnum->value;
             $event->metadata = [
                 'old_status' => $oldStatus,
                 'new_status' => $newStatus,
@@ -50,7 +66,8 @@ class ApplicationObserver
             $event->user_id = $application->user_id;
             $event->application_id = $application->id;
             $event->type = ApplicationEventType::Updated;
-            $event->description = 'Informations mises a jour: ' . implode(', ', $otherChanges);
+            $translatedFields = array_map(fn($f) => self::FIELD_LABELS[$f] ?? $f, $otherChanges);
+            $event->description = 'Informations mises à jour : ' . implode(', ', $translatedFields);
             $event->metadata = ['changed_fields' => $otherChanges];
             $event->save();
         }
@@ -60,9 +77,9 @@ class ApplicationObserver
     {
         $event = new ApplicationEvent();
         $event->user_id = $application->user_id;
-        $event->application_id = $application->id;
+        $event->application_id = null;
         $event->type = ApplicationEventType::Deleted;
-        $event->description = "Candidature supprimee: {$application->title} chez {$application->company}";
+        $event->description = "Candidature supprimée : {$application->title} chez {$application->company}";
         $event->metadata = [
             'title' => $application->title,
             'company' => $application->company,
