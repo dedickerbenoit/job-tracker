@@ -1,15 +1,23 @@
-import { useEffect } from 'react';
+import { useEffect } from "react";
 import {
-  PieChart, Pie, Cell, BarChart, Bar, LineChart, Line,
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
-} from 'recharts';
-import { TrendingUp, Briefcase, MessageSquare, Percent } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useApplicationStore } from '@/stores/applicationStore';
-import { STATUS_CONFIG, CHART_COLORS } from '@/lib/constants';
-import { t } from '@/lib/i18n';
-import type { ApplicationStatus, ApplicationSource } from '@/types';
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { TrendingUp, Briefcase, MessageSquare, Percent } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useApplicationStore } from "@/stores/applicationStore";
+import { STATUS_CONFIG, CHART_COLORS } from "@/lib/constants";
+import { t } from "@/lib/i18n";
+import type { ApplicationStatus, ApplicationSource } from "@/types";
 
 export default function StatsView() {
   const stats = useApplicationStore((s) => s.stats);
@@ -25,12 +33,25 @@ export default function StatsView() {
       <div className="space-y-6">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <Card key={i}><CardContent className="pt-6"><Skeleton className="h-8 w-20" /><Skeleton className="mt-2 h-4 w-32" /></CardContent></Card>
+            <Card key={i}>
+              <CardContent className="pt-6">
+                <Skeleton className="h-8 w-20" />
+                <Skeleton className="mt-2 h-4 w-32" />
+              </CardContent>
+            </Card>
           ))}
         </div>
         <div className="grid gap-4 lg:grid-cols-2">
-          <Card><CardContent className="pt-6"><Skeleton className="h-64 w-full" /></CardContent></Card>
-          <Card><CardContent className="pt-6"><Skeleton className="h-64 w-full" /></CardContent></Card>
+          <Card>
+            <CardContent className="pt-6">
+              <Skeleton className="h-64 w-full" />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <Skeleton className="h-64 w-full" />
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
@@ -55,26 +76,47 @@ export default function StatsView() {
       color: CHART_COLORS.source[source as ApplicationSource],
     }));
 
-  const activityData = Object.entries(stats.recent_activity)
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([date, count]) => ({
-      date: date.slice(5), // MM-DD
-      count,
-    }));
-
   // Metric calculations
   const interviewCount = stats.by_status.interview ?? 0;
-  const appliedAndBeyond = (stats.by_status.applied ?? 0) + (stats.by_status.follow_up ?? 0) +
-    interviewCount + (stats.by_status.offer ?? 0) + (stats.by_status.rejected ?? 0);
-  const responseRate = appliedAndBeyond > 0
-    ? Math.round(((interviewCount + (stats.by_status.offer ?? 0)) / appliedAndBeyond) * 100)
-    : 0;
+  const activePipeline =
+    (stats.by_status.applied ?? 0) +
+    (stats.by_status.follow_up ?? 0) +
+    interviewCount +
+    (stats.by_status.offer ?? 0);
+  const appliedAndBeyond = activePipeline + (stats.by_status.rejected ?? 0);
+  const responseRate =
+    appliedAndBeyond > 0
+      ? Math.round(
+          ((interviewCount + (stats.by_status.offer ?? 0)) / appliedAndBeyond) *
+            100,
+        )
+      : 0;
 
   const metrics = [
-    { label: t.stats.totalApplications, value: stats.total, icon: Briefcase, color: 'text-blue-600' },
-    { label: t.stats.thisMonth, value: activityData.reduce((s, d) => s + d.count, 0), icon: TrendingUp, color: 'text-green-600' },
-    { label: t.stats.ongoingInterviews, value: interviewCount, icon: MessageSquare, color: 'text-purple-600' },
-    { label: t.stats.responseRate, value: `${responseRate}%`, icon: Percent, color: 'text-amber-600' },
+    {
+      label: t.stats.totalApplications,
+      value: stats.total,
+      icon: Briefcase,
+      color: "text-blue-600",
+    },
+    {
+      label: t.stats.activePipeline,
+      value: activePipeline,
+      icon: TrendingUp,
+      color: "text-green-600",
+    },
+    {
+      label: t.stats.ongoingInterviews,
+      value: interviewCount,
+      icon: MessageSquare,
+      color: "text-purple-600",
+    },
+    {
+      label: t.stats.responseRate,
+      value: `${responseRate}%`,
+      icon: Percent,
+      color: "text-amber-600",
+    },
   ];
 
   return (
@@ -84,7 +126,9 @@ export default function StatsView() {
         {metrics.map((m) => (
           <Card key={m.label}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">{m.label}</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                {m.label}
+              </CardTitle>
               <m.icon className={`h-5 w-5 ${m.color}`} />
             </CardHeader>
             <CardContent>
@@ -103,11 +147,23 @@ export default function StatsView() {
           </CardHeader>
           <CardContent>
             {statusData.length === 0 ? (
-              <div className="flex h-64 items-center justify-center text-muted-foreground">{t.common.noData}</div>
+              <div className="flex h-64 items-center justify-center text-muted-foreground">
+                {t.common.noData}
+              </div>
             ) : (
               <ResponsiveContainer width="100%" height={280}>
                 <PieChart>
-                  <Pie data={statusData} cx="50%" cy="50%" innerRadius={60} outerRadius={100} dataKey="value" label={(props: { name?: string; percent?: number }) => `${props.name ?? ''} ${((props.percent ?? 0) * 100).toFixed(0)}%`}>
+                  <Pie
+                    data={statusData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={100}
+                    dataKey="value"
+                    label={(props: { name?: string; percent?: number }) =>
+                      `${props.name ?? ""} ${((props.percent ?? 0) * 100).toFixed(0)}%`
+                    }
+                  >
                     {statusData.map((entry, i) => (
                       <Cell key={i} fill={entry.color} />
                     ))}
@@ -126,7 +182,9 @@ export default function StatsView() {
           </CardHeader>
           <CardContent>
             {sourceData.length === 0 ? (
-              <div className="flex h-64 items-center justify-center text-muted-foreground">{t.common.noData}</div>
+              <div className="flex h-64 items-center justify-center text-muted-foreground">
+                {t.common.noData}
+              </div>
             ) : (
               <ResponsiveContainer width="100%" height={280}>
                 <BarChart data={sourceData}>
@@ -145,29 +203,6 @@ export default function StatsView() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Activity line chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">{t.stats.recentActivity}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {activityData.length === 0 ? (
-            <div className="flex h-48 items-center justify-center text-muted-foreground">{t.common.noData}</div>
-          ) : (
-            <ResponsiveContainer width="100%" height={250}>
-              <LineChart data={activityData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis allowDecimals={false} />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="count" name={t.stats.applications} stroke="#3b82f6" strokeWidth={2} dot={false} />
-              </LineChart>
-            </ResponsiveContainer>
-          )}
-        </CardContent>
-      </Card>
     </div>
   );
 }

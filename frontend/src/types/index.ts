@@ -64,7 +64,6 @@ export interface StatsData {
   total: number;
   by_status: Record<ApplicationStatus, number>;
   by_source: Record<ApplicationSource, number>;
-  recent_activity: Record<string, number>;
 }
 
 // ── API Types ──

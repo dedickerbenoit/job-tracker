@@ -10,7 +10,6 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select";
 import { STATUS_CONFIG, SOURCE_CONFIG } from "@/lib/constants";
 import { t } from "@/lib/i18n";
@@ -150,7 +149,9 @@ export function ApplicationForm({
             onValueChange={(v) => setValue("source", v as ApplicationSource)}
           >
             <SelectTrigger>
-              <SelectValue />
+              <span className="flex flex-1 text-left" data-slot="select-value">
+                {SOURCE_CONFIG[sourceValue].label}
+              </span>
             </SelectTrigger>
             <SelectContent>
               {Object.entries(SOURCE_CONFIG).map(([key, cfg]) => (
@@ -170,7 +171,9 @@ export function ApplicationForm({
             onValueChange={(v) => setValue("status", v as ApplicationStatus)}
           >
             <SelectTrigger>
-              <SelectValue />
+              <span className="flex flex-1 text-left" data-slot="select-value">
+                {statusValue ? STATUS_CONFIG[statusValue].label : ""}
+              </span>
             </SelectTrigger>
             <SelectContent>
               {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
