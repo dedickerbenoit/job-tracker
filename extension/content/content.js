@@ -5,6 +5,9 @@
   'use strict';
 
   let lastUrl = location.href;
+  let isListingPage = false;
+  let currentSite = null;
+  let lastJobKey = null;
 
   console.log('[JobTracker] Content script loaded on', location.hostname);
 
@@ -12,8 +15,18 @@
 
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'SCRAPE_JOB_DATA') {
+      currentSite = message.site;
+      isListingPage = !!message.listing;
+
+      if (isListingPage) {
+        console.log('[JobTracker] Listing page mode activated for', currentSite);
+        // Reset lastJobKey so first panel scrape goes through
+        lastJobKey = null;
+      }
+
       scrapeWithRetry(message.site, 5, 800).then((data) => {
         if (data) {
+          lastJobKey = data.title + '|' + data.company + '|' + (data.url || '');
           chrome.runtime.sendMessage({ type: 'SCRAPED_DATA', data });
           sendResponse({ scraped: true });
         } else {
@@ -59,18 +72,54 @@
     }
   }
 
+  // --- Panel change detection for listing pages ---
+
+  function tryScrapePanelChange() {
+    if (!isListingPage || !currentSite) return;
+
+    const data = scrapeCurrentSite(currentSite);
+    if (!data || !data.title || !data.company) return;
+
+    const jobKey = data.title + '|' + data.company + '|' + (data.url || '');
+    if (jobKey === lastJobKey) return;
+
+    lastJobKey = jobKey;
+    console.log('[JobTracker] Panel change detected, new job:', jobKey);
+    chrome.runtime.sendMessage({ type: 'SCRAPED_DATA', data });
+  }
+
   // --- SPA URL change detection (MutationObserver with debounce) ---
 
-  let debounceTimer;
+  let urlDebounceTimer;
+  let panelDebounceTimer;
+  let lastPanelCheck = 0;
+  const MAX_PANEL_WAIT = 3000;
+
   const observer = new MutationObserver(() => {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
-      if (location.href !== lastUrl) {
+    if (location.href !== lastUrl) {
+      // URL changed — handle via background
+      clearTimeout(urlDebounceTimer);
+      urlDebounceTimer = setTimeout(() => {
         lastUrl = location.href;
+        lastJobKey = null;
         console.log('[JobTracker] SPA navigation detected:', lastUrl);
         chrome.runtime.sendMessage({ type: 'URL_CHANGED', url: lastUrl });
+      }, 300);
+    } else if (isListingPage) {
+      // URL unchanged but DOM mutated on listing page — check for panel change
+      const now = Date.now();
+      if (now - lastPanelCheck > MAX_PANEL_WAIT) {
+        // Force check after max wait (avoids starvation during continuous mutations)
+        lastPanelCheck = now;
+        tryScrapePanelChange();
+      } else {
+        clearTimeout(panelDebounceTimer);
+        panelDebounceTimer = setTimeout(() => {
+          lastPanelCheck = Date.now();
+          tryScrapePanelChange();
+        }, 800);
       }
-    }, 300);
+    }
   });
 
   if (document.body) {
