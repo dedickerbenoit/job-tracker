@@ -33,8 +33,8 @@ class ApplicationController extends Controller
             $search = str_replace(['%', '_'], ['\\%', '\\_'], strtolower($request->input('search')));
             $query->where(function ($q) use ($search) {
                 $q->whereRaw('LOWER(title) LIKE ?', ["%{$search}%"])
-                  ->orWhereRaw('LOWER(company) LIKE ?', ["%{$search}%"])
-                  ->orWhereRaw('LOWER(location) LIKE ?', ["%{$search}%"]);
+                    ->orWhereRaw('LOWER(company) LIKE ?', ["%{$search}%"])
+                    ->orWhereRaw('LOWER(location) LIKE ?', ["%{$search}%"]);
             });
         }
 
@@ -200,19 +200,11 @@ class ApplicationController extends Controller
 
         $total = $user->applications()->count();
 
-        $recentActivity = $user->applicationEvents()
-            ->where('created_at', '>=', now()->subDays(30))
-            ->selectRaw('DATE(created_at) as date, count(*) as count')
-            ->groupBy('date')
-            ->orderBy('date')
-            ->pluck('count', 'date');
-
         return response()->json([
             'data' => [
                 'total' => $total,
                 'by_status' => $statusCounts,
                 'by_source' => $sourceCounts,
-                'recent_activity' => $recentActivity,
             ],
         ]);
     }
