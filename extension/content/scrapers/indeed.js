@@ -2,8 +2,33 @@
 (function () {
   'use strict';
 
+  // Build canonical URL: /viewjob?jk={id} from vjk/jk param or DOM link
+  function buildCanonicalUrl() {
+    try {
+      var params = new URLSearchParams(window.location.search);
+      var jobKey = params.get('vjk') || params.get('jk');
+      if (jobKey && /^[a-f0-9]+$/i.test(jobKey)) {
+        return 'https://' + window.location.hostname + '/viewjob?jk=' + encodeURIComponent(jobKey);
+      }
+      // Fallback: find a viewjob link in the DOM (selected job in listing)
+      var link = document.querySelector('a[href*="/viewjob?jk="]');
+      if (link) {
+        var linkUrl = new URL(link.href);
+        var linkJk = linkUrl.searchParams.get('jk');
+        if (linkJk && /^[a-f0-9]+$/i.test(linkJk)) {
+          return 'https://' + window.location.hostname + '/viewjob?jk=' + encodeURIComponent(linkJk);
+        }
+      }
+    } catch (e) {
+      // fallback below
+    }
+    // Already on a detail page — clean the URL
+    return window.cleanUrl(window.location.href, ['jk']);
+  }
+
   window.scrapeIndeed = function () {
     const failedFields = [];
+    const canonicalUrl = buildCanonicalUrl();
 
     const title = window.extractField([
       'h1.jobsearch-JobInfoHeader-title',
@@ -50,7 +75,7 @@
       company: company.value || '',
       location: location.value || '',
       description: description.value || '',
-      url: window.cleanUrl(window.location.href, ['jk']),
+      url: canonicalUrl,
       source: 'indeed',
     };
 

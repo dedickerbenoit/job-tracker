@@ -2,12 +2,30 @@
 (function () {
   'use strict';
 
+  // Generic titles that should not be used as job titles
+  var GENERIC_TITLES = ['collections', 'recommendations', 'search', 'jobs', 'linkedin', 'home', 'feed'];
+
+  // Build canonical URL: /jobs/view/{id}/ from currentJobId param or current URL
+  function buildCanonicalUrl() {
+    try {
+      var params = new URLSearchParams(window.location.search);
+      var jobId = params.get('currentJobId');
+      if (jobId && /^\d+$/.test(jobId)) {
+        return 'https://www.linkedin.com/jobs/view/' + jobId + '/';
+      }
+    } catch (e) {
+      // fallback below
+    }
+    // Already on a detail page — clean the URL
+    return window.cleanUrl(window.location.href, ['currentJobId']);
+  }
+
   // Strategy 1: Extract from JSON-LD structured data (most reliable)
   function tryJsonLd() {
     try {
-      const scripts = document.querySelectorAll('script[type="application/ld+json"]');
-      for (const script of scripts) {
-        const json = JSON.parse(script.textContent);
+      var scripts = document.querySelectorAll('script[type="application/ld+json"]');
+      for (var i = 0; i < scripts.length; i++) {
+        var json = JSON.parse(scripts[i].textContent);
         if (json['@type'] === 'JobPosting') {
           return {
             title: json.title || '',
@@ -26,13 +44,13 @@
 
   // Strategy 2: Heuristic extraction (resilient to hashed CSS classes)
   function tryHeuristic() {
-    let title = '';
-    let company = '';
-    let location = '';
-    let description = '';
+    var title = '';
+    var company = '';
+    var location = '';
+    var description = '';
 
     // Company: first visible link pointing to /company/ with text
-    const companyLink = [...document.querySelectorAll('a[href*="/company/"]')]
+    var companyLink = [...document.querySelectorAll('a[href*="/company/"]')]
       .find(function (a) {
         var t = a.textContent.trim();
         return t.length > 1 && t.length < 80;
@@ -41,14 +59,36 @@
       company = window.cleanText(companyLink.textContent);
     }
 
-    // Title: extract from document.title
-    // LinkedIn formats: "(N) Job Title | Company | LinkedIn"
-    if (document.title) {
+    // Title: try heading near the company link first (works on both detail and listing panels)
+    if (companyLink) {
+      var container = companyLink.closest('div');
+      for (var i = 0; i < 3 && container; i++) container = container.parentElement;
+      if (container) {
+        var heading = container.querySelector('h1, h2');
+        // Verify the heading appears before the company link in DOM order
+        if (heading && (companyLink.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_PRECEDING)) {
+          var headingText = window.cleanText(heading.textContent);
+          if (headingText.length > 1 && headingText.length < 120) {
+            title = headingText;
+          }
+        }
+      }
+    }
+
+    // Fallback: extract from document.title, filtering generic titles
+    if (!title && document.title) {
       var raw = document.title
         .replace(/^\(\d+\)\s*/, '')          // remove notification count
         .replace(/\s*[|]\s*LinkedIn\s*$/i, ''); // remove "| LinkedIn"
       var parts = raw.split(/\s*[|–]\s*/);
-      title = window.cleanText(parts[0]);
+      var candidate = window.cleanText(parts[0]);
+      // Check if the title is generic
+      var isGeneric = GENERIC_TITLES.some(function (g) {
+        return candidate.toLowerCase() === g;
+      });
+      if (!isGeneric && candidate.length > 1) {
+        title = candidate;
+      }
       // If company wasn't found via link, use second part
       if (!company && parts.length > 1) {
         company = window.cleanText(parts[1]);
@@ -60,11 +100,11 @@
     if (anchor) {
       var section = anchor.closest('div');
       // Walk up a few levels to get the job info container
-      for (var i = 0; i < 4 && section; i++) section = section.parentElement;
+      for (var j = 0; j < 4 && section; j++) section = section.parentElement;
       if (section) {
         var paragraphs = section.querySelectorAll('p');
-        for (var j = 0; j < paragraphs.length; j++) {
-          var text = window.cleanText(paragraphs[j].textContent);
+        for (var k = 0; k < paragraphs.length; k++) {
+          var text = window.cleanText(paragraphs[k].textContent);
           if (text.includes('\u00B7') && text.length < 200) {
             location = text.split('\u00B7')[0].trim();
             break;
@@ -75,11 +115,11 @@
 
     // Description: content after "À propos de l'offre" / "About the job" heading
     var headings = document.querySelectorAll('h2');
-    for (var k = 0; k < headings.length; k++) {
-      var hText = headings[k].textContent.toLowerCase();
+    for (var m = 0; m < headings.length; m++) {
+      var hText = headings[m].textContent.toLowerCase();
       if (hText.includes('propos de l') || hText.includes('about the job')) {
-        var descEl = headings[k].nextElementSibling;
-        if (!descEl) descEl = headings[k].parentElement?.nextElementSibling;
+        var descEl = headings[m].nextElementSibling;
+        if (!descEl) descEl = headings[m].parentElement?.nextElementSibling;
         if (descEl) {
           description = window.cleanText(descEl.textContent);
         }
@@ -92,6 +132,7 @@
 
   window.scrapeLinkedIn = function () {
     var failedFields = [];
+    var canonicalUrl = buildCanonicalUrl();
 
     // Strategy 1: JSON-LD
     var jsonLd = tryJsonLd();
@@ -101,7 +142,7 @@
         company: window.cleanText(jsonLd.company),
         location: window.cleanText(jsonLd.location),
         description: window.cleanText(jsonLd.description),
-        url: window.cleanUrl(window.location.href, ['currentJobId']),
+        url: canonicalUrl,
         source: 'linkedin',
       };
       window.logScrapingResult('LinkedIn', data, []);
@@ -119,7 +160,7 @@
         company: h.company,
         location: h.location,
         description: h.description,
-        url: window.cleanUrl(window.location.href, ['currentJobId']),
+        url: canonicalUrl,
         source: 'linkedin',
       };
       window.logScrapingResult('LinkedIn', data2, hFailedFields);
@@ -151,7 +192,7 @@
           company: h.company || '',
           location: h.location || '',
           description: h.description || '',
-          url: window.cleanUrl(window.location.href, ['currentJobId']),
+          url: canonicalUrl,
           source: 'linkedin',
         };
         window.logScrapingResult('LinkedIn', data3, failedFields);
@@ -180,7 +221,7 @@
       company: company.value || h.company || '',
       location: loc.value || h.location || '',
       description: desc.value || h.description || '',
-      url: window.cleanUrl(window.location.href, ['currentJobId']),
+      url: canonicalUrl,
       source: 'linkedin',
     };
 
