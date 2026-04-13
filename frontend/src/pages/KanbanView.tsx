@@ -11,10 +11,13 @@ import {
   type DragEndEvent,
 } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
+import { Eye, EyeOff } from "lucide-react";
 import { useApplicationStore } from "@/stores/applicationStore";
-import { STATUS_ORDER } from "@/lib/constants";
+import { KANBAN_COLUMNS } from "@/lib/constants";
 import { KanbanColumn } from "@/components/applications/KanbanColumn";
 import { KanbanCard } from "@/components/applications/KanbanCard";
+import { ApplicationModal } from "@/components/applications/ApplicationModal";
+import { DeleteConfirmModal } from "@/components/applications/DeleteConfirmModal";
 import {
   Dialog,
   DialogContent,
@@ -40,6 +43,9 @@ export default function KanbanView() {
     app: Application;
     newStatus: ApplicationStatus;
   } | null>(null);
+  const [showRejected, setShowRejected] = useState(false);
+  const [editApp, setEditApp] = useState<Application | null>(null);
+  const [deleteApp, setDeleteApp] = useState<Application | null>(null);
 
   useEffect(() => {
     fetchApplications({ per_page: 100 });
@@ -52,12 +58,23 @@ export default function KanbanView() {
     }),
   );
 
-  // Group applications by status
+  // Group applications by kanban columns (merge follow_up into applied)
   const columns = useMemo(
-    () => STATUS_ORDER.map((status) => ({
-      status,
-      items: applications.filter((app) => app.status === status),
-    })),
+    () =>
+      KANBAN_COLUMNS.map((status) => ({
+        status,
+        items: applications.filter((app) =>
+          status === "applied"
+            ? app.status === "applied" || app.status === "follow_up"
+            : app.status === status,
+        ),
+      })),
+    [applications],
+  );
+
+  // Rejected apps separated
+  const rejectedApps = useMemo(
+    () => applications.filter((app) => app.status === "rejected"),
     [applications],
   );
 
@@ -70,7 +87,7 @@ export default function KanbanView() {
   );
 
   const performStatusUpdate = useCallback(
-    async (appId: number, newStatus: string) => {
+    async (appId: number, newStatus: ApplicationStatus) => {
       try {
         await updateStatus(appId, newStatus);
       } catch {
@@ -89,9 +106,14 @@ export default function KanbanView() {
       const app = applications.find((a) => a.id === active.id);
       if (!app) return;
 
-      // The over.id is the column status
-      const newStatus = over.id as string;
-      if (!STATUS_ORDER.includes(newStatus as ApplicationStatus)) return;
+      const newStatus = over.id as ApplicationStatus;
+      // Accept kanban columns + rejected (when visible)
+      if (!KANBAN_COLUMNS.includes(newStatus) && newStatus !== "rejected")
+        return;
+
+      if (app.status === newStatus) return;
+      // If follow_up app dropped on "applied" column, no change needed
+      if (app.status === "follow_up" && newStatus === "applied") return;
 
       // Confirm if dropping to "rejected"
       if (newStatus === "rejected") {
@@ -114,7 +136,7 @@ export default function KanbanView() {
   if (loading && applications.length === 0) {
     return (
       <div className="flex gap-4 overflow-x-auto pb-4">
-        {STATUS_ORDER.map((status) => (
+        {KANBAN_COLUMNS.map((status) => (
           <div key={status} className="w-72 shrink-0 space-y-3">
             <Skeleton className="h-8 w-full" />
             <Skeleton className="h-24 w-full" />
@@ -127,6 +149,25 @@ export default function KanbanView() {
 
   return (
     <>
+      {/* Toggle rejected button */}
+      <div className="mb-3 flex items-center justify-end">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setShowRejected((v) => !v)}
+          className="gap-1.5 text-muted-foreground"
+        >
+          {showRejected ? (
+            <EyeOff className="h-4 w-4" />
+          ) : (
+            <Eye className="h-4 w-4" />
+          )}
+          {showRejected
+            ? t.kanban.hideRejected
+            : `${t.kanban.showRejected} (${t.kanban.rejectedCount(rejectedApps.length)})`}
+        </Button>
+      </div>
+
       <DndContext
         sensors={sensors}
         collisionDetection={closestCorners}
@@ -135,8 +176,22 @@ export default function KanbanView() {
       >
         <div className="flex gap-4 overflow-x-auto pb-4">
           {columns.map(({ status, items }) => (
-            <KanbanColumn key={status} status={status} items={items} />
+            <KanbanColumn
+              key={status}
+              status={status}
+              items={items}
+              onEditApp={setEditApp}
+              onDeleteApp={setDeleteApp}
+            />
           ))}
+          {showRejected && (
+            <KanbanColumn
+              status="rejected"
+              items={rejectedApps}
+              onEditApp={setEditApp}
+              onDeleteApp={setDeleteApp}
+            />
+          )}
         </div>
 
         <DragOverlay>
@@ -153,7 +208,11 @@ export default function KanbanView() {
           <DialogHeader>
             <DialogTitle>{t.kanban.confirmRejectTitle}</DialogTitle>
             <DialogDescription>
-              {confirmDrop && t.kanban.confirmRejectDescription(confirmDrop.app.title, confirmDrop.app.company)}
+              {confirmDrop &&
+                t.kanban.confirmRejectDescription(
+                  confirmDrop.app.title,
+                  confirmDrop.app.company,
+                )}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2">
@@ -166,6 +225,22 @@ export default function KanbanView() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Edit modal (quick action) */}
+      <ApplicationModal
+        open={!!editApp}
+        onClose={() => setEditApp(null)}
+        application={editApp ?? undefined}
+      />
+
+      {/* Delete modal (quick action) */}
+      {deleteApp && (
+        <DeleteConfirmModal
+          open
+          onClose={() => setDeleteApp(null)}
+          application={deleteApp}
+        />
+      )}
     </>
   );
 }

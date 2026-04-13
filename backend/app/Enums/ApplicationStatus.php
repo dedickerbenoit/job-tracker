@@ -14,12 +14,12 @@ enum ApplicationStatus: string
     public function label(): string
     {
         return match ($this) {
-            self::ToApply => 'A postuler',
-            self::Applied => 'Postule',
+            self::ToApply => 'À postuler',
+            self::Applied => 'Postulé',
             self::FollowUp => 'Relance',
             self::Interview => 'Entretien',
-            self::Offer => 'Offre recue',
-            self::Rejected => 'Refuse',
+            self::Offer => 'Offre reçue',
+            self::Rejected => 'Refusé',
         };
     }
 }
