@@ -29,10 +29,12 @@ class ApplicationObserver
             $event->user_id = $application->user_id;
             $event->application_id = $application->id;
             $event->type = ApplicationEventType::StatusChanged;
-            $event->description = "Statut change de '{$original['status']}' a '{$changes['status']}'";
+            $oldStatus = $original['status'] instanceof \App\Enums\ApplicationStatus ? $original['status']->value : $original['status'];
+            $newStatus = $changes['status'] instanceof \App\Enums\ApplicationStatus ? $changes['status']->value : $changes['status'];
+            $event->description = "Statut change de '{$oldStatus}' a '{$newStatus}'";
             $event->metadata = [
-                'old_status' => $original['status'],
-                'new_status' => $changes['status'],
+                'old_status' => $oldStatus,
+                'new_status' => $newStatus,
             ];
             $event->save();
         }
