@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Models\User;
+use App\Models\UserConsent;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -22,6 +23,18 @@ class AuthController extends Controller
             'email' => $validated['email'],
             'password' => $validated['password'],
         ]);
+
+        // Record RGPD consents
+        $now = now();
+        foreach (['terms', 'privacy'] as $type) {
+            UserConsent::create([
+                'user_id' => $user->id,
+                'consent_type' => $type,
+                'consented_at' => $now,
+                'ip_address' => $request->ip(),
+                'user_agent' => mb_substr((string) $request->userAgent(), 0, 500),
+            ]);
+        }
 
         // Support both SPA mode (session cookies) and token mode (Chrome extension)
         // If request wants a token (X-Request-Token header), return a token
