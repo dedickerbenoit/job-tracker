@@ -2,7 +2,7 @@
 (function () {
   'use strict';
 
-  window.scrapeHelloWork = function () {
+  window.defineGlobal('scrapeHelloWork', function () {
     const failedFields = [];
 
     // Prioritize schema.org microdata selectors
@@ -53,5 +53,5 @@
 
     window.logScrapingResult('HelloWork', data, failedFields);
     return data;
-  };
+  });
 })();

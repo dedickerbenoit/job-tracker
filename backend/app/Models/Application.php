@@ -37,6 +37,8 @@ class Application extends Model
     /** @use HasFactory<ApplicationFactory> */
     use HasFactory;
 
+    protected $guarded = ['id', 'user_id'];
+
     protected function casts(): array
     {
         return [

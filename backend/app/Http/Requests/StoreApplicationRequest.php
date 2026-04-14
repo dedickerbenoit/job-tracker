@@ -21,10 +21,10 @@ class StoreApplicationRequest extends FormRequest
             'company' => ['required', 'string', 'max:255'],
             'location' => ['required', 'string', 'max:255'],
             'url' => ['required', 'url', 'max:2048'],
-            'description' => ['nullable', 'string'],
+            'description' => ['nullable', 'string', 'max:50000'],
             'source' => ['required', Rule::enum(ApplicationSource::class)],
             'status' => ['sometimes', Rule::enum(ApplicationStatus::class)],
-            'notes' => ['nullable', 'string'],
+            'notes' => ['nullable', 'string', 'max:10000'],
             'applied_at' => ['nullable', 'date'],
         ];
     }

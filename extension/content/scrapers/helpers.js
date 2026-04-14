@@ -10,7 +10,19 @@
    * @param {string} property - Property to extract (default: 'textContent')
    * @returns {{ value: string|null, selector: string|null }}
    */
-  window.extractField = function (selectors, property = 'textContent') {
+  function defineGlobal(name, fn) {
+    Object.defineProperty(window, name, {
+      value: fn,
+      writable: false,
+      configurable: false,
+      enumerable: false,
+    });
+  }
+
+  // Expose defineGlobal for scrapers loaded after helpers.js
+  defineGlobal('defineGlobal', defineGlobal);
+
+  defineGlobal('extractField', function (selectors, property = 'textContent') {
     for (const selector of selectors) {
       try {
         const el = document.querySelector(selector);
@@ -24,22 +36,22 @@
       }
     }
     return { value: null, selector: null };
-  };
+  });
 
   /**
    * Clean whitespace: trim + collapse multiple spaces/newlines.
    */
-  window.cleanText = function (text) {
+  defineGlobal('cleanText', function (text) {
     if (!text) return '';
     return text.replace(/\s+/g, ' ').trim();
-  };
+  });
 
   /**
    * Clean a URL by removing tracking parameters.
    * @param {string} url - The URL to clean
    * @param {string[]} paramsToKeep - Query params to preserve (empty = remove all)
    */
-  window.cleanUrl = function (url, paramsToKeep = []) {
+  defineGlobal('cleanUrl', function (url, paramsToKeep = []) {
     try {
       const parsed = new URL(url);
       if (paramsToKeep.length === 0) {
@@ -58,12 +70,12 @@
     } catch (e) {
       return url;
     }
-  };
+  });
 
   /**
    * Log scraping results for debugging.
    */
-  window.logScrapingResult = function (site, data, failedFields) {
+  defineGlobal('logScrapingResult', function (site, data, failedFields) {
     console.group(`[JobTracker] ${site} scraping result`);
     if (data) {
       console.log('Data:', data);
@@ -74,5 +86,5 @@
       console.warn('Failed fields:', failedFields);
     }
     console.groupEnd();
-  };
+  });
 })();
