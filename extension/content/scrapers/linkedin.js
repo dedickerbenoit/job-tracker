@@ -130,7 +130,7 @@
     return { title: title, company: company, location: location, description: description };
   }
 
-  window.scrapeLinkedIn = function () {
+  window.defineGlobal('scrapeLinkedIn', function () {
     var failedFields = [];
     var canonicalUrl = buildCanonicalUrl();
 
@@ -227,5 +227,5 @@
 
     window.logScrapingResult('LinkedIn', data4, failedFields);
     return data4;
-  };
+  });
 })();
