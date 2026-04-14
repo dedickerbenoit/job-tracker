@@ -6,6 +6,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
@@ -26,11 +27,12 @@ use Laravel\Sanctum\HasApiTokens;
  * @property Carbon $updated_at
  * @property-read Collection<int, Application> $applications
  * @property-read Collection<int, ApplicationEvent> $applicationEvents
+ * @property-read Collection<int, UserConsent> $consents
  */
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     protected $fillable = ['first_name', 'last_name', 'email', 'password'];
 
@@ -52,5 +54,10 @@ class User extends Authenticatable
     public function applicationEvents(): HasMany
     {
         return $this->hasMany(ApplicationEvent::class);
+    }
+
+    public function consents(): HasMany
+    {
+        return $this->hasMany(UserConsent::class);
     }
 }
