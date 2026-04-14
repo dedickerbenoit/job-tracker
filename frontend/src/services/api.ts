@@ -6,6 +6,7 @@ import type {
   AuthResponse,
   CreateApplicationData,
   CreateApplicationResponse,
+  DataExport,
   LoginData,
   PaginatedResponse,
   RegisterData,
@@ -104,6 +105,18 @@ export async function getCsrfCookie(): Promise<void> {
   const csrfUrl = baseURL.replace('/api', '') + '/sanctum/csrf-cookie';
   await axios.get(csrfUrl, { withCredentials: true });
 }
+
+// ── Account API (RGPD) ──
+
+export const accountApi = {
+  exportData(): Promise<DataExport> {
+    return api.get('/account/data-export').then((r) => r.data.data ?? r.data);
+  },
+
+  deleteAccount(): Promise<void> {
+    return api.delete('/account').then(() => undefined);
+  },
+};
 
 // ── Auth API ──
 
