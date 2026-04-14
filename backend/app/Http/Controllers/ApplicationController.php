@@ -19,6 +19,15 @@ class ApplicationController extends Controller
     {
         $this->authorize('viewAny', Application::class);
 
+        $dateRules = [
+            'from_date' => ['nullable', 'date', 'date_format:Y-m-d'],
+            'to_date' => ['nullable', 'date', 'date_format:Y-m-d'],
+        ];
+        if ($request->filled('from_date')) {
+            $dateRules['to_date'][] = 'after_or_equal:from_date';
+        }
+        $request->validate($dateRules);
+
         $query = $request->user()->applications();
 
         if ($request->filled('status')) {
@@ -160,6 +169,17 @@ class ApplicationController extends Controller
 
     public function timeline(Request $request): AnonymousResourceCollection
     {
+        $this->authorize('viewAny', Application::class);
+
+        $dateRules = [
+            'from_date' => ['nullable', 'date', 'date_format:Y-m-d'],
+            'to_date' => ['nullable', 'date', 'date_format:Y-m-d'],
+        ];
+        if ($request->filled('from_date')) {
+            $dateRules['to_date'][] = 'after_or_equal:from_date';
+        }
+        $request->validate($dateRules);
+
         $query = $request->user()->applicationEvents();
 
         if ($request->filled('application_id')) {
@@ -186,6 +206,8 @@ class ApplicationController extends Controller
 
     public function stats(Request $request): JsonResponse
     {
+        $this->authorize('viewAny', Application::class);
+
         $user = $request->user();
 
         $statusCounts = $user->applications()

@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -22,14 +23,29 @@ class AuthController extends Controller
             'password' => $validated['password'],
         ]);
 
-        $token = $user->createToken('auth')->plainTextToken;
+        // Support both SPA mode (session cookies) and token mode (Chrome extension)
+        // If request wants a token (X-Request-Token header), return a token
+        // Otherwise, use session authentication (SPA mode)
+        $wantsToken = $request->header('X-Request-Token') === 'true';
 
-        return response()->json([
-            'data' => [
-                'user' => $user->only('id', 'first_name', 'last_name', 'email', 'avatar_url'),
-                'token' => $token,
-            ],
-        ], 201);
+        Log::info('User registered', [
+            'user_id' => $user->id,
+            'ip' => $request->ip(),
+            'auth_mode' => $wantsToken ? 'token' : 'session',
+        ]);
+
+        $data = [
+            'user' => $user->only('id', 'first_name', 'last_name', 'email', 'avatar_url'),
+        ];
+
+        if ($wantsToken) {
+            $data['token'] = $user->createToken('auth')->plainTextToken;
+        } else {
+            // Log in the user for session-based auth
+            Auth::login($user);
+        }
+
+        return response()->json(['data' => $data], 201);
     }
 
     public function login(LoginRequest $request): JsonResponse
@@ -37,6 +53,8 @@ class AuthController extends Controller
         $validated = $request->validated();
 
         if (!Auth::attempt($validated)) {
+            Log::warning('Failed login attempt', ['email' => $validated['email'], 'ip' => $request->ip()]);
+
             return response()->json([
                 'message' => 'Identifiants invalides',
                 'errors' => ['email' => ['Identifiants invalides']],
@@ -44,19 +62,44 @@ class AuthController extends Controller
         }
 
         $user = Auth::user();
-        $token = $user->createToken('auth')->plainTextToken;
 
-        return response()->json([
-            'data' => [
-                'user' => $user->only('id', 'first_name', 'last_name', 'email', 'avatar_url'),
-                'token' => $token,
-            ],
+        // Support both SPA mode (session cookies) and token mode (Chrome extension)
+        // If request wants a token (X-Request-Token header), return a token
+        // Otherwise, use session authentication (SPA mode)
+        $wantsToken = $request->header('X-Request-Token') === 'true';
+
+        Log::info('Successful login', [
+            'user_id' => $user->id,
+            'ip' => $request->ip(),
+            'auth_mode' => $wantsToken ? 'token' : 'session',
         ]);
+
+        $data = [
+            'user' => $user->only('id', 'first_name', 'last_name', 'email', 'avatar_url'),
+        ];
+
+        if ($wantsToken) {
+            $data['token'] = $user->createToken('auth')->plainTextToken;
+        }
+        // Session is already established by Auth::attempt()
+
+        return response()->json(['data' => $data]);
     }
 
     public function logout(Request $request): JsonResponse
     {
-        $request->user()->currentAccessToken()->delete();
+        Log::info('User logout', ['user_id' => $request->user()->id, 'ip' => $request->ip()]);
+
+        // Support both SPA mode (session) and token mode (Chrome extension)
+        // If authenticated via token, delete the token
+        // If authenticated via session, logout from session
+        if ($request->user()->currentAccessToken()) {
+            $request->user()->currentAccessToken()->delete();
+        } else {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
 
         return response()->json(null, 204);
     }
