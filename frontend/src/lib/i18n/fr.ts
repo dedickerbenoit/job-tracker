@@ -216,6 +216,38 @@ const fr = {
     },
   },
 
+  rgpd: {
+    myAccount: 'Mon compte',
+    personalInfo: 'Informations personnelles',
+    firstName: 'Prénom',
+    lastName: 'Nom',
+    email: 'Adresse e-mail',
+    memberSince: 'Membre depuis le',
+    exportData: 'Exporter mes données',
+    exportDescription: 'Téléchargez une copie de toutes vos données personnelles (profil, candidatures, événements) au format JSON.',
+    exporting: 'Export en cours...',
+    exportSuccess: 'Vos données ont été téléchargées.',
+    exportError: "Erreur lors de l'export de vos données.",
+    deleteAccount: 'Supprimer mon compte',
+    deleteDescription: 'Cette action est irréversible. Toutes vos données seront supprimées après un délai de 30 jours.',
+    deleteConfirmTitle: 'Supprimer votre compte ?',
+    deleteConfirmDescription: 'Votre compte sera désactivé immédiatement et toutes vos données seront définitivement supprimées après 30 jours. Cette action est irréversible.',
+    deleteConfirm: 'Oui, supprimer mon compte',
+    deleting: 'Suppression...',
+    deleteSuccess: 'Votre compte a été supprimé.',
+    deleteError: 'Erreur lors de la suppression du compte.',
+    acceptTerms: "J'accepte les conditions générales d'utilisation",
+    acceptPrivacy: "J'accepte la politique de confidentialité",
+    termsRequired: "Vous devez accepter les conditions générales d'utilisation.",
+    privacyRequired: 'Vous devez accepter la politique de confidentialité.',
+  },
+
+  footer: {
+    privacy: 'Politique de confidentialité',
+    legal: 'Mentions légales',
+    copyright: `© ${new Date().getFullYear()} JobTracker. Tous droits réservés.`,
+  },
+
   a11y: {
     addApplication: 'Ajouter une candidature',
   },

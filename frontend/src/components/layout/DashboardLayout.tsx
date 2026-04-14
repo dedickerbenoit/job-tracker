@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
 import { Sidebar } from "@/components/layout/Sidebar";
+import { Footer } from "@/components/layout/Footer";
 import { FloatingAddButton } from "@/components/applications/FloatingAddButton";
 import { ApplicationModal } from "@/components/applications/ApplicationModal";
 import { ApplicationDetailModal } from "@/components/applications/ApplicationDetailModal";
@@ -30,6 +31,8 @@ export function DashboardLayout() {
           <Outlet />
         </main>
       </div>
+
+      <Footer />
 
       <FloatingAddButton onClick={() => setAddModalOpen(true)} />
 

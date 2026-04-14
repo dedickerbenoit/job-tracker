@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { Menu, PanelLeftClose, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { t } from "@/lib/i18n";
@@ -17,15 +18,23 @@ interface HeaderProps {
 }
 
 export function Header({ sidebarCollapsed, onToggleSidebar }: HeaderProps) {
+  const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
-  const userName = user ? `${user.first_name} ${user.last_name}` : t.header.defaultUser;
+  const userName = user
+    ? `${user.first_name} ${user.last_name}`
+    : t.header.defaultUser;
 
   return (
     <header className="flex h-14 items-center justify-between border-b bg-background px-4">
       {/* Left: sidebar toggle + logo */}
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon-sm" onClick={onToggleSidebar} aria-label={sidebarCollapsed ? t.header.openMenu : t.header.closeMenu}>
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          onClick={onToggleSidebar}
+          aria-label={sidebarCollapsed ? t.header.openMenu : t.header.closeMenu}
+        >
           {sidebarCollapsed ? (
             <Menu className="h-5 w-5" />
           ) : (
@@ -47,7 +56,7 @@ export function Header({ sidebarCollapsed, onToggleSidebar }: HeaderProps) {
           <span className="hidden sm:inline">{userName}</span>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={() => navigate("/dashboard/account")}>
             <User className="mr-2 h-4 w-4" />
             {t.header.profile}
           </DropdownMenuItem>
