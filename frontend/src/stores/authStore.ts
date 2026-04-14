@@ -8,7 +8,6 @@ type AuthModalTab = 'login' | 'register';
 
 interface AuthState {
   user: User | null;
-  token: string | null;
   loading: boolean;
   isAuthenticated: boolean;
   showAuthModal: boolean;
@@ -25,40 +24,35 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
-  token: localStorage.getItem('auth_token'),
   loading: true,
   isAuthenticated: false,
   showAuthModal: false,
   authModalTab: 'login',
 
   initialize: async () => {
-    const token = localStorage.getItem('auth_token');
-    if (!token) {
-      set({ loading: false, isAuthenticated: false, user: null, token: null });
-      return;
-    }
+    // Check authentication by calling /auth/me
+    // Sanctum will validate the session cookie
     try {
       const user = await authApi.me();
-      set({ user, token, isAuthenticated: true, loading: false });
+      set({ user, isAuthenticated: true, loading: false });
     } catch {
-      localStorage.removeItem('auth_token');
-      set({ user: null, token: null, isAuthenticated: false, loading: false });
+      set({ user: null, isAuthenticated: false, loading: false });
     }
   },
 
   login: async (data) => {
     const response = await authApi.login(data);
-    const { user, token } = response.data;
-    localStorage.setItem('auth_token', token);
-    set({ user, token, isAuthenticated: true, showAuthModal: false });
+    const { user } = response.data;
+    // Session cookie is set automatically by Sanctum
+    set({ user, isAuthenticated: true, showAuthModal: false });
     toast.success(t.auth.welcomeBack);
   },
 
   register: async (data) => {
     const response = await authApi.register(data);
-    const { user, token } = response.data;
-    localStorage.setItem('auth_token', token);
-    set({ user, token, isAuthenticated: true, showAuthModal: false });
+    const { user } = response.data;
+    // Session cookie is set automatically by Sanctum
+    set({ user, isAuthenticated: true, showAuthModal: false });
     toast.success(t.auth.accountCreated);
   },
 
@@ -66,10 +60,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       await authApi.logout();
     } catch {
-      // Ignore error — token may already be invalid
+      // Ignore error — session may already be invalid
     }
-    localStorage.removeItem('auth_token');
-    set({ user: null, token: null, isAuthenticated: false });
+    set({ user: null, isAuthenticated: false });
     toast.success(t.auth.loggedOut);
   },
 
@@ -82,7 +75,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   clearAuth: () => {
-    localStorage.removeItem('auth_token');
-    set({ user: null, token: null, isAuthenticated: false });
+    set({ user: null, isAuthenticated: false });
   },
 }));
