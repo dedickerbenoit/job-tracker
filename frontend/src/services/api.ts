@@ -21,15 +21,8 @@ import type {
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
   headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-});
-
-// Auth interceptor — injects token from localStorage
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('auth_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
+  withCredentials: true, // Enable cookies for Sanctum SPA mode
+  withXSRFToken: true, // Automatically include XSRF token from cookies
 });
 
 // Error interceptor — clear auth on 401 and open login modal
@@ -98,14 +91,30 @@ export const applicationApi = {
   },
 };
 
+// ── CSRF Cookie Helper ──
+
+/**
+ * Retrieves CSRF cookie from backend.
+ * Must be called before any mutating request (login, register, etc.)
+ * when using Sanctum SPA mode with cookies.
+ */
+export async function getCsrfCookie(): Promise<void> {
+  const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+  // Sanctum CSRF endpoint is at /sanctum/csrf-cookie (not /api/sanctum/csrf-cookie)
+  const csrfUrl = baseURL.replace('/api', '') + '/sanctum/csrf-cookie';
+  await axios.get(csrfUrl, { withCredentials: true });
+}
+
 // ── Auth API ──
 
 export const authApi = {
-  login(data: LoginData): Promise<AuthResponse> {
+  async login(data: LoginData): Promise<AuthResponse> {
+    await getCsrfCookie();
     return api.post('/auth/login', data).then((r) => r.data);
   },
 
-  register(data: RegisterData): Promise<AuthResponse> {
+  async register(data: RegisterData): Promise<AuthResponse> {
+    await getCsrfCookie();
     return api.post('/auth/register', data).then((r) => r.data);
   },
 

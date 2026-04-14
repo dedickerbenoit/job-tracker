@@ -22,7 +22,7 @@ export interface RegisterData {
 }
 
 export interface AuthResponse {
-  data: { user: User; token: string };
+  data: { user: User; token?: string };
 }
 
 // ── Enums (string literals matching backend) ──
