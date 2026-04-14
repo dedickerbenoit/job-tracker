@@ -26,7 +26,7 @@
     return window.cleanUrl(window.location.href, ['jk']);
   }
 
-  window.scrapeIndeed = function () {
+  window.defineGlobal('scrapeIndeed', function () {
     const failedFields = [];
     const canonicalUrl = buildCanonicalUrl();
 
@@ -81,5 +81,5 @@
 
     window.logScrapingResult('Indeed', data, failedFields);
     return data;
-  };
+  });
 })();
