@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
@@ -24,4 +25,9 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
         ->name('applications.update-status');
 
     Route::apiResource('applications', ApplicationController::class);
+
+    // RGPD — Account management
+    Route::get('account/data-export', [AccountController::class, 'exportData'])
+        ->middleware('throttle:3,1');
+    Route::delete('account', [AccountController::class, 'deleteAccount']);
 });
