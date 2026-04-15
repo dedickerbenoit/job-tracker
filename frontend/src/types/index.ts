@@ -19,6 +19,8 @@ export interface RegisterData {
   email: string;
   password: string;
   password_confirmation: string;
+  accept_terms: boolean;
+  accept_privacy: boolean;
 }
 
 export interface AuthResponse {
@@ -127,3 +129,25 @@ export interface CreateApplicationData {
 }
 
 export type UpdateApplicationData = Partial<CreateApplicationData>;
+
+// ── RGPD ──
+
+export interface DataExport {
+  profile: {
+    id: number;
+    first_name: string;
+    last_name: string;
+    email: string;
+    created_at: string;
+    updated_at: string;
+  };
+  applications: (Application & { events: ApplicationEvent[] })[];
+  consents: {
+    id: number;
+    consent_type: string;
+    consented_at: string;
+    ip_address: string | null;
+    user_agent: string | null;
+    revoked_at: string | null;
+  }[];
+}

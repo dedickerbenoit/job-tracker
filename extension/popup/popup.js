@@ -1,48 +1,55 @@
-import { getSettings, updateSettings } from '../utils/settings.js';
-import { apiRequest, apiLogin, apiLogout, apiGetMe, getAuthToken } from '../utils/api.js';
+import { getSettings, updateSettings } from "../utils/settings.js";
+import {
+  apiRequest,
+  apiLogin,
+  apiLogout,
+  apiGetMe,
+  getAuthToken,
+} from "../utils/api.js";
 
 // --- DOM references ---
 const elements = {
-  sectionAuth: document.getElementById('section-auth'),
-  sectionJob: document.getElementById('section-job'),
-  sectionManual: document.getElementById('section-manual'),
-  sectionSettings: document.getElementById('section-settings'),
-  statusIcon: document.getElementById('status-icon'),
-  statusText: document.getElementById('status-text'),
-  jobForm: document.getElementById('job-form'),
-  authForm: document.getElementById('auth-form'),
-  authEmail: document.getElementById('auth-email'),
-  authPassword: document.getElementById('auth-password'),
-  authError: document.getElementById('auth-error'),
-  btnLogin: document.getElementById('btn-login'),
-  btnLogout: document.getElementById('btn-logout'),
-  btnManual: document.getElementById('btn-manual'),
-  btnSettings: document.getElementById('btn-settings'),
-  btnSettingsBack: document.getElementById('btn-settings-back'),
-  btnSubmit: document.getElementById('btn-submit'),
-  userInfo: document.getElementById('user-info'),
-  userName: document.getElementById('user-name'),
-  toast: document.getElementById('toast'),
-  fieldTitle: document.getElementById('field-title'),
-  fieldCompany: document.getElementById('field-company'),
-  fieldLocation: document.getElementById('field-location'),
-  fieldUrl: document.getElementById('field-url'),
-  fieldSource: document.getElementById('field-source'),
-  fieldDescription: document.getElementById('field-description'),
-  fieldNotes: document.getElementById('field-notes'),
-  fieldStatus: document.getElementById('field-status'),
-  settingLinkedin: document.getElementById('setting-linkedin'),
-  settingIndeed: document.getElementById('setting-indeed'),
-  settingHellowork: document.getElementById('setting-hellowork'),
+  sectionAuth: document.getElementById("section-auth"),
+  sectionJob: document.getElementById("section-job"),
+  sectionManual: document.getElementById("section-manual"),
+  sectionSettings: document.getElementById("section-settings"),
+  statusIcon: document.getElementById("status-icon"),
+  statusText: document.getElementById("status-text"),
+  jobForm: document.getElementById("job-form"),
+  authForm: document.getElementById("auth-form"),
+  authEmail: document.getElementById("auth-email"),
+  authPassword: document.getElementById("auth-password"),
+  authError: document.getElementById("auth-error"),
+  btnLogin: document.getElementById("btn-login"),
+  btnLogout: document.getElementById("btn-logout"),
+  btnManual: document.getElementById("btn-manual"),
+  btnScrape: document.getElementById("btn-scrape"),
+  btnSettings: document.getElementById("btn-settings"),
+  btnSettingsBack: document.getElementById("btn-settings-back"),
+  btnSubmit: document.getElementById("btn-submit"),
+  userInfo: document.getElementById("user-info"),
+  userName: document.getElementById("user-name"),
+  toast: document.getElementById("toast"),
+  fieldTitle: document.getElementById("field-title"),
+  fieldCompany: document.getElementById("field-company"),
+  fieldLocation: document.getElementById("field-location"),
+  fieldUrl: document.getElementById("field-url"),
+  fieldSource: document.getElementById("field-source"),
+  fieldDescription: document.getElementById("field-description"),
+  fieldNotes: document.getElementById("field-notes"),
+  fieldStatus: document.getElementById("field-status"),
+  settingLinkedin: document.getElementById("setting-linkedin"),
+  settingIndeed: document.getElementById("setting-indeed"),
+  settingHellowork: document.getElementById("setting-hellowork"),
 };
 
-let currentTabUrl = '';
+let currentTabUrl = "";
 let isAuthenticated = false;
 let hasSubmitted = false;
 
 // --- Init ---
 
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener("DOMContentLoaded", async () => {
   await checkAuth();
   await loadSettings();
   bindEvents();
@@ -68,27 +75,27 @@ async function checkAuth() {
 
 function setAuthenticated(user) {
   isAuthenticated = true;
-  elements.sectionAuth.classList.add('hidden');
-  elements.sectionJob.classList.remove('hidden');
-  elements.sectionManual.classList.remove('hidden');
-  elements.userInfo.classList.remove('hidden');
+  elements.sectionAuth.classList.add("hidden");
+  elements.sectionJob.classList.remove("hidden");
+  elements.sectionManual.classList.remove("hidden");
+  elements.userInfo.classList.remove("hidden");
   elements.userName.textContent = user.first_name || user.email;
   loadTabState();
 }
 
 function showAuthSection() {
   isAuthenticated = false;
-  elements.sectionAuth.classList.remove('hidden');
-  elements.sectionJob.classList.add('hidden');
-  elements.sectionManual.classList.add('hidden');
-  elements.userInfo.classList.add('hidden');
+  elements.sectionAuth.classList.remove("hidden");
+  elements.sectionJob.classList.add("hidden");
+  elements.sectionManual.classList.add("hidden");
+  elements.userInfo.classList.add("hidden");
 }
 
 async function handleLogin(e) {
   e.preventDefault();
-  elements.authError.classList.add('hidden');
+  elements.authError.classList.add("hidden");
   elements.btnLogin.disabled = true;
-  elements.btnLogin.textContent = 'Connexion...';
+  elements.btnLogin.textContent = "Connexion...";
 
   try {
     const result = await apiLogin(
@@ -97,20 +104,23 @@ async function handleLogin(e) {
     );
     const user = result?.data?.user || result?.user;
     if (!user) {
-      showToast('Erreur : profil non reçu', 'error');
+      showToast("Erreur : profil non reçu", "error");
       return;
     }
-    elements.authEmail.value = '';
-    elements.authPassword.value = '';
+    elements.authEmail.value = "";
+    elements.authPassword.value = "";
     setAuthenticated(user);
-    showToast('Connecté', 'success');
+    showToast("Connecté", "success");
   } catch (err) {
-    const message = err.data?.message || err.data?.errors?.email?.[0] || 'Identifiants invalides';
+    const message =
+      err.data?.message ||
+      err.data?.errors?.email?.[0] ||
+      "Identifiants invalides";
     elements.authError.textContent = message;
-    elements.authError.classList.remove('hidden');
+    elements.authError.classList.remove("hidden");
   } finally {
     elements.btnLogin.disabled = false;
-    elements.btnLogin.textContent = 'Se connecter';
+    elements.btnLogin.textContent = "Se connecter";
   }
 }
 
@@ -121,69 +131,107 @@ async function handleLogout() {
     // Ignore errors — token already cleared
   }
   showAuthSection();
-  showToast('Déconnecté', 'info');
+  showToast("Déconnecté", "info");
 }
 
 // --- Load current tab state from background ---
 
 async function loadTabState() {
   try {
-    const response = await chrome.runtime.sendMessage({ type: 'GET_CURRENT_TAB_STATE' });
-    currentTabUrl = response?.tabUrl || '';
+    const response = await chrome.runtime.sendMessage({
+      type: "GET_CURRENT_TAB_STATE",
+    });
+    currentTabUrl = response?.tabUrl || "";
 
     if (response?.state?.scrapedData) {
       showScrapedData(response.state.scrapedData);
+      elements.btnScrape.classList.add("hidden");
     } else if (response?.state?.detected) {
-      setStatus('detected', `Offre ${response.state.name} détectée, scraping en cours...`);
+      setStatus("detected", `Offre ${response.state.name} détectée`);
+      elements.btnScrape.classList.remove("hidden");
     } else {
-      setStatus('none', 'Aucune offre détectée sur cette page');
+      elements.btnScrape.classList.add("hidden");
+      setStatus("none", "Aucune offre détectée sur cette page");
     }
   } catch (e) {
-    setStatus('none', 'Impossible de communiquer avec l\'extension');
+    setStatus("none", "Impossible de communiquer avec l'extension");
   }
 }
 
 // --- UI update functions ---
 
 function setStatus(type, text) {
-  const icons = { detected: '●', success: '✓', none: '○' };
-  elements.statusIcon.textContent = icons[type] || '○';
+  const icons = { detected: "●", success: "✓", none: "○" };
+  elements.statusIcon.textContent = icons[type] || "○";
   elements.statusIcon.className = `status-icon ${type}`;
   elements.statusText.textContent = text;
 }
 
 function showScrapedData(data) {
-  setStatus('success', `Offre ${data.source} capturée`);
-  elements.fieldTitle.value = data.title || '';
-  elements.fieldCompany.value = data.company || '';
-  elements.fieldLocation.value = data.location || '';
-  elements.fieldUrl.value = data.url || '';
-  elements.fieldSource.value = data.source || 'other';
-  elements.fieldDescription.value = data.description || '';
-  elements.jobForm.classList.remove('hidden');
+  setStatus("success", `Offre ${data.source} capturée`);
+  elements.fieldTitle.value = data.title || "";
+  elements.fieldCompany.value = data.company || "";
+  elements.fieldLocation.value = data.location || "";
+  elements.fieldUrl.value = data.url || "";
+  elements.fieldSource.value = data.source || "other";
+  elements.fieldDescription.value = data.description || "";
+  elements.jobForm.classList.remove("hidden");
 }
 
 function showManualForm() {
-  setStatus('none', 'Saisie manuelle');
-  elements.fieldTitle.value = '';
-  elements.fieldCompany.value = '';
-  elements.fieldLocation.value = '';
+  setStatus("none", "Saisie manuelle");
+  elements.fieldTitle.value = "";
+  elements.fieldCompany.value = "";
+  elements.fieldLocation.value = "";
   elements.fieldUrl.value = currentTabUrl;
-  elements.fieldSource.value = 'other';
-  elements.fieldDescription.value = '';
-  elements.fieldNotes.value = '';
-  elements.jobForm.classList.remove('hidden');
-  elements.sectionManual.classList.add('hidden');
+  elements.fieldSource.value = "other";
+  elements.fieldDescription.value = "";
+  elements.fieldNotes.value = "";
+  elements.jobForm.classList.remove("hidden");
+  elements.sectionManual.classList.add("hidden");
   elements.fieldTitle.focus();
 }
 
-function showToast(message, type = 'info') {
+function showToast(message, type = "info") {
   elements.toast.textContent = message;
   elements.toast.className = `toast ${type}`;
-  elements.toast.classList.remove('hidden');
+  elements.toast.classList.remove("hidden");
   setTimeout(() => {
-    elements.toast.classList.add('hidden');
+    elements.toast.classList.add("hidden");
   }, 3000);
+}
+
+// --- User-initiated scrape (RGPD) ---
+
+async function handleScrape() {
+  elements.btnScrape.disabled = true;
+  elements.btnScrape.textContent = "Scraping...";
+  try {
+    await chrome.runtime.sendMessage({ type: "REQUEST_SCRAPE" });
+    // Wait for SCRAPED_DATA to come back via background → popup reload
+    // Poll for scraped data
+    let attempts = 0;
+    const poll = setInterval(async () => {
+      attempts++;
+      const response = await chrome.runtime.sendMessage({
+        type: "GET_CURRENT_TAB_STATE",
+      });
+      if (response?.state?.scrapedData) {
+        clearInterval(poll);
+        showScrapedData(response.state.scrapedData);
+        elements.btnScrape.classList.add("hidden");
+      } else if (attempts > 10) {
+        clearInterval(poll);
+        showToast("Impossible de scraper cette page", "error");
+        elements.btnScrape.disabled = false;
+        elements.btnScrape.textContent = "Scraper cette offre";
+      }
+    }, 800);
+  } catch (e) {
+    showToast("Erreur lors du scraping", "error");
+    elements.btnScrape.disabled = false;
+    elements.btnScrape.textContent = "Scraper cette offre";
+  }
 }
 
 // --- Form submit → API ---
@@ -193,12 +241,12 @@ async function handleSubmit(e) {
 
   // M3: Prevent duplicate submissions
   if (hasSubmitted) {
-    showToast('Candidature déjà sauvegardée', 'info');
+    showToast("Candidature déjà sauvegardée", "info");
     return;
   }
 
   elements.btnSubmit.disabled = true;
-  elements.btnSubmit.textContent = 'Envoi...';
+  elements.btnSubmit.textContent = "Envoi...";
 
   const data = {
     title: elements.fieldTitle.value,
@@ -212,31 +260,34 @@ async function handleSubmit(e) {
   };
 
   try {
-    await apiRequest('/applications', {
-      method: 'POST',
+    await apiRequest("/applications", {
+      method: "POST",
       body: JSON.stringify(data),
     });
 
     // Mark as submitted in background
     const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
     if (tabs[0]?.id) {
-      chrome.runtime.sendMessage({ type: 'MARK_AS_SUBMITTED', tabId: tabs[0].id });
+      chrome.runtime.sendMessage({
+        type: "MARK_AS_SUBMITTED",
+        tabId: tabs[0].id,
+      });
     }
 
     hasSubmitted = true;
-    showToast('Candidature sauvegardée !', 'success');
-    elements.btnSubmit.textContent = 'Sauvegardé ✓';
+    showToast("Candidature sauvegardée !", "success");
+    elements.btnSubmit.textContent = "Sauvegardé ✓";
     // M1: Form stays editable — only the submit button is disabled
   } catch (err) {
     if (err.status === 401) {
       showAuthSection();
-      showToast('Session expirée, reconnectez-vous', 'error');
+      showToast("Session expirée, reconnectez-vous", "error");
     } else {
-      const message = err.data?.message || 'Erreur lors de la sauvegarde';
-      showToast(message, 'error');
+      const message = err.data?.message || "Erreur lors de la sauvegarde";
+      showToast(message, "error");
     }
     elements.btnSubmit.disabled = false;
-    elements.btnSubmit.textContent = 'Sauvegarder';
+    elements.btnSubmit.textContent = "Sauvegarder";
   }
 }
 
@@ -257,34 +308,35 @@ async function saveSettings() {
       hellowork: elements.settingHellowork.checked,
     },
   });
-  showToast('Paramètres sauvegardés', 'success');
+  showToast("Paramètres sauvegardés", "success");
 }
 
 function toggleSettingsPanel() {
-  const isVisible = !elements.sectionSettings.classList.contains('hidden');
-  elements.sectionSettings.classList.toggle('hidden', isVisible);
+  const isVisible = !elements.sectionSettings.classList.contains("hidden");
+  elements.sectionSettings.classList.toggle("hidden", isVisible);
   if (isAuthenticated) {
-    elements.sectionJob.classList.toggle('hidden', !isVisible);
-    elements.sectionManual.classList.toggle('hidden', !isVisible);
+    elements.sectionJob.classList.toggle("hidden", !isVisible);
+    elements.sectionManual.classList.toggle("hidden", !isVisible);
   } else {
-    elements.sectionAuth.classList.toggle('hidden', !isVisible);
+    elements.sectionAuth.classList.toggle("hidden", !isVisible);
   }
 }
 
 // --- Events ---
 
 function bindEvents() {
-  elements.authForm.addEventListener('submit', handleLogin);
-  elements.btnLogout.addEventListener('click', handleLogout);
-  elements.btnManual.addEventListener('click', showManualForm);
-  elements.btnSettings.addEventListener('click', toggleSettingsPanel);
-  elements.btnSettingsBack.addEventListener('click', toggleSettingsPanel);
+  elements.authForm.addEventListener("submit", handleLogin);
+  elements.btnLogout.addEventListener("click", handleLogout);
+  elements.btnScrape.addEventListener("click", handleScrape);
+  elements.btnManual.addEventListener("click", showManualForm);
+  elements.btnSettings.addEventListener("click", toggleSettingsPanel);
+  elements.btnSettingsBack.addEventListener("click", toggleSettingsPanel);
 
   // Settings checkboxes auto-save
-  elements.settingLinkedin.addEventListener('change', saveSettings);
-  elements.settingIndeed.addEventListener('change', saveSettings);
-  elements.settingHellowork.addEventListener('change', saveSettings);
+  elements.settingLinkedin.addEventListener("change", saveSettings);
+  elements.settingIndeed.addEventListener("change", saveSettings);
+  elements.settingHellowork.addEventListener("change", saveSettings);
 
   // Form submit → API
-  elements.jobForm.addEventListener('submit', handleSubmit);
+  elements.jobForm.addEventListener("submit", handleSubmit);
 }

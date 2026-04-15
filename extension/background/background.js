@@ -1,17 +1,17 @@
-import { detectJobSite } from '../utils/detector.js';
-import { isSiteEnabled } from '../utils/settings.js';
+import { detectJobSite } from "../utils/detector.js";
+import { isSiteEnabled } from "../utils/settings.js";
 
 const currentTabStates = {};
 const pendingHandles = new Set();
 
 chrome.runtime.onInstalled.addListener(() => {
-  console.log('[JobTracker] Extension installed');
+  console.log("[JobTracker] Extension installed");
 });
 
 // --- Tab listeners ---
 
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-  if (changeInfo.url || changeInfo.status === 'complete') {
+  if (changeInfo.url || changeInfo.status === "complete") {
     const url = changeInfo.url || tab.url;
     if (url) await handleTabUrlChange(tabId, url);
   }
@@ -48,16 +48,20 @@ async function _handleTabUrlChangeInner(tabId, url) {
 
   if (!detection.detected) {
     currentTabStates[tabId] = { detected: false, url };
-    await setIcon(tabId, 'inactive');
-    await chrome.action.setBadgeText({ tabId, text: '' });
+    await setIcon(tabId, "inactive");
+    await chrome.action.setBadgeText({ tabId, text: "" });
     return;
   }
 
   const enabled = await isSiteEnabled(detection.site);
   if (!enabled) {
-    currentTabStates[tabId] = { detected: false, url, disabledSite: detection.site };
-    await setIcon(tabId, 'inactive');
-    await chrome.action.setBadgeText({ tabId, text: '' });
+    currentTabStates[tabId] = {
+      detected: false,
+      url,
+      disabledSite: detection.site,
+    };
+    await setIcon(tabId, "inactive");
+    await chrome.action.setBadgeText({ tabId, text: "" });
     return;
   }
 
@@ -71,20 +75,11 @@ async function _handleTabUrlChangeInner(tabId, url) {
     submitted: false,
   };
 
-  await setIcon(tabId, 'active');
-  await chrome.action.setBadgeText({ tabId, text: '!' });
-  await chrome.action.setBadgeBackgroundColor({ tabId, color: '#0073B1' });
+  await setIcon(tabId, "active");
+  await chrome.action.setBadgeText({ tabId, text: "!" });
+  await chrome.action.setBadgeBackgroundColor({ tabId, color: "#0073B1" });
 
-  // Ask content script to scrape
-  try {
-    await chrome.tabs.sendMessage(tabId, {
-      type: 'SCRAPE_JOB_DATA',
-      site: detection.site,
-      listing: detection.listing,
-    });
-  } catch (e) {
-    console.log('[JobTracker] Content script not ready yet, will retry on message');
-  }
+  // No auto-scrape — RGPD: scraping is triggered only by explicit user action
 }
 
 // --- Message handler ---
@@ -93,18 +88,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   const tabId = sender.tab?.id;
 
   switch (message.type) {
-    case 'SCRAPED_DATA': {
+    case "SCRAPED_DATA": {
       if (tabId && currentTabStates[tabId]) {
         currentTabStates[tabId].scrapedData = message.data;
-        setIcon(tabId, 'success');
-        chrome.action.setBadgeText({ tabId, text: '✓' });
-        chrome.action.setBadgeBackgroundColor({ tabId, color: '#4CAF50' });
+        setIcon(tabId, "success");
+        chrome.action.setBadgeText({ tabId, text: "✓" });
+        chrome.action.setBadgeBackgroundColor({ tabId, color: "#4CAF50" });
       }
       sendResponse({ received: true });
       break;
     }
 
-    case 'GET_CURRENT_TAB_STATE': {
+    case "GET_CURRENT_TAB_STATE": {
       chrome.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
         const activeTabId = tabs[0]?.id;
         const state = activeTabId ? currentTabStates[activeTabId] : null;
@@ -113,7 +108,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       return true; // async sendResponse
     }
 
-    case 'MARK_AS_SUBMITTED': {
+    case "MARK_AS_SUBMITTED": {
       if (message.tabId && currentTabStates[message.tabId]) {
         currentTabStates[message.tabId].submitted = true;
       }
@@ -121,7 +116,32 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       break;
     }
 
-    case 'URL_CHANGED': {
+    case "REQUEST_SCRAPE": {
+      // RGPD: user-initiated scrape only
+      chrome.tabs
+        .query({ active: true, currentWindow: true })
+        .then(async (tabs) => {
+          const activeTabId = tabs[0]?.id;
+          const state = activeTabId ? currentTabStates[activeTabId] : null;
+          if (activeTabId && state?.detected) {
+            try {
+              await chrome.tabs.sendMessage(activeTabId, {
+                type: "SCRAPE_JOB_DATA",
+                site: state.site,
+                listing: false,
+              });
+              sendResponse({ ok: true });
+            } catch (e) {
+              sendResponse({ ok: false, error: "Content script not ready" });
+            }
+          } else {
+            sendResponse({ ok: false, error: "No job detected" });
+          }
+        });
+      return true; // async sendResponse
+    }
+
+    case "URL_CHANGED": {
       if (tabId && message.url) {
         handleTabUrlChange(tabId, message.url);
       }

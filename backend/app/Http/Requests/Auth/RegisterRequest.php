@@ -23,6 +23,8 @@ class RegisterRequest extends FormRequest
                 ->mixedCase()
                 ->numbers()
                 ->uncompromised(), 'confirmed'],
+            'accept_terms' => ['required', 'accepted'],
+            'accept_privacy' => ['required', 'accepted'],
         ];
     }
 
@@ -30,6 +32,10 @@ class RegisterRequest extends FormRequest
     {
         return [
             'email.unique' => __('validation.email'),
+            'accept_terms.required' => 'Vous devez accepter les conditions générales d\'utilisation.',
+            'accept_terms.accepted' => 'Vous devez accepter les conditions générales d\'utilisation.',
+            'accept_privacy.required' => 'Vous devez accepter la politique de confidentialité.',
+            'accept_privacy.accepted' => 'Vous devez accepter la politique de confidentialité.',
         ];
     }
 }
