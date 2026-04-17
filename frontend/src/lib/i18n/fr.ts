@@ -215,6 +215,7 @@ const fr = {
       passwordComplexity:
         'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre',
       passwordMismatch: 'Les mots de passe ne correspondent pas',
+      passwordMatch: 'Les mots de passe correspondent',
       firstNameRequired: 'Le prénom est requis',
       lastNameRequired: 'Le nom est requis',
     },

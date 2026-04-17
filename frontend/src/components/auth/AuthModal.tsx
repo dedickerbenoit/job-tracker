@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/stores/authStore";
 import { PasswordStrengthIndicator } from "@/components/auth/PasswordStrengthIndicator";
+import { CheckCircle, XCircle } from "lucide-react";
 import { t } from "@/lib/i18n";
 import type { AxiosError } from "axios";
 
@@ -166,6 +167,7 @@ function RegisterForm() {
   } = useForm<RegisterValues>({ resolver: zodResolver(registerSchema) });
 
   const passwordValue = watch("password", "");
+  const confirmValue = watch("password_confirmation", "");
 
   const onSubmit = async (data: RegisterValues) => {
     setLoading(true);
@@ -259,6 +261,27 @@ function RegisterForm() {
           placeholder={t.auth.passwordPlaceholder}
           autoComplete="new-password"
         />
+        {confirmValue && (
+          <p
+            className={`flex items-center gap-1.5 text-xs ${
+              confirmValue === passwordValue
+                ? "text-success"
+                : "text-destructive"
+            }`}
+          >
+            {confirmValue === passwordValue ? (
+              <>
+                <CheckCircle className="h-3.5 w-3.5" />
+                {t.auth.validation.passwordMatch}
+              </>
+            ) : (
+              <>
+                <XCircle className="h-3.5 w-3.5" />
+                {t.auth.validation.passwordMismatch}
+              </>
+            )}
+          </p>
+        )}
         {errors.password_confirmation && (
           <p className="text-xs text-destructive">
             {errors.password_confirmation.message}
