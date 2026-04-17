@@ -1,4 +1,4 @@
-import { CheckCircle, Info, XCircle } from "lucide-react";
+import { CheckCircle, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 
@@ -66,11 +66,6 @@ export function PasswordStrengthIndicator({
           );
         })}
       </ul>
-
-      <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
-        <Info className="mt-0.5 h-3 w-3 shrink-0" />
-        <span>{t.auth.passwordRules.uncompromised}</span>
-      </p>
     </div>
   );
 }
