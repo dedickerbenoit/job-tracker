@@ -36,11 +36,13 @@ body {
 .btn-icon {
   background: none;
   border: none;
-  font-size: 18px;
   cursor: pointer;
-  padding: 4px 8px;
+  padding: 6px;
   border-radius: 4px;
   color: #666;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-icon:hover {
@@ -272,4 +274,15 @@ body {
   color: #f44336;
   font-size: 12px;
   margin: 0 0 8px;
+}
+
+/* --- Logout button --- */
+
+.btn-logout {
+  color: #e53935;
+}
+
+.btn-logout:hover {
+  background: #fce4ec;
+  color: #c62828;
 }

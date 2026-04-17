@@ -22,6 +22,23 @@ interface AuthState {
   clearAuth: () => void;
 }
 
+// Guard against double-invocation in React StrictMode (dev). Without this,
+// the one-shot handoff token gets consumed by the first call while the second
+// call races ahead with /auth/me, returns 401 before the session is set, and
+// the AuthGate briefly renders and opens the login modal.
+let initPromise: Promise<void> | null = null;
+
+// The handoff token is captured and stripped from the URL by the inline
+// bootstrap script in index.html, before any paint or React code runs.
+// We read it from the window global here and immediately clear it so it
+// cannot be reused by a later call.
+function consumeHandoffToken(): string | null {
+  const w = window as Window & { __JT_HANDOFF_TOKEN__?: string };
+  const token = w.__JT_HANDOFF_TOKEN__ ?? null;
+  if (token) delete w.__JT_HANDOFF_TOKEN__;
+  return token;
+}
+
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   loading: true,
@@ -29,15 +46,38 @@ export const useAuthStore = create<AuthState>((set) => ({
   showAuthModal: false,
   authModalTab: 'login',
 
-  initialize: async () => {
-    // Check authentication by calling /auth/me
-    // Sanctum will validate the session cookie
-    try {
-      const user = await authApi.me();
-      set({ user, isAuthenticated: true, loading: false });
-    } catch {
-      set({ user: null, isAuthenticated: false, loading: false });
-    }
+  initialize: () => {
+    if (initPromise) return initPromise;
+
+    initPromise = (async () => {
+      // Check if we have a handoff token from the extension (stripped from
+      // the URL at bootstrap — see index.html).
+      const authToken = consumeHandoffToken();
+
+      if (authToken) {
+        // Exchange the token for a session cookie
+        try {
+          const user = await authApi.tokenLogin(authToken);
+          set({ user, isAuthenticated: true, loading: false });
+          return;
+        } catch {
+          // Token invalid, expired, or already used — notify the user
+          toast.error(t.auth.handoffFailed);
+          // Fall through to normal /auth/me check
+        }
+      }
+
+      // Check authentication by calling /auth/me
+      // Sanctum will validate the session cookie
+      try {
+        const user = await authApi.me();
+        set({ user, isAuthenticated: true, loading: false });
+      } catch {
+        set({ user: null, isAuthenticated: false, loading: false });
+      }
+    })();
+
+    return initPromise;
   },
 
   login: async (data) => {

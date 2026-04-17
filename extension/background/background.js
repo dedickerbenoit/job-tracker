@@ -71,6 +71,7 @@ async function _handleTabUrlChangeInner(tabId, url) {
     site: detection.site,
     source: detection.source,
     name: detection.name,
+    listing: detection.listing,
     scrapedData: null,
     submitted: false,
   };
@@ -128,7 +129,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
               await chrome.tabs.sendMessage(activeTabId, {
                 type: "SCRAPE_JOB_DATA",
                 site: state.site,
-                listing: false,
+                listing: !!state.listing,
               });
               sendResponse({ ok: true });
             } catch (e) {
