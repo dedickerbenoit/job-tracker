@@ -5,6 +5,51 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>frontend</title>
+    <script>
+      // Capture and strip the extension handoff token from the URL before
+      // any other script or paint happens, so it is never visible in the
+      // address bar, browser history, Referer header, or server logs.
+      // Supports both hash fragment (#auth_token=...) and legacy query
+      // string (?auth_token=...).
+      (function () {
+        try {
+          var token = null;
+          if (window.location.hash) {
+            var hash = new URLSearchParams(window.location.hash.slice(1));
+            token = hash.get('auth_token');
+            if (token) {
+              hash.delete('auth_token');
+              var h = hash.toString();
+              window.history.replaceState(
+                {},
+                '',
+                window.location.pathname +
+                  window.location.search +
+                  (h ? '#' + h : '')
+              );
+            }
+          }
+          if (!token && window.location.search) {
+            var qs = new URLSearchParams(window.location.search);
+            token = qs.get('auth_token');
+            if (token) {
+              qs.delete('auth_token');
+              var q = qs.toString();
+              window.history.replaceState(
+                {},
+                '',
+                window.location.pathname +
+                  (q ? '?' + q : '') +
+                  window.location.hash
+              );
+            }
+          }
+          if (token) window.__JT_HANDOFF_TOKEN__ = token;
+        } catch (_) {
+          /* no-op */
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

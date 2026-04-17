@@ -258,7 +258,7 @@ export const KanbanCard = memo(function KanbanCard({
                       <Button
                         variant="ghost"
                         size="icon-xs"
-                        className="text-red-400"
+                        className="text-destructive"
                         onClick={onDelete}
                       />
                     }
