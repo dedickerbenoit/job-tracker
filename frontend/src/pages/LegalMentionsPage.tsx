@@ -1,67 +1,65 @@
 import { Link } from "react-router-dom";
+import { t } from "@/lib/i18n";
 
 export default function LegalMentionsPage() {
+  const s = t.legal.sections;
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
-      <h1 className="mb-8 text-3xl font-bold">Mentions légales</h1>
+      <h1 className="mb-8 text-3xl font-bold">{t.legal.pageTitle}</h1>
 
       <section className="space-y-6 text-sm leading-relaxed">
         <div>
-          <h2 className="mb-2 text-lg font-semibold">1. Éditeur du site</h2>
+          <h2 className="mb-2 text-lg font-semibold">{s.publisher.title}</h2>
           <p>
-            JobTracker est édité par [Votre Nom / Raison sociale].
+            {s.publisher.editedBy}
             <br />
-            Siège social : [Adresse complète]
+            {s.publisher.headOffice}
             <br />
-            SIRET : [Numéro SIRET]
+            {s.publisher.siret}
             <br />
-            Contact : [email@example.com]
+            {s.publisher.contact}
           </p>
         </div>
 
         <div>
           <h2 className="mb-2 text-lg font-semibold">
-            2. Directeur de la publication
+            {s.publicationDirector.title}
           </h2>
-          <p>[Nom du directeur de la publication]</p>
+          <p>{s.publicationDirector.value}</p>
         </div>
 
         <div>
-          <h2 className="mb-2 text-lg font-semibold">3. Hébergement</h2>
+          <h2 className="mb-2 text-lg font-semibold">{s.hosting.title}</h2>
           <p>
-            [Nom de l'hébergeur]
+            {s.hosting.name}
             <br />
-            [Adresse de l'hébergeur]
+            {s.hosting.address}
             <br />
-            [Téléphone de l'hébergeur]
+            {s.hosting.phone}
           </p>
         </div>
 
         <div>
           <h2 className="mb-2 text-lg font-semibold">
-            4. Propriété intellectuelle
+            {s.intellectualProperty.title}
           </h2>
-          <p>
-            L'ensemble du contenu de ce site (textes, images, code source) est
-            protégé par le droit d'auteur. Toute reproduction, même partielle,
-            est interdite sans autorisation préalable de l'éditeur.
-          </p>
+          <p>{s.intellectualProperty.content}</p>
         </div>
 
         <div>
           <h2 className="mb-2 text-lg font-semibold">
-            5. Protection des données personnelles
+            {s.dataProtection.title}
           </h2>
           <p>
-            Pour en savoir plus sur la collecte et le traitement de vos données,
-            consultez notre{" "}
+            {s.dataProtection.contentPrefix}
             <Link
               to="/privacy"
               className="font-medium text-primary underline-offset-4 hover:underline"
             >
-              Politique de confidentialité
+              {s.dataProtection.linkLabel}
             </Link>
-            .
+            {s.dataProtection.contentSuffix}
           </p>
         </div>
       </section>
@@ -71,7 +69,7 @@ export default function LegalMentionsPage() {
           to="/privacy"
           className="text-sm text-muted-foreground hover:text-primary"
         >
-          Politique de confidentialité
+          {t.legal.seePrivacy}
         </Link>
       </div>
     </div>
