@@ -14,48 +14,81 @@
         <div class="header-actions">
           <span id="user-info" class="user-info hidden">
             <span id="user-name" class="user-name"></span>
-            <button id="btn-logout" class="btn-icon" title="Déconnexion">
-              ✕
+            <button id="btn-dashboard" class="btn-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect width="7" height="9" x="3" y="3" rx="1" />
+                <rect width="7" height="5" x="14" y="3" rx="1" />
+                <rect width="7" height="9" x="14" y="12" rx="1" />
+                <rect width="7" height="5" x="3" y="16" rx="1" />
+              </svg>
             </button>
           </span>
-          <button id="btn-settings" class="btn-icon" title="Paramètres">
-            ⚙
+          <button id="btn-settings" class="btn-icon">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"
+              />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+          </button>
+          <button id="btn-logout" class="btn-icon btn-logout hidden">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
           </button>
         </div>
       </header>
 
       <!-- Auth section -->
       <section id="section-auth" class="section hidden">
-        <p class="text-muted">
-          Connectez-vous pour sauvegarder vos candidatures.
-        </p>
+        <p id="auth-intro" class="text-muted"></p>
         <form id="auth-form">
           <div class="form-group">
-            <label for="auth-email">Email</label>
-            <input
-              type="email"
-              id="auth-email"
-              required
-              placeholder="votre@email.com"
-            />
+            <label id="label-auth-email" for="auth-email"></label>
+            <input type="email" id="auth-email" required />
           </div>
           <div class="form-group">
-            <label for="auth-password">Mot de passe</label>
-            <input
-              type="password"
-              id="auth-password"
-              required
-              placeholder="Mot de passe"
-            />
+            <label id="label-auth-password" for="auth-password"></label>
+            <input type="password" id="auth-password" required />
           </div>
           <p id="auth-error" class="text-error hidden"></p>
           <button
             type="submit"
             id="btn-login"
             class="btn btn-primary btn-block"
-          >
-            Se connecter
-          </button>
+          ></button>
         </form>
       </section>
 
@@ -63,101 +96,100 @@
       <section id="section-job" class="section hidden">
         <div id="job-status" class="status-bar">
           <span id="status-icon" class="status-icon">○</span>
-          <span id="status-text">Chargement...</span>
+          <span id="status-text"></span>
         </div>
 
-        <button id="btn-scrape" class="btn btn-primary btn-block hidden">
-          Scraper cette offre
-        </button>
+        <button
+          id="btn-scrape"
+          class="btn btn-primary btn-block hidden"
+        ></button>
 
         <form id="job-form" class="hidden">
           <div class="form-group">
-            <label for="field-title">Titre du poste</label>
-            <input
-              type="text"
-              id="field-title"
-              placeholder="Ex: Développeur Full Stack"
-              required
-            />
+            <label id="label-field-title" for="field-title"></label>
+            <input type="text" id="field-title" required />
           </div>
           <div class="form-group">
-            <label for="field-company">Entreprise</label>
-            <input
-              type="text"
-              id="field-company"
-              placeholder="Ex: Acme Corp"
-              required
-            />
+            <label id="label-field-company" for="field-company"></label>
+            <input type="text" id="field-company" required />
           </div>
           <div class="form-group">
-            <label for="field-location">Localisation</label>
-            <input
-              type="text"
-              id="field-location"
-              placeholder="Ex: Paris, France"
-            />
+            <label id="label-field-location" for="field-location"></label>
+            <input type="text" id="field-location" />
           </div>
           <div class="form-group">
-            <label for="field-url">URL de l'offre</label>
-            <input type="url" id="field-url" placeholder="https://..." />
+            <label id="label-field-url" for="field-url"></label>
+            <input type="url" id="field-url" />
           </div>
           <div class="form-group">
-            <label for="field-source">Source</label>
+            <label id="label-field-source" for="field-source"></label>
             <select id="field-source">
               <option value="linkedin">LinkedIn</option>
               <option value="indeed">Indeed</option>
               <option value="hellowork">HelloWork</option>
-              <option value="other">Autre</option>
+              <option value="other"></option>
             </select>
           </div>
           <div class="form-group">
-            <label for="field-status">Statut</label>
+            <label id="label-field-status" for="field-status"></label>
             <select id="field-status">
-              <option value="applied">Candidaté</option>
-              <option value="interview">Entretien</option>
-              <option value="offer">Offre</option>
-              <option value="rejected">Refusé</option>
-              <option value="withdrawn">Retiré</option>
+              <option value="applied"></option>
+              <option value="interview"></option>
+              <option value="offer"></option>
+              <option value="rejected"></option>
+              <option value="withdrawn"></option>
             </select>
           </div>
           <div class="form-group">
-            <label for="field-description">Description</label>
-            <textarea
-              id="field-description"
-              rows="4"
-              placeholder="Description du poste..."
-            ></textarea>
+            <label id="label-field-description" for="field-description"></label>
+            <textarea id="field-description" rows="4"></textarea>
           </div>
           <div class="form-group">
-            <label for="field-notes">Notes personnelles</label>
-            <textarea
-              id="field-notes"
-              rows="2"
-              placeholder="Vos notes..."
-            ></textarea>
+            <label id="label-field-notes" for="field-notes"></label>
+            <textarea id="field-notes" rows="2"></textarea>
           </div>
           <button
             type="submit"
             id="btn-submit"
             class="btn btn-primary btn-block"
+          ></button>
+          <button
+            type="button"
+            id="btn-open-dashboard"
+            class="btn btn-secondary btn-block hidden"
           >
-            Sauvegarder
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              style="margin-right: 6px"
+            >
+              <rect width="7" height="9" x="3" y="3" rx="1" />
+              <rect width="7" height="5" x="14" y="3" rx="1" />
+              <rect width="7" height="9" x="14" y="12" rx="1" />
+              <rect width="7" height="5" x="3" y="16" rx="1" />
+            </svg>
+            <span id="btn-open-dashboard-label"></span>
           </button>
         </form>
       </section>
 
       <!-- Manual entry -->
       <section id="section-manual" class="section hidden">
-        <button id="btn-manual" class="btn btn-secondary btn-block">
-          Saisie manuelle
-        </button>
+        <button id="btn-manual" class="btn btn-secondary btn-block"></button>
       </section>
 
       <!-- Settings panel -->
       <section id="section-settings" class="section hidden">
-        <h2>Paramètres</h2>
+        <h2 id="settings-title"></h2>
         <div class="settings-group">
-          <h3>Sites activés</h3>
+          <h3 id="settings-enabled-sites"></h3>
           <label class="checkbox-label">
             <input type="checkbox" id="setting-linkedin" checked />
             LinkedIn
@@ -171,9 +203,10 @@
             HelloWork
           </label>
         </div>
-        <button id="btn-settings-back" class="btn btn-secondary btn-block">
-          Retour
-        </button>
+        <button
+          id="btn-settings-back"
+          class="btn btn-secondary btn-block"
+        ></button>
       </section>
 
       <!-- Toast notification -->
