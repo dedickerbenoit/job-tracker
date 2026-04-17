@@ -27,7 +27,7 @@
         lastJobKey = null;
       }
 
-      scrapeWithRetry(message.site, 5, 800).then((data) => {
+      scrapeWithRetry(message.site, 5, 800, isListingPage).then((data) => {
         if (data) {
           lastJobKey = data.title + "|" + data.company + "|" + (data.url || "");
           chrome.runtime.sendMessage({ type: "SCRAPED_DATA", data });
@@ -45,16 +45,16 @@
 
   // --- Scrape with retry (waits for SPA DOM to render) ---
 
-  async function scrapeWithRetry(site, maxRetries, delayMs) {
+  async function scrapeWithRetry(site, maxRetries, delayMs, listing) {
     for (let i = 0; i < maxRetries; i++) {
-      const data = scrapeCurrentSite(site);
+      const data = scrapeCurrentSite(site, listing);
       if (data && data.title && data.company) return data;
       console.log(
         `[JobTracker] Scrape attempt ${i + 1}/${maxRetries} - DOM not ready, retrying...`,
       );
       await new Promise((r) => setTimeout(r, delayMs));
     }
-    const lastAttempt = scrapeCurrentSite(site);
+    const lastAttempt = scrapeCurrentSite(site, listing);
     return lastAttempt && lastAttempt.title && lastAttempt.company
       ? lastAttempt
       : null;
@@ -62,19 +62,19 @@
 
   // --- Scrape dispatcher ---
 
-  function scrapeCurrentSite(site) {
+  function scrapeCurrentSite(site, listing) {
     switch (site) {
       case "linkedin":
         return typeof window.scrapeLinkedIn === "function"
-          ? window.scrapeLinkedIn()
+          ? window.scrapeLinkedIn(listing)
           : null;
       case "indeed":
         return typeof window.scrapeIndeed === "function"
-          ? window.scrapeIndeed()
+          ? window.scrapeIndeed(listing)
           : null;
       case "hellowork":
         return typeof window.scrapeHelloWork === "function"
-          ? window.scrapeHelloWork()
+          ? window.scrapeHelloWork(listing)
           : null;
       default:
         console.warn("[JobTracker] Unknown site:", site);

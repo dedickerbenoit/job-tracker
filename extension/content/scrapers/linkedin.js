@@ -5,6 +5,18 @@
   // Generic titles that should not be used as job titles
   var GENERIC_TITLES = ['collections', 'recommendations', 'search', 'jobs', 'linkedin', 'home', 'feed'];
 
+  // On listing pages (/jobs/collections/, /jobs/search/, ...), LinkedIn renders
+  // the selected job inside a right-hand detail panel. These selectors target
+  // it so DOM queries don't pick up data from the left-side job cards.
+  var DETAIL_PANE_SELECTORS = [
+    '.jobs-search__job-details--container',
+    '.jobs-search__job-details',
+    '.jobs-details__main-content',
+    '.job-view-layout',
+    '.scaffold-layout__detail',
+    'main',
+  ];
+
   // Build canonical URL: /jobs/view/{id}/ from currentJobId param or current URL
   function buildCanonicalUrl() {
     try {
@@ -43,14 +55,15 @@
   }
 
   // Strategy 2: Heuristic extraction (resilient to hashed CSS classes)
-  function tryHeuristic() {
+  function tryHeuristic(scope) {
+    scope = scope || document;
     var title = '';
     var company = '';
     var location = '';
     var description = '';
 
     // Company: first visible link pointing to /company/ with text
-    var companyLink = [...document.querySelectorAll('a[href*="/company/"]')]
+    var companyLink = [...scope.querySelectorAll('a[href*="/company/"]')]
       .find(function (a) {
         var t = a.textContent.trim();
         return t.length > 1 && t.length < 80;
@@ -96,7 +109,7 @@
     }
 
     // Location: <p> containing · near the company link
-    var anchor = companyLink || document.querySelector('[data-display-contents]');
+    var anchor = companyLink || scope.querySelector('[data-display-contents]');
     if (anchor) {
       var section = anchor.closest('div');
       // Walk up a few levels to get the job info container
@@ -114,7 +127,7 @@
     }
 
     // Description: content after "À propos de l'offre" / "About the job" heading
-    var headings = document.querySelectorAll('h2');
+    var headings = scope.querySelectorAll('h2');
     for (var m = 0; m < headings.length; m++) {
       var hText = headings[m].textContent.toLowerCase();
       if (hText.includes('propos de l') || hText.includes('about the job')) {
@@ -130,27 +143,34 @@
     return { title: title, company: company, location: location, description: description };
   }
 
-  window.defineGlobal('scrapeLinkedIn', function () {
+  window.defineGlobal('scrapeLinkedIn', function (isListing) {
     var failedFields = [];
     var canonicalUrl = buildCanonicalUrl();
+    // On listing pages, scope DOM queries to the detail panel to avoid
+    // reading data from the left-side job cards.
+    var scope = isListing
+      ? window.findDetailScope(DETAIL_PANE_SELECTORS, 'LinkedIn')
+      : document;
 
-    // Strategy 1: JSON-LD
-    var jsonLd = tryJsonLd();
-    if (jsonLd && jsonLd.title && jsonLd.company) {
-      var data = {
-        title: window.cleanText(jsonLd.title),
-        company: window.cleanText(jsonLd.company),
-        location: window.cleanText(jsonLd.location),
-        description: window.cleanText(jsonLd.description),
-        url: canonicalUrl,
-        source: 'linkedin',
-      };
-      window.logScrapingResult('LinkedIn', data, []);
-      return data;
+    // Strategy 1: JSON-LD (document-wide; only reliable on /jobs/view/ pages)
+    if (!isListing) {
+      var jsonLd = tryJsonLd();
+      if (jsonLd && jsonLd.title && jsonLd.company) {
+        var data = {
+          title: window.cleanText(jsonLd.title),
+          company: window.cleanText(jsonLd.company),
+          location: window.cleanText(jsonLd.location),
+          description: window.cleanText(jsonLd.description),
+          url: canonicalUrl,
+          source: 'linkedin',
+        };
+        window.logScrapingResult('LinkedIn', data, []);
+        return data;
+      }
     }
 
     // Strategy 2: Heuristic
-    var h = tryHeuristic();
+    var h = tryHeuristic(scope);
     if (h.title && h.company) {
       var hFailedFields = [];
       if (!h.location) hFailedFields.push('location');
@@ -173,7 +193,7 @@
       'h1.top-card-layout__title',
       'h1.topcard__title',
       'h1',
-    ]);
+    ], 'textContent', scope);
     if (!title.value) failedFields.push('title');
 
     var company = window.extractField([
@@ -181,7 +201,7 @@
       '.job-details-jobs-unified-top-card__company-name',
       'a.topcard__org-name-link',
       'span.topcard__flavor a',
-    ]);
+    ], 'textContent', scope);
     if (!company.value) failedFields.push('company');
 
     if (!title.value && !company.value) {
@@ -205,7 +225,7 @@
     var loc = window.extractField([
       '.job-details-jobs-unified-top-card__bullet',
       'span.topcard__flavor--bullet',
-    ]);
+    ], 'textContent', scope);
     if (!loc.value) failedFields.push('location');
 
     var desc = window.extractField([
@@ -213,7 +233,7 @@
       '.show-more-less-html__markup',
       '#job-details > span',
       '#job-details',
-    ]);
+    ], 'textContent', scope);
     if (!desc.value) failedFields.push('description');
 
     var data4 = {

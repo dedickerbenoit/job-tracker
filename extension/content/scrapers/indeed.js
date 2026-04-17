@@ -2,8 +2,23 @@
 (function () {
   'use strict';
 
-  // Build canonical URL: /viewjob?jk={id} from vjk/jk param or DOM link
-  function buildCanonicalUrl() {
+  // On Indeed SERP (search results / homepage with selected job), the active
+  // offer is rendered in a right-hand detail pane. These selectors target it
+  // so DOM queries don't mix with the list on the left.
+  var DETAIL_PANE_SELECTORS = [
+    '#jobsearch-ViewjobPaneWrapper',
+    '.jobsearch-RightPane',
+    '[data-testid="jobView"]',
+    '#vjs-container',
+    'main',
+  ];
+
+  // Build canonical URL: /viewjob?jk={id} from vjk/jk param or DOM link.
+  // When called on a listing page, `scope` restricts the DOM link fallback
+  // to the active detail pane so we don't pick up a link from the left-side
+  // card list (which would produce a URL/title mismatch).
+  function buildCanonicalUrl(scope) {
+    var root = scope || document;
     try {
       var params = new URLSearchParams(window.location.search);
       var jobKey = params.get('vjk') || params.get('jk');
@@ -11,7 +26,7 @@
         return 'https://' + window.location.hostname + '/viewjob?jk=' + encodeURIComponent(jobKey);
       }
       // Fallback: find a viewjob link in the DOM (selected job in listing)
-      var link = document.querySelector('a[href*="/viewjob?jk="]');
+      var link = root.querySelector('a[href*="/viewjob?jk="]');
       if (link) {
         var linkUrl = new URL(link.href);
         var linkJk = linkUrl.searchParams.get('jk');
@@ -26,9 +41,14 @@
     return window.cleanUrl(window.location.href, ['jk']);
   }
 
-  window.defineGlobal('scrapeIndeed', function () {
+  window.defineGlobal('scrapeIndeed', function (isListing) {
     const failedFields = [];
-    const canonicalUrl = buildCanonicalUrl();
+    // On listing pages, scope to the detail pane so we don't read cards.
+    const scope = isListing
+      ? window.findDetailScope(DETAIL_PANE_SELECTORS, 'Indeed')
+      : document;
+    // Canonical URL built AFTER scope so the DOM fallback is scoped too.
+    const canonicalUrl = buildCanonicalUrl(scope);
 
     const title = window.extractField([
       'h1.jobsearch-JobInfoHeader-title',
@@ -36,7 +56,7 @@
       'h2.jobTitle',
       '[data-testid="jobsearch-JobInfoHeader-title"]',
       'h1',
-    ]);
+    ], 'textContent', scope);
     if (!title.value) failedFields.push('title');
 
     const company = window.extractField([
@@ -46,7 +66,7 @@
       '.jobsearch-InlineCompanyRating div',
       '.jobsearch-CompanyInfoWithoutHeaderImage a',
       '[data-company-name="true"]',
-    ]);
+    ], 'textContent', scope);
     if (!company.value) failedFields.push('company');
 
     if (!title.value && !company.value) {
@@ -60,14 +80,14 @@
       '.jobsearch-JobInfoHeader-subtitle div:last-child',
       '.jobsearch-InlineCompanyRating + div',
       '#jobLocationText',
-    ]);
+    ], 'textContent', scope);
     if (!location.value) failedFields.push('location');
 
     const description = window.extractField([
       '#jobDescriptionText',
       '.jobsearch-jobDescriptionText',
       '.jobsearch-JobComponent-description',
-    ]);
+    ], 'textContent', scope);
     if (!description.value) failedFields.push('description');
 
     const data = {
