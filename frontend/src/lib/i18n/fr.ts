@@ -205,14 +205,26 @@ const fr = {
     registerError: "Erreur lors de l'inscription",
     emailAlreadyUsed: 'Cet e-mail est déjà utilisé',
     loginToAccess: 'Connectez-vous pour accéder à vos candidatures',
+    handoffFailed: "Lien d'authentification expiré. Veuillez vous reconnecter.",
     validation: {
       emailRequired: "L'adresse e-mail est requise",
       emailInvalid: "L'adresse e-mail n'est pas valide",
       passwordRequired: 'Le mot de passe est requis',
-      passwordMin: 'Le mot de passe doit contenir au moins 8 caractères',
+      // Unified complexity message: the per-rule UI feedback is shown live
+      // by <PasswordStrengthIndicator/>, so form errors stay concise.
+      passwordComplexity:
+        'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre',
       passwordMismatch: 'Les mots de passe ne correspondent pas',
       firstNameRequired: 'Le prénom est requis',
       lastNameRequired: 'Le nom est requis',
+    },
+    passwordRules: {
+      minLength: '8 caractères minimum',
+      uppercase: 'Une lettre majuscule',
+      lowercase: 'Une lettre minuscule',
+      digit: 'Un chiffre',
+      uncompromised:
+        'Votre mot de passe sera également vérifié contre les fuites de données connues (Have I Been Pwned).',
     },
   },
 
@@ -246,6 +258,183 @@ const fr = {
     privacy: 'Politique de confidentialité',
     legal: 'Mentions légales',
     copyright: `© ${new Date().getFullYear()} JobTracker. Tous droits réservés.`,
+  },
+
+  legal: {
+    pageTitle: 'Mentions légales',
+    seePrivacy: 'Politique de confidentialité',
+    sections: {
+      publisher: {
+        title: '1. Éditeur du site',
+        editedBy: 'JobTracker est édité par [Votre Nom / Raison sociale].',
+        headOffice: 'Siège social : [Adresse complète]',
+        siret: 'SIRET : [Numéro SIRET]',
+        contact: 'Contact : [email@example.com]',
+      },
+      publicationDirector: {
+        title: '2. Directeur de la publication',
+        value: '[Nom du directeur de la publication]',
+      },
+      hosting: {
+        title: '3. Hébergement',
+        name: "[Nom de l'hébergeur]",
+        address: "[Adresse de l'hébergeur]",
+        phone: "[Téléphone de l'hébergeur]",
+      },
+      intellectualProperty: {
+        title: '4. Propriété intellectuelle',
+        content:
+          "L'ensemble du contenu de ce site (textes, images, code source) est protégé par le droit d'auteur. Toute reproduction, même partielle, est interdite sans autorisation préalable de l'éditeur.",
+      },
+      dataProtection: {
+        title: '5. Protection des données personnelles',
+        contentPrefix: 'Pour en savoir plus sur la collecte et le traitement de vos données, consultez notre ',
+        linkLabel: 'Politique de confidentialité',
+        contentSuffix: '.',
+      },
+    },
+  },
+
+  privacy: {
+    pageTitle: 'Politique de confidentialité',
+    lastUpdated: 'Dernière mise à jour : 14 avril 2026',
+    seeLegal: 'Mentions légales',
+    sections: {
+      controller: {
+        title: '1. Identité du responsable de traitement',
+        content:
+          'JobTracker est édité par [Votre Nom / Raison sociale], dont le siège social est situé à [Adresse]. Contact : [email@example.com].',
+      },
+      collected: {
+        title: '2. Données collectées',
+        intro: 'Nous collectons les données suivantes :',
+        items: [
+          {
+            label: "Données d'identification :",
+            text: 'prénom, nom, adresse e-mail',
+          },
+          {
+            label: 'Données de candidature :',
+            text: "titre du poste, entreprise, localisation, URL de l'offre, description, notes personnelles, statut, source",
+          },
+          {
+            label: 'Données techniques :',
+            text: "adresse IP, user-agent (lors de l'inscription uniquement, pour le consentement)",
+          },
+          {
+            label: 'Données de connexion :',
+            text: "sessions, tokens d'authentification",
+          },
+        ],
+      },
+      legalBasis: {
+        title: '3. Bases légales des traitements',
+        items: [
+          {
+            label: 'Exécution du contrat',
+            text: ' (art. 6.1.b RGPD) : gestion du compte utilisateur et suivi des candidatures',
+          },
+          {
+            label: 'Consentement',
+            text: " (art. 6.1.a RGPD) : acceptation des CGU et de la politique de confidentialité lors de l'inscription",
+          },
+          {
+            label: 'Intérêt légitime',
+            text: " (art. 6.1.f RGPD) : sécurité de l'application, journalisation des accès",
+          },
+        ],
+      },
+      purposes: {
+        title: '4. Finalités des traitements',
+        items: [
+          'Création et gestion de votre compte utilisateur',
+          'Suivi de vos candidatures professionnelles',
+          'Statistiques personnelles sur vos candidatures',
+          'Sécurité et prévention des accès non autorisés',
+        ],
+      },
+      retention: {
+        title: '5. Durées de conservation',
+        items: [
+          {
+            label: 'Compte actif :',
+            text: ' données conservées tant que le compte est actif',
+          },
+          {
+            label: 'Après suppression :',
+            text: ' données supprimées définitivement 30 jours après la demande de suppression',
+          },
+          {
+            label: 'Sessions :',
+            text: " purgées après 30 jours d'inactivité",
+          },
+          {
+            label: "Tokens d'accès :",
+            text: ' purgés après 30 jours sans utilisation',
+          },
+        ],
+      },
+      recipients: {
+        title: '6. Destinataires des données',
+        content:
+          "Vos données ne sont transmises à aucun tiers. Elles sont uniquement accessibles par vous-même et les administrateurs techniques de la plateforme, dans le cadre strict de la maintenance.",
+      },
+      transfers: {
+        title: '7. Transferts hors UE',
+        content:
+          "Aucun transfert de données personnelles hors de l'Union Européenne n'est effectué.",
+      },
+      rights: {
+        title: '8. Vos droits',
+        intro: 'Conformément au RGPD, vous disposez des droits suivants :',
+        items: [
+          {
+            label: "Droit d'accès :",
+            text: ' obtenir une copie de vos données (export depuis votre profil)',
+          },
+          {
+            label: 'Droit de rectification :',
+            text: ' modifier vos informations personnelles',
+          },
+          {
+            label: "Droit à l'effacement :",
+            text: ' supprimer votre compte et toutes vos données',
+          },
+          {
+            label: 'Droit à la portabilité :',
+            text: ' exporter vos données au format JSON',
+          },
+          {
+            label: "Droit d'opposition :",
+            text: ' vous opposer au traitement de vos données',
+          },
+          {
+            label: 'Droit à la limitation :',
+            text: ' demander la limitation du traitement',
+          },
+        ],
+        exercisePrefix: 'Pour exercer ces droits, rendez-vous sur votre page ',
+        accountLink: 'Mon compte',
+        exerciseSuffix: ' ou contactez-nous à [email@example.com].',
+      },
+      cookies: {
+        title: '9. Cookies',
+        content:
+          "JobTracker utilise uniquement des cookies strictement nécessaires au fonctionnement du service (cookie de session, token CSRF). Aucun cookie de traçage ou publicitaire n'est utilisé.",
+      },
+      security: {
+        title: '10. Sécurité',
+        content:
+          'Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos données : chiffrement HTTPS, hachage des mots de passe (bcrypt), protection CSRF, rate limiting, validation des entrées.',
+      },
+      cnil: {
+        title: '11. Réclamation auprès de la CNIL',
+        contentPrefix:
+          'Si vous estimez que le traitement de vos données ne respecte pas la réglementation, vous pouvez introduire une réclamation auprès de la CNIL : ',
+        linkLabel: 'www.cnil.fr',
+        contentSuffix: '.',
+      },
+    },
   },
 
   a11y: {
