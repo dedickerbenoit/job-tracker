@@ -22,10 +22,11 @@
   // Expose defineGlobal for scrapers loaded after helpers.js
   defineGlobal('defineGlobal', defineGlobal);
 
-  defineGlobal('extractField', function (selectors, property = 'textContent') {
+  defineGlobal('extractField', function (selectors, property = 'textContent', scope = document) {
+    const root = scope || document;
     for (const selector of selectors) {
       try {
-        const el = document.querySelector(selector);
+        const el = root.querySelector(selector);
         if (el) {
           const raw = property === 'href' ? el.href : el[property] || el.getAttribute(property);
           const value = typeof raw === 'string' ? window.cleanText(raw) : raw;
@@ -70,6 +71,32 @@
     } catch (e) {
       return url;
     }
+  });
+
+  /**
+   * Find the "detail pane" element on a listing page by trying a list of
+   * site-specific selectors in order. Falls back to `document` and logs a
+   * warning so that a DOM regression (site redesign) is caught early
+   * rather than silently scraping the left-side card list.
+   *
+   * @param {string[]} selectors - Ordered list of CSS selectors to try
+   * @param {string} siteLabel - Human-readable site name for logs
+   * @returns {Document|Element}
+   */
+  defineGlobal('findDetailScope', function (selectors, siteLabel) {
+    for (var i = 0; i < selectors.length; i++) {
+      try {
+        var el = document.querySelector(selectors[i]);
+        if (el) return el;
+      } catch (e) {
+        // Invalid selector, skip
+      }
+    }
+    console.warn(
+      '[JobTracker] Detail pane not found on ' + siteLabel +
+      ' listing page — DOM may have changed. Falling back to document scope.'
+    );
+    return document;
   });
 
   /**
