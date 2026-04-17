@@ -224,8 +224,6 @@ const fr = {
       uppercase: 'Une lettre majuscule',
       lowercase: 'Une lettre minuscule',
       digit: 'Un chiffre',
-      uncompromised:
-        'Votre mot de passe sera également vérifié contre les fuites de données connues (Have I Been Pwned).',
     },
   },
 
