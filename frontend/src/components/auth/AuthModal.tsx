@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/stores/authStore";
+import { PasswordStrengthIndicator } from "@/components/auth/PasswordStrengthIndicator";
 import { t } from "@/lib/i18n";
 import type { AxiosError } from "axios";
 
@@ -34,7 +35,17 @@ const registerSchema = z
       .string()
       .min(1, t.auth.validation.emailRequired)
       .email(t.auth.validation.emailInvalid),
-    password: z.string().min(8, t.auth.validation.passwordMin),
+    // Single unified message: per-rule feedback is shown live by
+    // <PasswordStrengthIndicator/>, so the form error stays concise instead
+    // of surfacing one rule at a time through a chain of .regex() validators.
+    password: z.string().refine(
+      (v) =>
+        v.length >= 8 &&
+        /[A-Z]/.test(v) &&
+        /[a-z]/.test(v) &&
+        /[0-9]/.test(v),
+      { message: t.auth.validation.passwordComplexity },
+    ),
     password_confirmation: z
       .string()
       .min(1, t.auth.validation.passwordRequired),
@@ -150,8 +161,11 @@ function RegisterForm() {
     register,
     handleSubmit,
     setError,
+    watch,
     formState: { errors },
   } = useForm<RegisterValues>({ resolver: zodResolver(registerSchema) });
+
+  const passwordValue = watch("password", "");
 
   const onSubmit = async (data: RegisterValues) => {
     setLoading(true);
@@ -228,6 +242,7 @@ function RegisterForm() {
           placeholder={t.auth.passwordPlaceholder}
           autoComplete="new-password"
         />
+        <PasswordStrengthIndicator password={passwordValue} />
         {errors.password && (
           <p className="text-xs text-destructive">{errors.password.message}</p>
         )}
@@ -259,11 +274,14 @@ function RegisterForm() {
             className="mt-0.5 h-4 w-4 rounded border-input"
           />
           <span>
+            {/* stopPropagation prevents the surrounding <label>'s click
+                from toggling the checkbox when the user follows the link. */}
             <Link
               to="/legal"
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary underline-offset-4 hover:underline"
+              onClick={(e) => e.stopPropagation()}
             >
               {t.rgpd.acceptTerms}
             </Link>
@@ -287,6 +305,7 @@ function RegisterForm() {
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary underline-offset-4 hover:underline"
+              onClick={(e) => e.stopPropagation()}
             >
               {t.rgpd.acceptPrivacy}
             </Link>
@@ -313,10 +332,9 @@ export function AuthModal() {
   const authModalTab = useAuthStore((s) => s.authModalTab);
   const closeAuthModal = useAuthStore((s) => s.closeAuthModal);
   const openAuthModal = useAuthStore((s) => s.openAuthModal);
-
   return (
     <Dialog open={showAuthModal} onOpenChange={(v) => !v && closeAuthModal()}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {authModalTab === "login" ? t.auth.login : t.auth.register}

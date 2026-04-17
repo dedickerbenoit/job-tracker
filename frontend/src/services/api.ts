@@ -1,4 +1,5 @@
 import axios from 'axios';
+import type { InternalAxiosRequestConfig } from 'axios';
 import type {
   Application,
   ApplicationEvent,
@@ -26,16 +27,25 @@ const api = axios.create({
   withXSRFToken: true, // Automatically include XSRF token from cookies
 });
 
+// Silent requests bypass the modal-opening branch of the 401 interceptor.
+// Used for bootstrap auth probes (e.g. /auth/me on page load) where a 401
+// is expected for anonymous visitors and must not prompt a login modal.
+interface SilentRequestConfig extends InternalAxiosRequestConfig {
+  silent?: boolean;
+}
+
 // Error interceptor — clear auth on 401 and open login modal
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Lazy import to avoid circular dependency at module level
+      const isSilent = (error.config as SilentRequestConfig | undefined)?.silent === true;
       import('@/stores/authStore').then(({ useAuthStore }) => {
         const { clearAuth, openAuthModal } = useAuthStore.getState();
         clearAuth();
-        openAuthModal('login');
+        if (!isSilent) {
+          openAuthModal('login');
+        }
       });
     }
     return Promise.reject(error);
@@ -136,6 +146,16 @@ export const authApi = {
   },
 
   me(): Promise<User> {
-    return api.get('/auth/me').then((r) => r.data.data);
+    // silent: 401 here is expected for anonymous visitors — do not open modal
+    return api
+      .get('/auth/me', { silent: true } as SilentRequestConfig)
+      .then((r) => r.data.data);
+  },
+
+  async tokenLogin(token: string): Promise<User> {
+    await getCsrfCookie();
+    return api.post('/auth/token-login', {}, {
+      headers: { Authorization: `Bearer ${token}` },
+    }).then((r) => r.data.data.user);
   },
 };
