@@ -6,7 +6,7 @@ import {
   removeFromSession,
 } from "./storage.js";
 
-const DEFAULT_API_URL = "http://localhost:8000/api";
+const DEFAULT_API_URL = "http://localhost:8000/api/v1";
 const DEFAULT_DASHBOARD_URL = "http://localhost:5173";
 
 async function getApiBaseUrl() {
