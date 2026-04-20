@@ -16,7 +16,7 @@ class AuthHandoffTest extends TestCase
 
     public function test_create_handoff_token_requires_authentication(): void
     {
-        $response = $this->postJson('/api/auth/create-handoff-token');
+        $response = $this->postJson('/api/v1/auth/create-handoff-token');
 
         $response->assertStatus(401);
     }
@@ -26,7 +26,7 @@ class AuthHandoffTest extends TestCase
         $user = User::factory()->create();
         Sanctum::actingAs($user, ['*']);
 
-        $response = $this->postJson('/api/auth/create-handoff-token');
+        $response = $this->postJson('/api/v1/auth/create-handoff-token');
 
         $response->assertStatus(200)
             ->assertJsonStructure(['data' => ['token']]);
@@ -57,7 +57,7 @@ class AuthHandoffTest extends TestCase
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $plainToken,
-        ])->postJson('/api/auth/token-login');
+        ])->postJson('/api/v1/auth/token-login');
 
         $response->assertStatus(200)
             ->assertJsonStructure([
@@ -77,7 +77,7 @@ class AuthHandoffTest extends TestCase
 
         $this->withHeaders([
             'Authorization' => 'Bearer ' . $plainToken,
-        ])->postJson('/api/auth/token-login')->assertStatus(200);
+        ])->postJson('/api/v1/auth/token-login')->assertStatus(200);
 
         // Token should be deleted
         $this->assertNull(PersonalAccessToken::find($tokenId));
@@ -90,7 +90,7 @@ class AuthHandoffTest extends TestCase
         // consumed handoff tokens (deleted one-shot) cannot be reused.
         $response = $this->withHeaders([
             'Authorization' => 'Bearer 9999|nonexistent-token-value',
-        ])->postJson('/api/auth/token-login');
+        ])->postJson('/api/v1/auth/token-login');
 
         $response->assertStatus(401);
     }
@@ -103,14 +103,14 @@ class AuthHandoffTest extends TestCase
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $plainToken,
-        ])->postJson('/api/auth/token-login');
+        ])->postJson('/api/v1/auth/token-login');
 
         $response->assertStatus(403);
     }
 
     public function test_token_login_requires_authentication(): void
     {
-        $response = $this->postJson('/api/auth/token-login');
+        $response = $this->postJson('/api/v1/auth/token-login');
 
         $response->assertStatus(401);
     }
@@ -123,7 +123,7 @@ class AuthHandoffTest extends TestCase
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $plainToken,
-        ])->postJson('/api/auth/token-login');
+        ])->postJson('/api/v1/auth/token-login');
 
         $response->assertStatus(401);
     }
@@ -136,7 +136,7 @@ class AuthHandoffTest extends TestCase
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $plainToken,
-        ])->postJson('/api/auth/token-login');
+        ])->postJson('/api/v1/auth/token-login');
 
         $response->assertStatus(403);
     }
@@ -149,7 +149,7 @@ class AuthHandoffTest extends TestCase
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $plainToken,
-        ])->postJson('/api/auth/token-login');
+        ])->postJson('/api/v1/auth/token-login');
 
         $response->assertStatus(403);
     }
@@ -167,7 +167,7 @@ class AuthHandoffTest extends TestCase
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $plainToken,
-        ])->postJson('/api/auth/token-login');
+        ])->postJson('/api/v1/auth/token-login');
 
         $response->assertStatus(200)
             ->assertJsonPath('data.user.id', $target->id);
@@ -191,7 +191,7 @@ class AuthHandoffTest extends TestCase
         $response = $this->withHeaders([
             'X-Request-Token' => 'true',
             'Origin' => 'http://localhost',
-        ])->postJson('/api/auth/login', [
+        ])->postJson('/api/v1/auth/login', [
             'email' => 'token-mode@test.local',
             'password' => 'secret-password',
         ]);
@@ -209,7 +209,7 @@ class AuthHandoffTest extends TestCase
         // token-mode login did not leak auth into the shared session store.
         $followup = $this->withHeaders([
             'Origin' => 'http://localhost',
-        ])->getJson('/api/auth/me');
+        ])->getJson('/api/v1/auth/me');
 
         $followup->assertStatus(401);
     }
@@ -226,7 +226,7 @@ class AuthHandoffTest extends TestCase
 
         $response = $this->withHeaders([
             'Origin' => 'http://localhost',
-        ])->postJson('/api/auth/login', [
+        ])->postJson('/api/v1/auth/login', [
             'email' => 'session-mode@test.local',
             'password' => 'secret-password',
         ]);
@@ -242,7 +242,7 @@ class AuthHandoffTest extends TestCase
         // Follow-up request without any Bearer token sees the persisted session.
         $followup = $this->withHeaders([
             'Origin' => 'http://localhost',
-        ])->getJson('/api/auth/me');
+        ])->getJson('/api/v1/auth/me');
 
         $followup->assertStatus(200)
             ->assertJsonPath('data.email', 'session-mode@test.local');
