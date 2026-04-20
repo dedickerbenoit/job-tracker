@@ -11,8 +11,7 @@
     "https://*.indeed.com/*",
     "https://*.indeed.fr/*",
     "https://www.hellowork.com/*",
-    "https://*.hellowork.com/*",
-    "http://localhost:8000/*"
+    "https://*.hellowork.com/*"
   ],
   "action": {
     "default_popup": "popup/popup.html",

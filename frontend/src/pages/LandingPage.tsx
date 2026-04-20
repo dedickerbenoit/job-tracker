@@ -78,8 +78,8 @@ function LandingNavbar() {
       }`}
     >
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link to="/" className="text-xl font-bold tracking-tight">
-          JobTracker
+        <Link to="/">
+          <img src="/logo-full.png" alt="JobTracker" className="h-8" />
         </Link>
 
         {/* Desktop links */}
