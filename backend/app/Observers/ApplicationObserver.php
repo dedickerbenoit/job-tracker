@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Enums\ApplicationEventType;
+use App\Enums\ApplicationStatus;
 use App\Models\Application;
 use App\Models\ApplicationEvent;
 
@@ -23,7 +24,7 @@ class ApplicationObserver
 
     public function created(Application $application): void
     {
-        $event = new ApplicationEvent();
+        $event = new ApplicationEvent;
         $event->user_id = $application->user_id;
         $event->application_id = $application->id;
         $event->type = ApplicationEventType::Created;
@@ -38,12 +39,12 @@ class ApplicationObserver
         $original = $application->getOriginal();
 
         if ($application->isDirty('status')) {
-            $event = new ApplicationEvent();
+            $event = new ApplicationEvent;
             $event->user_id = $application->user_id;
             $event->application_id = $application->id;
             $event->type = ApplicationEventType::StatusChanged;
-            $oldEnum = $original['status'] instanceof \App\Enums\ApplicationStatus ? $original['status'] : \App\Enums\ApplicationStatus::from($original['status']);
-            $newEnum = $changes['status'] instanceof \App\Enums\ApplicationStatus ? $changes['status'] : \App\Enums\ApplicationStatus::from($changes['status']);
+            $oldEnum = $original['status'] instanceof ApplicationStatus ? $original['status'] : ApplicationStatus::from($original['status']);
+            $newEnum = $changes['status'] instanceof ApplicationStatus ? $changes['status'] : ApplicationStatus::from($changes['status']);
             $event->description = "Statut modifié de '{$oldEnum->label()}' à '{$newEnum->label()}'";
 
             $oldStatus = $oldEnum->value;
@@ -61,13 +62,13 @@ class ApplicationObserver
             $excludeFields[] = 'applied_at';
         }
         $otherChanges = collect($changes)->except($excludeFields)->keys()->toArray();
-        if (!empty($otherChanges)) {
-            $event = new ApplicationEvent();
+        if (! empty($otherChanges)) {
+            $event = new ApplicationEvent;
             $event->user_id = $application->user_id;
             $event->application_id = $application->id;
             $event->type = ApplicationEventType::Updated;
-            $translatedFields = array_map(fn($f) => self::FIELD_LABELS[$f] ?? $f, $otherChanges);
-            $event->description = 'Informations mises à jour : ' . implode(', ', $translatedFields);
+            $translatedFields = array_map(fn ($f) => self::FIELD_LABELS[$f] ?? $f, $otherChanges);
+            $event->description = 'Informations mises à jour : '.implode(', ', $translatedFields);
             $event->metadata = ['changed_fields' => $otherChanges];
             $event->save();
         }
@@ -75,7 +76,7 @@ class ApplicationObserver
 
     public function deleted(Application $application): void
     {
-        $event = new ApplicationEvent();
+        $event = new ApplicationEvent;
         $event->user_id = $application->user_id;
         $event->application_id = null;
         $event->type = ApplicationEventType::Deleted;
