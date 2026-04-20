@@ -20,8 +20,10 @@ import type {
 
 // ── Axios instance ──
 
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
+  baseURL: BASE_URL,
   headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
   withCredentials: true, // Enable cookies for Sanctum SPA mode
   withXSRFToken: true, // Automatically include XSRF token from cookies
@@ -110,9 +112,9 @@ export const applicationApi = {
  * when using Sanctum SPA mode with cookies.
  */
 export async function getCsrfCookie(): Promise<void> {
-  const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
-  // Sanctum CSRF endpoint is at /sanctum/csrf-cookie (not /api/sanctum/csrf-cookie)
-  const csrfUrl = baseURL.replace('/api', '') + '/sanctum/csrf-cookie';
+  // Sanctum CSRF endpoint is at /sanctum/csrf-cookie (not /api/v1/sanctum/csrf-cookie)
+  // Strip versioned path first, then fallback to unversioned (for custom VITE_API_URL without /v1)
+  const csrfUrl = BASE_URL.replace('/api/v1', '').replace('/api', '') + '/sanctum/csrf-cookie';
   await axios.get(csrfUrl, { withCredentials: true });
 }
 
