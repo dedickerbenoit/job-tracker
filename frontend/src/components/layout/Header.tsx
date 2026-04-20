@@ -41,7 +41,7 @@ export function Header({ sidebarCollapsed, onToggleSidebar }: HeaderProps) {
             <PanelLeftClose className="h-5 w-5" />
           )}
         </Button>
-        <span className="text-lg font-bold tracking-tight">JobTracker</span>
+        <img src="/logo-full.png" alt="JobTracker" className="h-7" />
       </div>
 
       {/* Center: search */}
