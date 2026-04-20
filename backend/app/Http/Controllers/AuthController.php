@@ -79,7 +79,7 @@ class AuthController extends Controller
             ? Auth::once($validated)
             : Auth::attempt($validated);
 
-        if (!$authenticated) {
+        if (! $authenticated) {
             Log::warning('Failed login attempt', ['email' => $validated['email'], 'ip' => $request->ip()]);
 
             return response()->json([
@@ -182,13 +182,13 @@ class AuthController extends Controller
         }
 
         $bearer = $request->bearerToken();
-        if (!$bearer) {
+        if (! $bearer) {
             abort(401, 'Missing bearer token');
         }
 
         $accessToken = PersonalAccessToken::findToken($bearer);
 
-        if (!$accessToken || ($accessToken->expires_at && $accessToken->expires_at->isPast())) {
+        if (! $accessToken || ($accessToken->expires_at && $accessToken->expires_at->isPast())) {
             abort(401, 'Invalid or expired token');
         }
 
@@ -196,7 +196,7 @@ class AuthController extends Controller
         // 'handoff'. Rejecting wildcard tokens ('*') and any extra ability
         // prevents a regular auth token from being used as a handoff token.
         $abilities = $accessToken->abilities ?? [];
-        if (count($abilities) !== 1 || !in_array('handoff', $abilities, true)) {
+        if (count($abilities) !== 1 || ! in_array('handoff', $abilities, true)) {
             Log::warning('Token-login attempted without handoff ability', [
                 'user_id' => $accessToken->tokenable_id,
                 'ip' => $request->ip(),
@@ -205,6 +205,7 @@ class AuthController extends Controller
             abort(403, 'Token not allowed for handoff');
         }
 
+        /** @var User $user */
         $user = $accessToken->tokenable;
 
         // Establish a fresh session for the SPA via the web guard.

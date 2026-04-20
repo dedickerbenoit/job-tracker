@@ -80,7 +80,9 @@ export default function ListView() {
   const [deleteApp, setDeleteApp] = useState<Application | null>(null);
 
   const filtersRef = useRef(filters);
-  filtersRef.current = filters;
+  useEffect(() => {
+    filtersRef.current = filters;
+  }, [filters]);
 
   const doFetch = useCallback(
     (overrides?: Partial<ApplicationFilters>) => {

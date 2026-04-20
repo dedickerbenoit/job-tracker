@@ -1,0 +1,78 @@
+name: Extension CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'extension/**'
+      - '.github/workflows/extension.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'extension/**'
+      - '.github/workflows/extension.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate Extension
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate manifest JSON
+        run: |
+          echo "Validating manifest.prod.json..."
+          python3 -c "import json; m = json.load(open('extension/manifest.prod.json')); assert 'name' in m; assert 'version' in m; assert 'manifest_version' in m; print('Manifest is valid JSON with required fields.')"
+
+      - name: Run build script
+        run: |
+          chmod +x extension/build.sh
+          ./extension/build.sh prod
+
+      - name: Verify referenced files exist
+        run: |
+          cd extension
+          manifest="manifest.json"
+          echo "Checking files referenced in manifest..."
+
+          # Check content scripts
+          for file in $(python3 -c "import json; m = json.load(open('$manifest')); [print(f) for cs in m.get('content_scripts', []) for f in cs.get('js', []) + cs.get('css', [])]"); do
+            if [ ! -f "$file" ]; then
+              echo "ERROR: Referenced file not found: $file"
+              exit 1
+            fi
+            echo "  OK: $file"
+          done
+
+          # Check background service worker
+          bg=$(python3 -c "import json; m = json.load(open('$manifest')); print(m.get('background', {}).get('service_worker', ''))")
+          if [ -n "$bg" ] && [ ! -f "$bg" ]; then
+            echo "ERROR: Background service worker not found: $bg"
+            exit 1
+          elif [ -n "$bg" ]; then
+            echo "  OK: $bg"
+          fi
+
+          # Check popup
+          popup=$(python3 -c "import json; m = json.load(open('$manifest')); print(m.get('action', {}).get('default_popup', ''))")
+          if [ -n "$popup" ] && [ ! -f "$popup" ]; then
+            echo "ERROR: Popup file not found: $popup"
+            exit 1
+          elif [ -n "$popup" ]; then
+            echo "  OK: $popup"
+          fi
+
+          # Check icons
+          for icon in $(python3 -c "import json; m = json.load(open('$manifest')); [print(v) for v in m.get('icons', {}).values()]"); do
+            if [ ! -f "$icon" ]; then
+              echo "ERROR: Icon not found: $icon"
+              exit 1
+            fi
+            echo "  OK: $icon"
+          done
+
+          echo "All referenced files exist."

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Footer } from '@/components/layout/Footer';
@@ -32,12 +32,10 @@ const CHROME_STORE_URL = '#'; // TODO: replace with real Chrome Web Store URL
 // ---------------------------------------------------------------------------
 // Scroll-reveal hook
 // ---------------------------------------------------------------------------
-function useReveal<T extends HTMLElement>() {
-  const ref = useRef<T>(null);
+function useReveal(): [(el: HTMLElement | null) => void, string] {
   const [visible, setVisible] = useState(false);
 
-  useEffect(() => {
-    const el = ref.current;
+  const callbackRef = useCallback((el: HTMLElement | null) => {
     if (!el) return;
     const obs = new IntersectionObserver(
       ([entry]) => {
@@ -49,10 +47,9 @@ function useReveal<T extends HTMLElement>() {
       { threshold: 0.15 },
     );
     obs.observe(el);
-    return () => obs.disconnect();
   }, []);
 
-  return { ref, className: visible ? 'landing-reveal landing-visible' : 'landing-reveal' };
+  return [callbackRef, visible ? 'landing-reveal landing-visible' : 'landing-reveal'];
 }
 
 // ---------------------------------------------------------------------------
@@ -175,7 +172,7 @@ function Hero() {
 // Logos banner
 // ---------------------------------------------------------------------------
 function LogosBanner() {
-  const reveal = useReveal<HTMLDivElement>();
+  const [revealRef, revealClass] = useReveal();
 
   const logos = [
     { name: 'LinkedIn', color: '#0A66C2' },
@@ -183,7 +180,7 @@ function LogosBanner() {
   ];
 
   return (
-    <section {...reveal} ref={reveal.ref} className={`py-12 ${reveal.className}`}>
+    <section ref={revealRef} className={`py-12 ${revealClass}`}>
       <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
         <p className="text-sm font-medium tracking-wide text-muted-foreground uppercase">
           {t.landing.logos.title}
@@ -208,7 +205,7 @@ function LogosBanner() {
 // Features
 // ---------------------------------------------------------------------------
 function Features() {
-  const reveal = useReveal<HTMLDivElement>();
+  const [revealRef, revealClass] = useReveal();
 
   const features = [
     {
@@ -234,7 +231,7 @@ function Features() {
   ];
 
   return (
-    <section id="features" {...reveal} ref={reveal.ref} className={`py-24 ${reveal.className}`}>
+    <section id="features" ref={revealRef} className={`py-24 ${revealClass}`}>
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
@@ -266,7 +263,7 @@ function Features() {
 // How it works
 // ---------------------------------------------------------------------------
 function HowItWorks() {
-  const reveal = useReveal<HTMLDivElement>();
+  const [revealRef, revealClass] = useReveal();
 
   const steps = [
     { icon: UserPlus, ...t.landing.howItWorks.step1 },
@@ -277,9 +274,8 @@ function HowItWorks() {
   return (
     <section
       id="how-it-works"
-      {...reveal}
-      ref={reveal.ref}
-      className={`bg-muted/40 py-24 ${reveal.className}`}
+      ref={revealRef}
+      className={`bg-muted/40 py-24 ${revealClass}`}
     >
       <div className="mx-auto max-w-5xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center">
@@ -309,10 +305,10 @@ function HowItWorks() {
 // Screenshot / Demo
 // ---------------------------------------------------------------------------
 function Screenshot() {
-  const reveal = useReveal<HTMLDivElement>();
+  const [revealRef, revealClass] = useReveal();
 
   return (
-    <section {...reveal} ref={reveal.ref} className={`py-24 ${reveal.className}`}>
+    <section ref={revealRef} className={`py-24 ${revealClass}`}>
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
@@ -397,14 +393,13 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
 }
 
 function Faq() {
-  const reveal = useReveal<HTMLDivElement>();
+  const [revealRef, revealClass] = useReveal();
 
   return (
     <section
       id="faq"
-      {...reveal}
-      ref={reveal.ref}
-      className={`bg-muted/40 py-24 ${reveal.className}`}
+      ref={revealRef}
+      className={`bg-muted/40 py-24 ${revealClass}`}
     >
       <div className="mx-auto max-w-2xl px-4 sm:px-6">
         <h2 className="text-center text-3xl font-bold tracking-tight sm:text-4xl">
@@ -424,10 +419,10 @@ function Faq() {
 // Final CTA
 // ---------------------------------------------------------------------------
 function FinalCta() {
-  const reveal = useReveal<HTMLDivElement>();
+  const [revealRef, revealClass] = useReveal();
 
   return (
-    <section {...reveal} ref={reveal.ref} className={`py-24 ${reveal.className}`}>
+    <section ref={revealRef} className={`py-24 ${revealClass}`}>
       <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
         <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
           {t.landing.finalCta.title}

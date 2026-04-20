@@ -74,7 +74,7 @@ class ApplicationController extends Controller
 
         $validated = $request->validated();
 
-        $application = new Application();
+        $application = new Application;
         $application->user_id = $request->user()->id;
         $application->title = $validated['title'];
         $application->company = $validated['company'];
@@ -123,15 +123,33 @@ class ApplicationController extends Controller
 
         $validated = $request->validated();
 
-        if (isset($validated['title'])) $application->title = $validated['title'];
-        if (isset($validated['company'])) $application->company = $validated['company'];
-        if (isset($validated['location'])) $application->location = $validated['location'];
-        if (isset($validated['url'])) $application->url = $validated['url'];
-        if (array_key_exists('description', $validated)) $application->description = $validated['description'];
-        if (isset($validated['source'])) $application->source = $validated['source'];
-        if (isset($validated['status'])) $application->status = $validated['status'];
-        if (array_key_exists('notes', $validated)) $application->notes = $validated['notes'];
-        if (array_key_exists('applied_at', $validated)) $application->applied_at = $validated['applied_at'];
+        if (isset($validated['title'])) {
+            $application->title = $validated['title'];
+        }
+        if (isset($validated['company'])) {
+            $application->company = $validated['company'];
+        }
+        if (isset($validated['location'])) {
+            $application->location = $validated['location'];
+        }
+        if (isset($validated['url'])) {
+            $application->url = $validated['url'];
+        }
+        if (array_key_exists('description', $validated)) {
+            $application->description = $validated['description'];
+        }
+        if (isset($validated['source'])) {
+            $application->source = $validated['source'];
+        }
+        if (isset($validated['status'])) {
+            $application->status = $validated['status'];
+        }
+        if (array_key_exists('notes', $validated)) {
+            $application->notes = $validated['notes'];
+        }
+        if (array_key_exists('applied_at', $validated)) {
+            $application->applied_at = $validated['applied_at'];
+        }
 
         if ($application->status === ApplicationStatus::Applied && $application->applied_at === null) {
             $application->applied_at = now();
