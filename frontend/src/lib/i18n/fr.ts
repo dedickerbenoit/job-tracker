@@ -436,6 +436,103 @@ const fr = {
     },
   },
 
+  landing: {
+    nav: {
+      features: 'Fonctionnalités',
+      howItWorks: 'Comment ça marche',
+      faq: 'FAQ',
+      cta: 'Commencer gratuitement',
+    },
+    hero: {
+      title: `Fini le chaos dans ta recherche d'emploi`,
+      subtitle:
+        `Centralise toutes tes candidatures, suis leur avancement en temps réel et décroche le job de tes rêves — sans prise de tête.`,
+      ctaDashboard: 'Lancer le dashboard',
+      ctaExtension: `Installer l'extension Chrome`,
+    },
+    logos: {
+      title: `Compatible avec tes sites d'emploi préférés`,
+    },
+    features: {
+      title: `Tout ce qu'il te faut, rien de superflu`,
+      subtitle: `Des outils pensés pour les chercheurs d'emploi qui veulent rester organisés.`,
+      kanban: {
+        title: 'Tableau Kanban',
+        description:
+          `Visualise tes candidatures par statut : à postuler, postulé, entretien, offre... Déplace-les d'un simple glisser-déposer.`,
+      },
+      extension: {
+        title: 'Extension Chrome',
+        description:
+          'Sauvegarde une offre depuis LinkedIn ou Indeed en un clic. Plus besoin de copier-coller.',
+      },
+      timeline: {
+        title: 'Timeline intelligente',
+        description:
+          `Retrouve l'historique complet de chaque candidature : relances, entretiens, changements de statut.`,
+      },
+      stats: {
+        title: 'Statistiques claires',
+        description:
+          `Taux de réponse, répartition par source, par statut… Comprends ta recherche en un coup d'œil.`,
+      },
+    },
+    howItWorks: {
+      title: 'Prêt en 3 étapes',
+      subtitle: 'Commence à suivre tes candidatures en moins de 2 minutes.',
+      step1: {
+        title: 'Crée ton compte',
+        description: `Inscription gratuite, sans carte bancaire. C'est parti !`,
+      },
+      step2: {
+        title: 'Ajoute tes candidatures',
+        description:
+          `Manuellement ou via l'extension Chrome directement depuis les sites d'emploi.`,
+      },
+      step3: {
+        title: 'Suis et organise',
+        description:
+          'Déplace tes candidatures sur le Kanban, ajoute des notes et ne rate plus aucune relance.',
+      },
+    },
+    screenshot: {
+      title: 'Un dashboard pensé pour toi',
+      subtitle: 'Interface épurée, rapide et intuitive. Tout est à portée de clic.',
+    },
+    faq: {
+      title: 'Questions fréquentes',
+      items: [
+        {
+          question: 'Est-ce que JobTracker est gratuit ?',
+          answer:
+            'Oui ! JobTracker est entièrement gratuit. Pas de freemium caché, pas de limite sur le nombre de candidatures.',
+        },
+        {
+          question: 'Mes données sont-elles en sécurité ?',
+          answer:
+            'Absolument. Tes données sont chiffrées, hébergées en Europe et ne sont jamais partagées avec des tiers. Tu peux les exporter ou supprimer ton compte à tout moment.',
+        },
+        {
+          question: `L'extension Chrome fonctionne avec quels sites ?`,
+          answer:
+            `LinkedIn et Indeed pour le moment. D'autres sites seront ajoutés prochainement.`,
+        },
+        {
+          question: 'Puis-je utiliser JobTracker sur mobile ?',
+          answer:
+            `JobTracker est conçu pour une utilisation sur desktop. L'extension Chrome est également disponible uniquement sur ordinateur.`,
+        },
+      ],
+    },
+    finalCta: {
+      title: 'Prêt à organiser ta recherche ?',
+      subtitle:
+        `Rejoins des centaines de candidats qui ont repris le contrôle de leur recherche d'emploi.`,
+      ctaDashboard: 'Créer mon compte gratuitement',
+      ctaExtension: `Installer l'extension`,
+    },
+  },
+
   a11y: {
     addApplication: 'Ajouter une candidature',
   },
