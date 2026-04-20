@@ -56,7 +56,7 @@ class AuthHandoffTest extends TestCase
         $plainToken = $user->createToken('handoff', ['handoff'], now()->addMinute())->plainTextToken;
 
         $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $plainToken,
+            'Authorization' => 'Bearer '.$plainToken,
         ])->postJson('/api/v1/auth/token-login');
 
         $response->assertStatus(200)
@@ -76,7 +76,7 @@ class AuthHandoffTest extends TestCase
         $tokenId = (int) explode('|', $plainToken)[0];
 
         $this->withHeaders([
-            'Authorization' => 'Bearer ' . $plainToken,
+            'Authorization' => 'Bearer '.$plainToken,
         ])->postJson('/api/v1/auth/token-login')->assertStatus(200);
 
         // Token should be deleted
@@ -102,7 +102,7 @@ class AuthHandoffTest extends TestCase
         $plainToken = $user->createToken('auth')->plainTextToken;
 
         $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $plainToken,
+            'Authorization' => 'Bearer '.$plainToken,
         ])->postJson('/api/v1/auth/token-login');
 
         $response->assertStatus(403);
@@ -122,7 +122,7 @@ class AuthHandoffTest extends TestCase
         $plainToken = $user->createToken('handoff', ['handoff'], now()->subMinute())->plainTextToken;
 
         $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $plainToken,
+            'Authorization' => 'Bearer '.$plainToken,
         ])->postJson('/api/v1/auth/token-login');
 
         $response->assertStatus(401);
@@ -135,7 +135,7 @@ class AuthHandoffTest extends TestCase
         $plainToken = $user->createToken('auth', ['*'])->plainTextToken;
 
         $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $plainToken,
+            'Authorization' => 'Bearer '.$plainToken,
         ])->postJson('/api/v1/auth/token-login');
 
         $response->assertStatus(403);
@@ -148,7 +148,7 @@ class AuthHandoffTest extends TestCase
         $plainToken = $user->createToken('mixed', ['handoff', 'read'], now()->addMinute())->plainTextToken;
 
         $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $plainToken,
+            'Authorization' => 'Bearer '.$plainToken,
         ])->postJson('/api/v1/auth/token-login');
 
         $response->assertStatus(403);
@@ -166,7 +166,7 @@ class AuthHandoffTest extends TestCase
         $plainToken = $target->createToken('handoff', ['handoff'], now()->addMinute())->plainTextToken;
 
         $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $plainToken,
+            'Authorization' => 'Bearer '.$plainToken,
         ])->postJson('/api/v1/auth/token-login');
 
         $response->assertStatus(200)

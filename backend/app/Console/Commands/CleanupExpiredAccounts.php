@@ -20,7 +20,7 @@ class CleanupExpiredAccounts extends Command
             ->get();
 
         $count = $users->count();
-        $users->each(fn(User $user) => $user->forceDelete());
+        $users->each(fn (User $user) => $user->forceDelete());
 
         $this->info("Purged {$count} expired account(s).");
 

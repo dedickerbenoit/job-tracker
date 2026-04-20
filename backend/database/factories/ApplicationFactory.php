@@ -66,7 +66,7 @@ class ApplicationFactory extends Factory
     {
         return $this->state(fn () => [
             'source' => ApplicationSource::LinkedIn,
-            'url' => 'https://www.linkedin.com/jobs/view/' . fake()->randomNumber(9),
+            'url' => 'https://www.linkedin.com/jobs/view/'.fake()->randomNumber(9),
         ]);
     }
 }
