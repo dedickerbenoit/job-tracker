@@ -1,0 +1,20 @@
+.git
+.github
+
+# Backend
+backend/vendor/
+backend/node_modules/
+backend/.env
+backend/tests/
+backend/storage/logs/*
+
+# Frontend
+frontend/node_modules/
+frontend/.env
+
+# Extension (not needed for deploy)
+extension/
+
+# Misc
+*.zip
+**/*.Zone.Identifier
