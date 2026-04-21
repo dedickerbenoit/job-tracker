@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { ChromeIcon } from '@/components/icons/ChromeIcon';
+import { ExtensionComingSoonModal } from '@/components/ExtensionComingSoonModal';
 import { Footer } from '@/components/layout/Footer';
 import { t } from '@/lib/i18n';
 import {
@@ -14,20 +16,6 @@ import {
   Menu,
   X,
 } from 'lucide-react';
-
-function ChromeIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <circle cx="12" cy="12" r="10" />
-      <circle cx="12" cy="12" r="4" />
-      <line x1="21.17" y1="8" x2="12" y2="8" />
-      <line x1="3.95" y1="6.06" x2="8.54" y2="14" />
-      <line x1="10.88" y1="21.94" x2="15.46" y2="14" />
-    </svg>
-  );
-}
-
-const CHROME_STORE_URL = '#'; // TODO: replace with real Chrome Web Store URL
 
 // ---------------------------------------------------------------------------
 // Scroll-reveal hook
@@ -134,7 +122,7 @@ function LandingNavbar() {
 // ---------------------------------------------------------------------------
 // Hero
 // ---------------------------------------------------------------------------
-function Hero() {
+function Hero({ onExtensionClick }: { onExtensionClick: () => void }) {
   return (
     <section className="relative flex min-h-[90vh] items-center justify-center overflow-hidden pt-16">
       {/* Background gradient blobs */}
@@ -156,12 +144,10 @@ function Hero() {
               {t.landing.hero.ctaDashboard}
             </Button>
           </Link>
-          <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer">
-            <Button variant="outline" size="lg" className="h-12 px-6 text-base">
-              <ChromeIcon className="mr-2 size-5" />
-              {t.landing.hero.ctaExtension}
-            </Button>
-          </a>
+          <Button variant="outline" size="lg" className="h-12 px-6 text-base" onClick={onExtensionClick}>
+            <ChromeIcon className="mr-2 size-5" />
+            {t.landing.hero.ctaExtension}
+          </Button>
         </div>
       </div>
     </section>
@@ -418,7 +404,7 @@ function Faq() {
 // ---------------------------------------------------------------------------
 // Final CTA
 // ---------------------------------------------------------------------------
-function FinalCta() {
+function FinalCta({ onExtensionClick }: { onExtensionClick: () => void }) {
   const [revealRef, revealClass] = useReveal();
 
   return (
@@ -434,12 +420,10 @@ function FinalCta() {
               {t.landing.finalCta.ctaDashboard}
             </Button>
           </Link>
-          <a href={CHROME_STORE_URL} target="_blank" rel="noopener noreferrer">
-            <Button variant="outline" size="lg" className="h-12 px-6 text-base">
-              <ChromeIcon className="mr-2 size-5" />
-              {t.landing.finalCta.ctaExtension}
-            </Button>
-          </a>
+          <Button variant="outline" size="lg" className="h-12 px-6 text-base" onClick={onExtensionClick}>
+            <ChromeIcon className="mr-2 size-5" />
+            {t.landing.finalCta.ctaExtension}
+          </Button>
         </div>
       </div>
     </section>
@@ -450,17 +434,21 @@ function FinalCta() {
 // Landing Page (assembled)
 // ---------------------------------------------------------------------------
 export default function LandingPage() {
+  const [extensionModalOpen, setExtensionModalOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <LandingNavbar />
-      <Hero />
+      <Hero onExtensionClick={() => setExtensionModalOpen(true)} />
       <LogosBanner />
       <Features />
       <HowItWorks />
       <Screenshot />
       <Faq />
-      <FinalCta />
+      <FinalCta onExtensionClick={() => setExtensionModalOpen(true)} />
       <Footer />
+
+      <ExtensionComingSoonModal open={extensionModalOpen} onClose={() => setExtensionModalOpen(false)} />
     </div>
   );
 }

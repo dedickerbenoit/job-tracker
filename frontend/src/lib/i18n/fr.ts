@@ -533,6 +533,15 @@ const fr = {
     },
   },
 
+  extension: {
+    comingSoon: {
+      title: `L'extension arrive bientôt`,
+      description: `Ajoute tes candidatures en 1 clic depuis LinkedIn et Indeed.`,
+      status: 'On met les derniers coups de polish avant le lancement.',
+      close: 'Fermer',
+    },
+  },
+
   a11y: {
     addApplication: 'Ajouter une candidature',
   },
