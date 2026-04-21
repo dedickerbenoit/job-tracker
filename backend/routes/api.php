@@ -6,6 +6,9 @@ use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
+    // Health check (public, no auth)
+    Route::get('/health', fn () => response()->json(['status' => 'ok']));
+
     // Auth routes (public, rate-limited)
     Route::middleware('throttle:5,1')->group(function () {
         Route::post('auth/register', [AuthController::class, 'register']);
