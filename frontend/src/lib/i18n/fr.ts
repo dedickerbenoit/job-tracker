@@ -265,20 +265,20 @@ const fr = {
     sections: {
       publisher: {
         title: '1. Éditeur du site',
-        editedBy: 'JobTracker est édité par [Votre Nom / Raison sociale].',
-        headOffice: 'Siège social : [Adresse complète]',
-        siret: 'SIRET : [Numéro SIRET]',
-        contact: 'Contact : [email@example.com]',
+        editedBy: 'JobTracker est édité par Benoit Dedicker (personne physique).',
+        headOffice: 'Contact : dedickerbenoit@gmail.com',
+        siret: '',
+        contact: '',
       },
       publicationDirector: {
         title: '2. Directeur de la publication',
-        value: '[Nom du directeur de la publication]',
+        value: 'Benoit Dedicker',
       },
       hosting: {
         title: '3. Hébergement',
-        name: "[Nom de l'hébergeur]",
-        address: "[Adresse de l'hébergeur]",
-        phone: "[Téléphone de l'hébergeur]",
+        name: 'Fly.io, Inc.',
+        address: '2261 Market Street #4990, San Francisco, CA 94114, USA',
+        phone: 'https://fly.io',
       },
       intellectualProperty: {
         title: '4. Propriété intellectuelle',
@@ -296,13 +296,13 @@ const fr = {
 
   privacy: {
     pageTitle: 'Politique de confidentialité',
-    lastUpdated: 'Dernière mise à jour : 14 avril 2026',
+    lastUpdated: 'Dernière mise à jour : 21 avril 2026',
     seeLegal: 'Mentions légales',
     sections: {
       controller: {
         title: '1. Identité du responsable de traitement',
         content:
-          'JobTracker est édité par [Votre Nom / Raison sociale], dont le siège social est situé à [Adresse]. Contact : [email@example.com].',
+          'JobTracker est édité par Benoit Dedicker. Contact : dedickerbenoit@gmail.com.',
       },
       collected: {
         title: '2. Données collectées',
@@ -381,7 +381,7 @@ const fr = {
       transfers: {
         title: '7. Transferts hors UE',
         content:
-          "Aucun transfert de données personnelles hors de l'Union Européenne n'est effectué.",
+          "L'hébergement applicatif (Fly.io) et la base de données (Neon) peuvent impliquer des traitements aux États-Unis. Ces prestataires adhèrent au Data Privacy Framework (DPF) UE-États-Unis, garantissant un niveau de protection adéquat conformément au RGPD.",
       },
       rights: {
         title: '8. Vos droits',
@@ -414,7 +414,7 @@ const fr = {
         ],
         exercisePrefix: 'Pour exercer ces droits, rendez-vous sur votre page ',
         accountLink: 'Mon compte',
-        exerciseSuffix: ' ou contactez-nous à [email@example.com].',
+        exerciseSuffix: ' ou contactez-nous à dedickerbenoit@gmail.com.',
       },
       cookies: {
         title: '9. Cookies',

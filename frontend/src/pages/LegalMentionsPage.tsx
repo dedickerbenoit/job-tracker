@@ -13,12 +13,24 @@ export default function LegalMentionsPage() {
           <h2 className="mb-2 text-lg font-semibold">{s.publisher.title}</h2>
           <p>
             {s.publisher.editedBy}
-            <br />
-            {s.publisher.headOffice}
-            <br />
-            {s.publisher.siret}
-            <br />
-            {s.publisher.contact}
+            {s.publisher.headOffice && (
+              <>
+                <br />
+                {s.publisher.headOffice}
+              </>
+            )}
+            {s.publisher.siret && (
+              <>
+                <br />
+                {s.publisher.siret}
+              </>
+            )}
+            {s.publisher.contact && (
+              <>
+                <br />
+                {s.publisher.contact}
+              </>
+            )}
           </p>
         </div>
 
