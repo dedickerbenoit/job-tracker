@@ -9,13 +9,12 @@ import {
 // TODO: Make this configurable
 const isProduction = true
 
+const PROD_BASE = "https://jobtracker-bd.fly.dev"
 const DEFAULT_API_URL = isProduction
-  ? "https://jobtracker-bd.fly.dev/api/v1"
+  ? `${PROD_BASE}/api/v1`
   : "http://localhost:8000/api/v1"
 
-const DEFAULT_DASHBOARD_URL = isProduction
-  ? "https://jobtracker-bd.fly.dev"
-  : "http://localhost:5173"
+const DEFAULT_DASHBOARD_URL = isProduction ? PROD_BASE : "http://localhost:5173"
 
 async function getApiBaseUrl() {
   const customUrl = await getFromStorage("api_base_url")
