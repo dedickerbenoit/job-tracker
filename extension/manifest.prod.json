@@ -11,7 +11,8 @@
     "https://*.indeed.com/*",
     "https://*.indeed.fr/*",
     "https://www.hellowork.com/*",
-    "https://*.hellowork.com/*"
+    "https://*.hellowork.com/*",
+    "https://jobtracker-bd.fly.dev/*"
   ],
   "action": {
     "default_popup": "popup/popup.html",
