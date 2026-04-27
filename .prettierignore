@@ -1,0 +1,7 @@
+backend/**/*.php
+vendor/
+node_modules/
+dist/
+package-lock.json
+*.lock
+*.png
