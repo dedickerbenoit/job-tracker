@@ -69,11 +69,17 @@ const fr = {
       openDashboard: "Voir dans le Dashboard",
     },
     applicationStatus: {
-      applied: "Candidaté",
+      to_apply: "À postuler",
+      applied: "Postulé",
+      follow_up: "Relance",
       interview: "Entretien",
-      offer: "Offre",
+      offer: "Offre reçue",
       rejected: "Refusé",
-      withdrawn: "Retiré",
+    },
+    applicationSource: {
+      linkedin: "LinkedIn",
+      indeed: "Indeed",
+      manual: "Manuel",
     },
     manual: {
       button: "Saisie manuelle",
