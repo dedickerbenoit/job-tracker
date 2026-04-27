@@ -7,7 +7,7 @@
   let lastUrl = location.href;
   let isListingPage = false;
   let currentSite = null;
-  let lastJobKey = null;
+  let _lastJobKey = null;
 
   console.log("[JobTracker] Content script loaded on", location.hostname);
 
@@ -23,13 +23,14 @@
           "[JobTracker] Listing page mode activated for",
           currentSite,
         );
-        // Reset lastJobKey so first panel scrape goes through
-        lastJobKey = null;
+        // Reset _lastJobKey so first panel scrape goes through
+        _lastJobKey = null;
       }
 
       scrapeWithRetry(message.site, 5, 800, isListingPage).then((data) => {
         if (data) {
-          lastJobKey = data.title + "|" + data.company + "|" + (data.url || "");
+          _lastJobKey =
+            data.title + "|" + data.company + "|" + (data.url || "");
           chrome.runtime.sendMessage({ type: "SCRAPED_DATA", data });
           sendResponse({ scraped: true });
         } else {
@@ -92,7 +93,7 @@
       clearTimeout(urlDebounceTimer);
       urlDebounceTimer = setTimeout(() => {
         lastUrl = location.href;
-        lastJobKey = null;
+        _lastJobKey = null;
         console.log("[JobTracker] SPA navigation detected:", lastUrl);
         chrome.runtime.sendMessage({ type: "URL_CHANGED", url: lastUrl });
       }, 300);
