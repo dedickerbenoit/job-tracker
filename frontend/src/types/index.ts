@@ -29,11 +29,21 @@ export interface AuthResponse {
 
 // ── Enums (string literals matching backend) ──
 
-export type ApplicationStatus = 'to_apply' | 'applied' | 'follow_up' | 'interview' | 'offer' | 'rejected';
+export type ApplicationStatus =
+  | "to_apply"
+  | "applied"
+  | "follow_up"
+  | "interview"
+  | "offer"
+  | "rejected";
 
-export type ApplicationSource = 'linkedin' | 'indeed' | 'hellowork' | 'manual';
+export type ApplicationSource = "linkedin" | "indeed" | "hellowork" | "manual";
 
-export type ApplicationEventType = 'created' | 'status_changed' | 'updated' | 'deleted';
+export type ApplicationEventType =
+  | "created"
+  | "status_changed"
+  | "updated"
+  | "deleted";
 
 // ── Models ──
 
@@ -85,7 +95,7 @@ export interface PaginatedResponse<T> {
 }
 
 export interface DuplicateWarning {
-  type: 'duplicate_url';
+  type: "duplicate_url";
   message: string;
   duplicates: Application[];
 }
@@ -102,7 +112,7 @@ export interface ApplicationFilters {
   from_date?: string;
   to_date?: string;
   sort?: string;
-  direction?: 'asc' | 'desc';
+  direction?: "asc" | "desc";
   per_page?: number;
   page?: number;
 }

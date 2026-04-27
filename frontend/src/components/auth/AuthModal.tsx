@@ -39,14 +39,16 @@ const registerSchema = z
     // Single unified message: per-rule feedback is shown live by
     // <PasswordStrengthIndicator/>, so the form error stays concise instead
     // of surfacing one rule at a time through a chain of .regex() validators.
-    password: z.string().refine(
-      (v) =>
-        v.length >= 8 &&
-        /[A-Z]/.test(v) &&
-        /[a-z]/.test(v) &&
-        /[0-9]/.test(v),
-      { message: t.auth.validation.passwordComplexity },
-    ),
+    password: z
+      .string()
+      .refine(
+        (v) =>
+          v.length >= 8 &&
+          /[A-Z]/.test(v) &&
+          /[a-z]/.test(v) &&
+          /[0-9]/.test(v),
+        { message: t.auth.validation.passwordComplexity },
+      ),
     password_confirmation: z
       .string()
       .min(1, t.auth.validation.passwordRequired),

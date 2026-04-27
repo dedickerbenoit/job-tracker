@@ -6,17 +6,20 @@ import {
   DialogDescription,
   DialogFooter,
   DialogClose,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { ChromeIcon } from '@/components/icons/ChromeIcon';
-import { t } from '@/lib/i18n';
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { ChromeIcon } from "@/components/icons/ChromeIcon";
+import { t } from "@/lib/i18n";
 
 interface ExtensionComingSoonModalProps {
   open: boolean;
   onClose: () => void;
 }
 
-export function ExtensionComingSoonModal({ open, onClose }: ExtensionComingSoonModalProps) {
+export function ExtensionComingSoonModal({
+  open,
+  onClose,
+}: ExtensionComingSoonModalProps) {
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent className="sm:max-w-sm">

@@ -40,4 +40,11 @@ async function removeFromSession(key) {
   });
 }
 
-export { getFromStorage, setInStorage, removeFromStorage, getFromSession, setInSession, removeFromSession };
+export {
+  getFromStorage,
+  setInStorage,
+  removeFromStorage,
+  getFromSession,
+  setInSession,
+  removeFromSession,
+};
