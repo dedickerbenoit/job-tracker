@@ -8,7 +8,7 @@ const DEFAULTS = {
 
 export async function getSettings() {
   return new Promise((resolve) => {
-    chrome.storage.local.get('settings', (result) => {
+    chrome.storage.local.get("settings", (result) => {
       resolve({ ...DEFAULTS, ...result.settings });
     });
   });

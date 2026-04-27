@@ -1,10 +1,10 @@
-import { create } from 'zustand';
-import { toast } from 'sonner';
-import { authApi } from '@/services/api';
-import { t } from '@/lib/i18n';
-import type { User, LoginData, RegisterData } from '@/types';
+import { create } from "zustand";
+import { toast } from "sonner";
+import { authApi } from "@/services/api";
+import { t } from "@/lib/i18n";
+import type { User, LoginData, RegisterData } from "@/types";
 
-type AuthModalTab = 'login' | 'register';
+type AuthModalTab = "login" | "register";
 
 interface AuthState {
   user: User | null;
@@ -44,7 +44,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   loading: true,
   isAuthenticated: false,
   showAuthModal: false,
-  authModalTab: 'login',
+  authModalTab: "login",
 
   initialize: () => {
     if (initPromise) return initPromise;
@@ -106,7 +106,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     toast.success(t.auth.loggedOut);
   },
 
-  openAuthModal: (tab = 'login') => {
+  openAuthModal: (tab = "login") => {
     set({ showAuthModal: true, authModalTab: tab });
   },
 

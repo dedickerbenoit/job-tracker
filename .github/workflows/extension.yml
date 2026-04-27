@@ -4,13 +4,13 @@ on:
   push:
     branches: [main]
     paths:
-      - 'extension/**'
-      - '.github/workflows/extension.yml'
+      - "extension/**"
+      - ".github/workflows/extension.yml"
   pull_request:
     branches: [main]
     paths:
-      - 'extension/**'
-      - '.github/workflows/extension.yml'
+      - "extension/**"
+      - ".github/workflows/extension.yml"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

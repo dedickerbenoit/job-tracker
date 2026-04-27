@@ -1,8 +1,8 @@
-import { create } from 'zustand';
-import { toast } from 'sonner';
-import { applicationApi } from '@/services/api';
-import { STATUS_CONFIG } from '@/lib/constants';
-import { t } from '@/lib/i18n';
+import { create } from "zustand";
+import { toast } from "sonner";
+import { applicationApi } from "@/services/api";
+import { STATUS_CONFIG } from "@/lib/constants";
+import { t } from "@/lib/i18n";
 import type {
   Application,
   ApplicationEvent,
@@ -14,7 +14,7 @@ import type {
   StatsData,
   TimelineFilters,
   UpdateApplicationData,
-} from '@/types';
+} from "@/types";
 
 interface ApplicationState {
   // Data
@@ -42,7 +42,10 @@ interface ApplicationState {
   fetchApplications: (filters?: ApplicationFilters) => Promise<void>;
   fetchApplication: (id: number) => Promise<Application>;
   createApplication: (data: CreateApplicationData) => Promise<Application>;
-  updateApplication: (id: number, data: UpdateApplicationData) => Promise<Application>;
+  updateApplication: (
+    id: number,
+    data: UpdateApplicationData,
+  ) => Promise<Application>;
   deleteApplication: (id: number) => Promise<void>;
   updateStatus: (id: number, status: ApplicationStatus) => Promise<void>;
   fetchTimeline: (filters?: TimelineFilters) => Promise<void>;
@@ -107,8 +110,11 @@ export const useApplicationStore = create<ApplicationState>((set, get) => ({
     const app = await applicationApi.update(id, data);
     // Update in local list
     set((state) => ({
-      applications: state.applications.map((a) => (a.id === id ? { ...a, ...app } : a)),
-      selectedApplication: state.selectedApplication?.id === id ? app : state.selectedApplication,
+      applications: state.applications.map((a) =>
+        a.id === id ? { ...a, ...app } : a,
+      ),
+      selectedApplication:
+        state.selectedApplication?.id === id ? app : state.selectedApplication,
     }));
     return app;
   },
@@ -117,7 +123,8 @@ export const useApplicationStore = create<ApplicationState>((set, get) => ({
     await applicationApi.delete(id);
     set((state) => ({
       applications: state.applications.filter((a) => a.id !== id),
-      selectedApplication: state.selectedApplication?.id === id ? null : state.selectedApplication,
+      selectedApplication:
+        state.selectedApplication?.id === id ? null : state.selectedApplication,
     }));
   },
 
@@ -134,7 +141,9 @@ export const useApplicationStore = create<ApplicationState>((set, get) => ({
     try {
       const updated = await applicationApi.updateStatus(id, status);
       set((state) => ({
-        applications: state.applications.map((a) => (a.id === id ? { ...a, ...updated } : a)),
+        applications: state.applications.map((a) =>
+          a.id === id ? { ...a, ...updated } : a,
+        ),
       }));
     } catch {
       // Rollback on error
@@ -158,7 +167,11 @@ export const useApplicationStore = create<ApplicationState>((set, get) => ({
 
   loadMoreTimeline: async () => {
     const { timelinePagination, timelineFilters } = get();
-    if (!timelinePagination || timelinePagination.current_page >= timelinePagination.last_page) return;
+    if (
+      !timelinePagination ||
+      timelinePagination.current_page >= timelinePagination.last_page
+    )
+      return;
 
     set({ timelineLoading: true });
     try {

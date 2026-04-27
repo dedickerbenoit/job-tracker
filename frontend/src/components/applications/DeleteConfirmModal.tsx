@@ -30,7 +30,9 @@ export function DeleteConfirmModal({
 
   useEffect(() => {
     mountedRef.current = true;
-    return () => { mountedRef.current = false; };
+    return () => {
+      mountedRef.current = false;
+    };
   }, []);
 
   const handleDelete = async () => {
