@@ -6,8 +6,18 @@ import {
   removeFromSession,
 } from "./storage.js";
 
-const DEFAULT_API_URL = "http://localhost:8000/api/v1";
-const DEFAULT_DASHBOARD_URL = "http://localhost:5173";
+// TODO: Make this configurable
+const isProduction = true;
+
+const PROD_BASE = "https://jobtracker-bd.fly.dev";
+
+const DEFAULT_API_URL = isProduction
+  ? `${PROD_BASE}/api/v1`
+  : "http://localhost:8000/api/v1";
+
+const DEFAULT_DASHBOARD_URL = isProduction
+  ? PROD_BASE
+  : "http://localhost:5173";
 
 async function getApiBaseUrl() {
   const customUrl = await getFromStorage("api_base_url");
