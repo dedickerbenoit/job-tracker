@@ -8,6 +8,11 @@ import {
   openDashboard,
 } from "../utils/api.js";
 import { t } from "../utils/i18n.js";
+import {
+  APPLICATION_STATUSES,
+  DEFAULT_STATUS,
+  APPLICATION_SOURCES,
+} from "../utils/constants.js";
 
 // --- DOM references ---
 const elements = {
@@ -68,7 +73,6 @@ const elements = {
   settingsEnabledSites: document.getElementById("settings-enabled-sites"),
   settingLinkedin: document.getElementById("setting-linkedin"),
   settingIndeed: document.getElementById("setting-indeed"),
-  settingHellowork: document.getElementById("setting-hellowork"),
 
   // Misc
   userInfo: document.getElementById("user-info"),
@@ -119,19 +123,24 @@ function applyTranslations() {
   elements.labelFieldUrl.textContent = t.ui.form.urlLabel;
   elements.fieldUrl.placeholder = t.ui.form.urlPlaceholder;
   elements.labelFieldSource.textContent = t.ui.form.sourceLabel;
-  elements.fieldSource.querySelector('option[value="other"]').textContent =
-    t.ui.form.sourceOther;
+  // Génération dynamique des options source
+  elements.fieldSource.innerHTML = "";
+  APPLICATION_SOURCES.forEach((value) => {
+    const opt = document.createElement("option");
+    opt.value = value;
+    opt.textContent = t.ui.applicationSource[value];
+    elements.fieldSource.appendChild(opt);
+  });
+
   elements.labelFieldStatus.textContent = t.ui.form.statusLabel;
-  elements.fieldStatus.querySelector('option[value="applied"]').textContent =
-    t.ui.applicationStatus.applied;
-  elements.fieldStatus.querySelector('option[value="interview"]').textContent =
-    t.ui.applicationStatus.interview;
-  elements.fieldStatus.querySelector('option[value="offer"]').textContent =
-    t.ui.applicationStatus.offer;
-  elements.fieldStatus.querySelector('option[value="rejected"]').textContent =
-    t.ui.applicationStatus.rejected;
-  elements.fieldStatus.querySelector('option[value="withdrawn"]').textContent =
-    t.ui.applicationStatus.withdrawn;
+  // Génération dynamique des options statut
+  elements.fieldStatus.innerHTML = "";
+  APPLICATION_STATUSES.forEach((value) => {
+    const opt = document.createElement("option");
+    opt.value = value;
+    opt.textContent = t.ui.applicationStatus[value];
+    elements.fieldStatus.appendChild(opt);
+  });
   elements.labelFieldDescription.textContent = t.ui.form.descriptionLabel;
   elements.fieldDescription.placeholder = t.ui.form.descriptionPlaceholder;
   elements.labelFieldNotes.textContent = t.ui.form.notesLabel;
@@ -268,7 +277,7 @@ function showScrapedData(data) {
   elements.fieldCompany.value = data.company || "";
   elements.fieldLocation.value = data.location || "";
   elements.fieldUrl.value = data.url || "";
-  elements.fieldSource.value = data.source || "other";
+  elements.fieldSource.value = data.source || "manual";
   elements.fieldDescription.value = data.description || "";
   elements.jobForm.classList.remove("hidden");
 }
@@ -279,7 +288,8 @@ function showManualForm() {
   elements.fieldCompany.value = "";
   elements.fieldLocation.value = "";
   elements.fieldUrl.value = currentTabUrl;
-  elements.fieldSource.value = "other";
+  elements.fieldSource.value = "manual";
+  elements.fieldStatus.value = DEFAULT_STATUS;
   elements.fieldDescription.value = "";
   elements.fieldNotes.value = "";
   elements.jobForm.classList.remove("hidden");
@@ -393,7 +403,6 @@ async function loadSettings() {
   const settings = await getSettings();
   elements.settingLinkedin.checked = settings.enabledSites.linkedin;
   elements.settingIndeed.checked = settings.enabledSites.indeed;
-  elements.settingHellowork.checked = settings.enabledSites.hellowork;
 }
 
 async function saveSettings() {
@@ -401,7 +410,6 @@ async function saveSettings() {
     enabledSites: {
       linkedin: elements.settingLinkedin.checked,
       indeed: elements.settingIndeed.checked,
-      hellowork: elements.settingHellowork.checked,
     },
   });
   showToast(t.settings.saved, "success");
@@ -433,7 +441,6 @@ function bindEvents() {
   // Settings checkboxes auto-save
   elements.settingLinkedin.addEventListener("change", saveSettings);
   elements.settingIndeed.addEventListener("change", saveSettings);
-  elements.settingHellowork.addEventListener("change", saveSettings);
 
   // Form submit → API
   elements.jobForm.addEventListener("submit", handleSubmit);
