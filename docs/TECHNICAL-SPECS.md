@@ -41,21 +41,22 @@
 
 ### Table : `users`
 
-| Colonne | Type | Contraintes | Description |
-|---------|------|-------------|-------------|
-| id | BIGINT UNSIGNED | PRIMARY KEY, AUTO_INCREMENT | ID unique de l'utilisateur |
-| first_name | VARCHAR(100) | NULL | Prenom |
-| last_name | VARCHAR(100) | NULL | Nom |
-| email | VARCHAR(255) | UNIQUE, NOT NULL | Email (login) |
-| password | VARCHAR(255) | NULL | Mot de passe hache (NULL si social login uniquement) |
-| email_verified_at | TIMESTAMP | NULL | Date de verification de l'email |
-| google_id | VARCHAR(255) | UNIQUE, NULL | ID Google pour OAuth |
-| linkedin_id | VARCHAR(255) | UNIQUE, NULL | ID LinkedIn pour OAuth |
-| avatar_url | VARCHAR(500) | NULL | URL de la photo de profil |
-| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Date de creation |
-| updated_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP ON UPDATE | Date de mise a jour |
+| Colonne           | Type            | Contraintes                         | Description                                          |
+| ----------------- | --------------- | ----------------------------------- | ---------------------------------------------------- |
+| id                | BIGINT UNSIGNED | PRIMARY KEY, AUTO_INCREMENT         | ID unique de l'utilisateur                           |
+| first_name        | VARCHAR(100)    | NULL                                | Prenom                                               |
+| last_name         | VARCHAR(100)    | NULL                                | Nom                                                  |
+| email             | VARCHAR(255)    | UNIQUE, NOT NULL                    | Email (login)                                        |
+| password          | VARCHAR(255)    | NULL                                | Mot de passe hache (NULL si social login uniquement) |
+| email_verified_at | TIMESTAMP       | NULL                                | Date de verification de l'email                      |
+| google_id         | VARCHAR(255)    | UNIQUE, NULL                        | ID Google pour OAuth                                 |
+| linkedin_id       | VARCHAR(255)    | UNIQUE, NULL                        | ID LinkedIn pour OAuth                               |
+| avatar_url        | VARCHAR(500)    | NULL                                | URL de la photo de profil                            |
+| created_at        | TIMESTAMP       | DEFAULT CURRENT_TIMESTAMP           | Date de creation                                     |
+| updated_at        | TIMESTAMP       | DEFAULT CURRENT_TIMESTAMP ON UPDATE | Date de mise a jour                                  |
 
 **Indexes :**
+
 - PRIMARY KEY (`id`)
 - UNIQUE KEY (`email`)
 - UNIQUE KEY (`google_id`)
@@ -65,23 +66,24 @@
 
 ### Table : `applications`
 
-| Colonne | Type | Contraintes | Description |
-|---------|------|-------------|-------------|
-| id | BIGINT UNSIGNED | PRIMARY KEY, AUTO_INCREMENT | ID unique de la candidature |
-| user_id | BIGINT UNSIGNED | NOT NULL, FOREIGN KEY | Utilisateur proprietaire |
-| title | VARCHAR(255) | NOT NULL | Titre du poste |
-| company | VARCHAR(255) | NOT NULL | Nom de l'entreprise |
-| location | VARCHAR(255) | NOT NULL | Localisation du poste |
-| url | VARCHAR(2048) | NOT NULL | Lien vers l'offre |
-| description | TEXT | NULL | Description complete de l'offre |
-| source | ENUM | NOT NULL | Source ('linkedin', 'indeed', 'hellowork', 'manual') |
-| status | ENUM | DEFAULT 'to_apply' | Statut actuel (voir ci-dessous) |
-| notes | TEXT | NULL | Notes personnelles |
-| applied_at | TIMESTAMP | NULL | Date de candidature effective |
-| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Date d'ajout |
-| updated_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP ON UPDATE | Date de mise a jour |
+| Colonne     | Type            | Contraintes                         | Description                                          |
+| ----------- | --------------- | ----------------------------------- | ---------------------------------------------------- |
+| id          | BIGINT UNSIGNED | PRIMARY KEY, AUTO_INCREMENT         | ID unique de la candidature                          |
+| user_id     | BIGINT UNSIGNED | NOT NULL, FOREIGN KEY               | Utilisateur proprietaire                             |
+| title       | VARCHAR(255)    | NOT NULL                            | Titre du poste                                       |
+| company     | VARCHAR(255)    | NOT NULL                            | Nom de l'entreprise                                  |
+| location    | VARCHAR(255)    | NOT NULL                            | Localisation du poste                                |
+| url         | VARCHAR(2048)   | NOT NULL                            | Lien vers l'offre                                    |
+| description | TEXT            | NULL                                | Description complete de l'offre                      |
+| source      | ENUM            | NOT NULL                            | Source ('linkedin', 'indeed', 'hellowork', 'manual') |
+| status      | ENUM            | DEFAULT 'to_apply'                  | Statut actuel (voir ci-dessous)                      |
+| notes       | TEXT            | NULL                                | Notes personnelles                                   |
+| applied_at  | TIMESTAMP       | NULL                                | Date de candidature effective                        |
+| created_at  | TIMESTAMP       | DEFAULT CURRENT_TIMESTAMP           | Date d'ajout                                         |
+| updated_at  | TIMESTAMP       | DEFAULT CURRENT_TIMESTAMP ON UPDATE | Date de mise a jour                                  |
 
 **Enum `status` :**
+
 - `to_apply` : A postuler
 - `applied` : Postule
 - `follow_up` : Relance
@@ -90,12 +92,14 @@
 - `rejected` : Refus
 
 **Enum `source` :**
+
 - `linkedin` : Capture depuis LinkedIn
 - `indeed` : Capture depuis Indeed
 - `hellowork` : Capture depuis HelloWork
 - `manual` : Ajout manuel
 
 **Indexes :**
+
 - PRIMARY KEY (`id`)
 - FOREIGN KEY (`user_id`) REFERENCES `users(id)` ON DELETE CASCADE
 - INDEX `idx_user_status` (`user_id`, `status`)
@@ -106,29 +110,32 @@
 
 ### Table : `application_events`
 
-| Colonne | Type | Contraintes | Description |
-|---------|------|-------------|-------------|
-| id | BIGINT UNSIGNED | PRIMARY KEY, AUTO_INCREMENT | ID unique de l'evenement |
-| user_id | BIGINT UNSIGNED | NOT NULL, FOREIGN KEY | Utilisateur |
-| application_id | BIGINT UNSIGNED | NULL, FOREIGN KEY | Candidature concernee (NULL si supprimee) |
-| type | ENUM | NOT NULL | Type d'evenement (voir ci-dessous) |
-| description | TEXT | NOT NULL | Description lisible de l'evenement |
-| metadata | JSON | NULL | Donnees supplementaires (old/new values) |
-| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Date de l'evenement |
+| Colonne        | Type            | Contraintes                 | Description                               |
+| -------------- | --------------- | --------------------------- | ----------------------------------------- |
+| id             | BIGINT UNSIGNED | PRIMARY KEY, AUTO_INCREMENT | ID unique de l'evenement                  |
+| user_id        | BIGINT UNSIGNED | NOT NULL, FOREIGN KEY       | Utilisateur                               |
+| application_id | BIGINT UNSIGNED | NULL, FOREIGN KEY           | Candidature concernee (NULL si supprimee) |
+| type           | ENUM            | NOT NULL                    | Type d'evenement (voir ci-dessous)        |
+| description    | TEXT            | NOT NULL                    | Description lisible de l'evenement        |
+| metadata       | JSON            | NULL                        | Donnees supplementaires (old/new values)  |
+| created_at     | TIMESTAMP       | DEFAULT CURRENT_TIMESTAMP   | Date de l'evenement                       |
 
 **Enum `type` :**
+
 - `created` : Candidature creee
 - `status_changed` : Changement de statut
 - `updated` : Mise a jour des informations
 - `deleted` : Candidature supprimee
 
 **Indexes :**
+
 - PRIMARY KEY (`id`)
 - FOREIGN KEY (`user_id`) REFERENCES `users(id)` ON DELETE CASCADE
 - FOREIGN KEY (`application_id`) REFERENCES `applications(id)` ON DELETE SET NULL
 - INDEX `idx_user_created` (`user_id`, `created_at` DESC)
 
 **Exemple de `metadata` :**
+
 ```json
 {
   "old_status": "applied",
@@ -141,13 +148,14 @@
 
 ### Table : `password_resets`
 
-| Colonne | Type | Contraintes | Description |
-|---------|------|-------------|-------------|
-| email | VARCHAR(255) | PRIMARY KEY | Email de l'utilisateur |
-| token | VARCHAR(255) | NOT NULL | Token de reinitialisation |
-| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Date de creation |
+| Colonne    | Type         | Contraintes               | Description               |
+| ---------- | ------------ | ------------------------- | ------------------------- |
+| email      | VARCHAR(255) | PRIMARY KEY               | Email de l'utilisateur    |
+| token      | VARCHAR(255) | NOT NULL                  | Token de reinitialisation |
+| created_at | TIMESTAMP    | DEFAULT CURRENT_TIMESTAMP | Date de creation          |
 
 **Indexes :**
+
 - PRIMARY KEY (`email`)
 - INDEX (`token`)
 
@@ -157,41 +165,42 @@
 
 ### Authentification
 
-| Methode | Route | Description | Auth |
-|---------|-------|-------------|------|
-| POST | `/api/auth/register` | Inscription | Non |
-| POST | `/api/auth/login` | Connexion | Non |
-| POST | `/api/auth/logout` | Deconnexion | Oui |
-| GET | `/api/auth/google/redirect` | Redirection OAuth Google | Non |
-| GET | `/api/auth/google/callback` | Callback OAuth Google | Non |
-| GET | `/api/auth/linkedin/redirect` | Redirection OAuth LinkedIn | Non |
-| GET | `/api/auth/linkedin/callback` | Callback OAuth LinkedIn | Non |
-| POST | `/api/auth/forgot-password` | Demande reset password | Non |
-| POST | `/api/auth/reset-password` | Reset password | Non |
+| Methode | Route                         | Description                | Auth |
+| ------- | ----------------------------- | -------------------------- | ---- |
+| POST    | `/api/auth/register`          | Inscription                | Non  |
+| POST    | `/api/auth/login`             | Connexion                  | Non  |
+| POST    | `/api/auth/logout`            | Deconnexion                | Oui  |
+| GET     | `/api/auth/google/redirect`   | Redirection OAuth Google   | Non  |
+| GET     | `/api/auth/google/callback`   | Callback OAuth Google      | Non  |
+| GET     | `/api/auth/linkedin/redirect` | Redirection OAuth LinkedIn | Non  |
+| GET     | `/api/auth/linkedin/callback` | Callback OAuth LinkedIn    | Non  |
+| POST    | `/api/auth/forgot-password`   | Demande reset password     | Non  |
+| POST    | `/api/auth/reset-password`    | Reset password             | Non  |
 
 ### Utilisateur
 
-| Methode | Route | Description | Auth |
-|---------|-------|-------------|------|
-| GET | `/api/user/profile` | Recuperer le profil | Oui |
-| PUT | `/api/user/profile` | Mettre a jour le profil | Oui |
-| POST | `/api/user/avatar` | Upload avatar | Oui |
-| DELETE | `/api/user/account` | Supprimer le compte | Oui |
+| Methode | Route               | Description             | Auth |
+| ------- | ------------------- | ----------------------- | ---- |
+| GET     | `/api/user/profile` | Recuperer le profil     | Oui  |
+| PUT     | `/api/user/profile` | Mettre a jour le profil | Oui  |
+| POST    | `/api/user/avatar`  | Upload avatar           | Oui  |
+| DELETE  | `/api/user/account` | Supprimer le compte     | Oui  |
 
 ### Candidatures
 
-| Methode | Route | Description | Auth |
-|---------|-------|-------------|------|
-| GET | `/api/applications` | Liste des candidatures (avec filtres) | Oui |
-| POST | `/api/applications` | Creer une candidature | Oui |
-| GET | `/api/applications/{id}` | Detail d'une candidature | Oui |
-| PUT | `/api/applications/{id}` | Mettre a jour une candidature | Oui |
-| DELETE | `/api/applications/{id}` | Supprimer une candidature | Oui |
-| PATCH | `/api/applications/{id}/status` | Changer le statut uniquement | Oui |
-| GET | `/api/applications/timeline` | Historique des evenements | Oui |
-| GET | `/api/applications/stats` | Statistiques agregees | Oui |
+| Methode | Route                           | Description                           | Auth |
+| ------- | ------------------------------- | ------------------------------------- | ---- |
+| GET     | `/api/applications`             | Liste des candidatures (avec filtres) | Oui  |
+| POST    | `/api/applications`             | Creer une candidature                 | Oui  |
+| GET     | `/api/applications/{id}`        | Detail d'une candidature              | Oui  |
+| PUT     | `/api/applications/{id}`        | Mettre a jour une candidature         | Oui  |
+| DELETE  | `/api/applications/{id}`        | Supprimer une candidature             | Oui  |
+| PATCH   | `/api/applications/{id}/status` | Changer le statut uniquement          | Oui  |
+| GET     | `/api/applications/timeline`    | Historique des evenements             | Oui  |
+| GET     | `/api/applications/stats`       | Statistiques agregees                 | Oui  |
 
 **Exemples de query params pour `/api/applications` :**
+
 ```
 GET /api/applications?status=applied&source=linkedin&search=developer&sort=created_at&per_page=50&page=1
 GET /api/applications?from_date=2025-01-01&to_date=2025-03-31
@@ -233,6 +242,7 @@ src/
 ### Gestion de l'etat
 
 **Option 1 : Context API (recommande pour MVP)**
+
 ```jsx
 // contexts/AuthContext.jsx
 export const AuthContext = createContext();
@@ -257,6 +267,7 @@ export const useAuth = () => useContext(AuthContext);
 ```
 
 **Option 2 : Zustand (si besoin de plus de performance)**
+
 ```js
 // stores/authStore.js
 import create from 'zustand';
@@ -307,11 +318,7 @@ extension/
   "name": "JobTracker",
   "version": "1.0.0",
   "description": "Suivez vos candidatures d'emploi facilement",
-  "permissions": [
-    "storage",
-    "tabs",
-    "activeTab"
-  ],
+  "permissions": ["storage", "tabs", "activeTab"],
   "host_permissions": [
     "https://www.linkedin.com/*",
     "https://*.indeed.com/*",
@@ -366,16 +373,17 @@ extension/
 ```
 
 **Exemple de communication :**
+
 ```javascript
 // content.js - Envoie les donnees scrapees
 chrome.runtime.sendMessage({
-  type: 'JOB_SCRAPED',
-  data: { title: '...', company: '...' }
+  type: "JOB_SCRAPED",
+  data: { title: "...", company: "..." },
 });
 
 // background.js - Recoit et traite
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === 'JOB_SCRAPED') {
+  if (message.type === "JOB_SCRAPED") {
     // Envoyer vers l'API
     sendToAPI(message.data);
   }
@@ -392,11 +400,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 // content/scrapers/linkedin.js
 export function scrapeLinkedIn() {
   return {
-    title: document.querySelector('.top-card-layout__title')?.innerText.trim(),
-    company: document.querySelector('.topcard__org-name-link')?.innerText.trim(),
-    location: document.querySelector('.topcard__flavor--bullet')?.innerText.trim(),
-    description: document.querySelector('.description__text')?.innerText.trim(),
-    url: window.location.href
+    title: document.querySelector(".top-card-layout__title")?.innerText.trim(),
+    company: document
+      .querySelector(".topcard__org-name-link")
+      ?.innerText.trim(),
+    location: document
+      .querySelector(".topcard__flavor--bullet")
+      ?.innerText.trim(),
+    description: document.querySelector(".description__text")?.innerText.trim(),
+    url: window.location.href,
   };
 }
 ```
@@ -407,11 +419,19 @@ export function scrapeLinkedIn() {
 // content/scrapers/indeed.js
 export function scrapeIndeed() {
   return {
-    title: document.querySelector('.jobsearch-JobInfoHeader-title')?.innerText.trim(),
-    company: document.querySelector('[data-testid="company-name"]')?.innerText.trim(),
-    location: document.querySelector('[data-testid="job-location"]')?.innerText.trim(),
-    description: document.querySelector('#jobDescriptionText')?.innerText.trim(),
-    url: window.location.href
+    title: document
+      .querySelector(".jobsearch-JobInfoHeader-title")
+      ?.innerText.trim(),
+    company: document
+      .querySelector('[data-testid="company-name"]')
+      ?.innerText.trim(),
+    location: document
+      .querySelector('[data-testid="job-location"]')
+      ?.innerText.trim(),
+    description: document
+      .querySelector("#jobDescriptionText")
+      ?.innerText.trim(),
+    url: window.location.href,
   };
 }
 ```
@@ -423,10 +443,16 @@ export function scrapeIndeed() {
 export function scrapeHelloWork() {
   return {
     title: document.querySelector('[itemprop="title"]')?.innerText.trim(),
-    company: document.querySelector('[itemprop="hiringOrganization"]')?.innerText.trim(),
-    location: document.querySelector('[itemprop="jobLocation"]')?.innerText.trim(),
-    description: document.querySelector('[itemprop="description"]')?.innerText.trim(),
-    url: window.location.href
+    company: document
+      .querySelector('[itemprop="hiringOrganization"]')
+      ?.innerText.trim(),
+    location: document
+      .querySelector('[itemprop="jobLocation"]')
+      ?.innerText.trim(),
+    description: document
+      .querySelector('[itemprop="description"]')
+      ?.innerText.trim(),
+    url: window.location.href,
   };
 }
 ```
@@ -613,7 +639,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2'
+          php-version: "8.2"
       - name: Install dependencies
         run: composer install
       - name: Run tests
@@ -630,4 +656,4 @@ jobs:
 
 ---
 
-*Document genere le 2025-03-30*
+_Document genere le 2025-03-30_

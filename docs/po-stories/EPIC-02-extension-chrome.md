@@ -34,12 +34,15 @@ P0 - Fonctionnalite core de l'application
 # US-101 : Detection automatique du site d'offres d'emploi
 
 ## En tant que
+
 Utilisateur de l'extension
 
 ## Je veux
+
 Que l'extension detecte automatiquement si je suis sur une page d'offre d'emploi
 
 ## Afin de
+
 Savoir si je peux capturer l'offre ou pas
 
 ## Criteres d'acceptation
@@ -63,8 +66,10 @@ Savoir si je peux capturer l'offre ou pas
 ## Contexte technique
 
 **Extension :**
+
 - Fichier `content-script.js` injecte sur les domaines cibles
 - Utilisation de `manifest.json` avec `content_scripts` :
+
 ```json
 {
   "content_scripts": [
@@ -79,20 +84,23 @@ Savoir si je peux capturer l'offre ou pas
   ]
 }
 ```
+
 - Detection via regex sur `window.location.href`
 - Communication avec le background script via `chrome.runtime.sendMessage`
 - Changement de l'icone via `chrome.action.setIcon`
 
 **Patterns de detection :**
+
 ```javascript
 const JOB_PATTERNS = {
   linkedin: /^https:\/\/www\.linkedin\.com\/jobs\/view\/\d+/,
   indeed: /^https:\/\/[a-z]{2}\.indeed\.com\/viewjob/,
-  hellowork: /^https:\/\/www\.hellowork\.com\/[^\/]+\/emploi\//
+  hellowork: /^https:\/\/www\.hellowork\.com\/[^\/]+\/emploi\//,
 };
 ```
 
 **Detection des changements d'URL en SPA :**
+
 - Utiliser un `MutationObserver` ou `setInterval(1000)` pour surveiller `window.location.href`
 - Ou ecouter les events `popstate` et `pushstate` (override de history.pushState)
 - Re-verifier les patterns d'URL a chaque changement detecte
@@ -118,12 +126,15 @@ Complexite : Faible
 # US-102 : Scraping des informations de l'offre (LinkedIn)
 
 ## En tant que
+
 Utilisateur sur une page d'offre LinkedIn
 
 ## Je veux
+
 Que l'extension capture automatiquement les informations de l'offre
 
 ## Afin de
+
 Ne pas avoir a recopier manuellement les informations
 
 ## Criteres d'acceptation
@@ -154,30 +165,32 @@ Ne pas avoir a recopier manuellement les informations
 ## Contexte technique
 
 **Scraping LinkedIn :**
+
 - Les selecteurs CSS peuvent changer, prevoir une logique de fallback
 - Exemple de selecteurs avec fallbacks (a valider) :
+
 ```javascript
 const linkedinSelectors = {
   title: [
-    '.top-card-layout__title',
-    '.jobs-unified-top-card__job-title',
-    'h1.t-24'
+    ".top-card-layout__title",
+    ".jobs-unified-top-card__job-title",
+    "h1.t-24",
   ],
   company: [
-    '.topcard__org-name-link',
-    '.jobs-unified-top-card__company-name',
-    'a.ember-view'
+    ".topcard__org-name-link",
+    ".jobs-unified-top-card__company-name",
+    "a.ember-view",
   ],
   location: [
-    '.topcard__flavor--bullet',
-    '.jobs-unified-top-card__bullet',
-    'span.jobs-unified-top-card__workplace-type'
+    ".topcard__flavor--bullet",
+    ".jobs-unified-top-card__bullet",
+    "span.jobs-unified-top-card__workplace-type",
   ],
   description: [
-    '.description__text',
-    '.jobs-description__content',
-    'div[class*="description"]'
-  ]
+    ".description__text",
+    ".jobs-description__content",
+    'div[class*="description"]',
+  ],
 };
 
 // Fonction de scraping avec fallback
@@ -191,11 +204,13 @@ function scrapeField(selectors) {
   return null; // Aucun selecteur n'a fonctionne
 }
 ```
+
 - Utilisation de `document.querySelector` avec tentatives multiples
 - Nettoyage du texte (trim, suppression des espaces multiples)
 - Logging des selecteurs qui echouent pour mise a jour future
 
 **Popup :**
+
 - Affichage des champs dans un formulaire
 - Inputs editables
 - Validation avant envoi
@@ -221,12 +236,15 @@ Complexite : Elevee
 # US-103 : Scraping des informations de l'offre (Indeed)
 
 ## En tant que
+
 Utilisateur sur une page d'offre Indeed
 
 ## Je veux
+
 Que l'extension capture automatiquement les informations de l'offre
 
 ## Afin de
+
 Ne pas avoir a recopier manuellement les informations
 
 ## Criteres d'acceptation
@@ -257,32 +275,35 @@ Ne pas avoir a recopier manuellement les informations
 ## Contexte technique
 
 **Scraping Indeed :**
+
 - Indeed a plusieurs layouts selon les pays/langues, fallbacks critiques
 - Exemple de selecteurs avec fallbacks (a valider) :
+
 ```javascript
 const indeedSelectors = {
   title: [
-    '.jobsearch-JobInfoHeader-title',
+    ".jobsearch-JobInfoHeader-title",
     'h1[class*="jobTitle"]',
-    '.icl-u-xs-mb--xs'
+    ".icl-u-xs-mb--xs",
   ],
   company: [
     '[data-testid="company-name"]',
-    '[data-company-name]',
-    'div[class*="companyName"]'
+    "[data-company-name]",
+    'div[class*="companyName"]',
   ],
   location: [
     '[data-testid="job-location"]',
     'div[class*="companyLocation"]',
-    '.jobsearch-JobInfoHeader-subtitle'
+    ".jobsearch-JobInfoHeader-subtitle",
   ],
   description: [
-    '#jobDescriptionText',
+    "#jobDescriptionText",
     'div[id*="jobDesc"]',
-    '.jobsearch-jobDescriptionText'
-  ]
+    ".jobsearch-jobDescriptionText",
+  ],
 };
 ```
+
 - Utiliser la meme logique de fallback que LinkedIn (fonction `scrapeField`)
 
 ## Dependances
@@ -306,12 +327,15 @@ Complexite : Elevee
 # US-104 : Scraping des informations de l'offre (HelloWork)
 
 ## En tant que
+
 Utilisateur sur une page d'offre HelloWork
 
 ## Je veux
+
 Que l'extension capture automatiquement les informations de l'offre
 
 ## Afin de
+
 Ne pas avoir a recopier manuellement les informations
 
 ## Criteres d'acceptation
@@ -342,32 +366,31 @@ Ne pas avoir a recopier manuellement les informations
 ## Contexte technique
 
 **Scraping HelloWork :**
+
 - HelloWork a une structure HTML plus stable que LinkedIn/Indeed (utilise des microdata schema.org)
 - Exemple de selecteurs avec fallbacks (a valider) :
+
 ```javascript
 const helloworkSelectors = {
-  title: [
-    '[itemprop="title"]',
-    'h1.offer-title',
-    'h1'
-  ],
+  title: ['[itemprop="title"]', "h1.offer-title", "h1"],
   company: [
     '[itemprop="hiringOrganization"]',
-    '.company-name',
-    'div[class*="company"]'
+    ".company-name",
+    'div[class*="company"]',
   ],
   location: [
     '[itemprop="jobLocation"]',
-    '.offer-location',
-    'span[class*="location"]'
+    ".offer-location",
+    'span[class*="location"]',
   ],
   description: [
     '[itemprop="description"]',
-    '.offer-description',
-    'div[class*="description"]'
-  ]
+    ".offer-description",
+    'div[class*="description"]',
+  ],
 };
 ```
+
 - Utiliser la meme logique de fallback que LinkedIn et Indeed
 
 ## Dependances
@@ -390,18 +413,22 @@ Complexite : Elevee
 # US-105 : Envoi des donnees vers l'API
 
 ## En tant que
+
 Utilisateur ayant capture une offre
 
 ## Je veux
+
 Que l'extension envoie automatiquement l'offre vers mon compte JobTracker
 
 ## Afin de
+
 Retrouver l'offre dans mon dashboard
 
 ## Criteres d'acceptation
 
 - [ ] Au clic sur "Ajouter a mes candidatures", appel POST vers l'API `/api/applications`
 - [ ] Payload JSON contenant :
+
 ```json
 {
   "title": "...",
@@ -413,6 +440,7 @@ Retrouver l'offre dans mon dashboard
   "status": "to_apply"
 }
 ```
+
 - [ ] Avant l'envoi, verifier la presence et la validite du token JWT :
   - Si token absent ou expire (erreur 401 de l'API) : afficher "Session expiree, reconnectez-vous" et ouvrir le login
   - Sinon : poursuivre l'envoi
@@ -438,12 +466,14 @@ Retrouver l'offre dans mon dashboard
 ## Contexte technique
 
 **Extension :**
+
 - Utilisation de `fetch` dans le background script
 - Token recupere depuis `chrome.storage.local`
 - Timeout de 10 secondes
 - Retry automatique apres echec (max 3 tentatives)
 
 **API :**
+
 - Route POST `/api/applications`
 - Auth middleware
 - Retourne la candidature creee avec son ID
@@ -468,12 +498,15 @@ Complexite : Moyenne
 # US-106 : Feedback visuel de confirmation
 
 ## En tant que
+
 Utilisateur ayant ajoute une offre
 
 ## Je veux
+
 Avoir un feedback visuel clair que l'offre a ete ajoutee
 
 ## Afin de
+
 Etre sur que l'action a fonctionne
 
 ## Criteres d'acceptation
@@ -496,12 +529,15 @@ Etre sur que l'action a fonctionne
 ## Contexte technique
 
 **Extension :**
+
 - Utilisation de `chrome.notifications` pour les notifications systeme (optionnel)
 - Ou notification custom dans le popup avec CSS animations
 - Stockage temporaire des URLs deja ajoutees dans `chrome.storage.local` (cache de 7 jours)
 
 **Detection des offres deja ajoutees :**
+
 - Stocker les URLs des offres ajoutees dans `chrome.storage.local` avec timestamp
+
 ```javascript
 {
   "added_urls": {
@@ -510,6 +546,7 @@ Etre sur que l'action a fonctionne
   }
 }
 ```
+
 - Au scraping, verifier si `window.location.href` existe dans `added_urls`
 - Si oui et age < 7 jours, afficher "Offre deja ajoutee le [date]" avec lien vers le dashboard
 - Nettoyer les entrees de plus de 7 jours automatiquement
@@ -532,12 +569,15 @@ Complexite : Faible
 # US-107 : Gestion des erreurs et retry
 
 ## En tant que
+
 Utilisateur de l'extension
 
 ## Je veux
+
 Que l'extension gere les erreurs de maniere intelligente
 
 ## Afin de
+
 Ne pas perdre mes donnees en cas de probleme reseau
 
 ## Criteres d'acceptation
@@ -567,9 +607,11 @@ Ne pas perdre mes donnees en cas de probleme reseau
 ## Contexte technique
 
 **Extension :**
+
 - Utilisation de `navigator.onLine` pour detecter le statut reseau
 - Event listeners sur `online` et `offline`
 - Queue de sync dans `chrome.storage.local` :
+
 ```json
 {
   "pending_applications": [
@@ -577,6 +619,7 @@ Ne pas perdre mes donnees en cas de probleme reseau
   ]
 }
 ```
+
 - Background script qui ecoute les changements de connexion
 - Exponential backoff pour les retries
 
@@ -599,12 +642,15 @@ Complexite : Elevee
 # US-108 : Mode manuel de saisie (fallback scraping)
 
 ## En tant que
+
 Utilisateur sur une offre dont le scraping a echoue
 
 ## Je veux
+
 Saisir manuellement les informations de l'offre
 
 ## Afin de
+
 Pouvoir quand meme ajouter l'offre a mes candidatures sans dependre du scraping
 
 ## Criteres d'acceptation
@@ -633,17 +679,19 @@ Pouvoir quand meme ajouter l'offre a mes candidatures sans dependre du scraping
 ## Contexte technique
 
 **Extension :**
+
 - Composant `ManualForm.jsx` ou HTML/CSS simple dans le popup
 - Reutiliser la logique d'envoi API de US-105
 - Stocker les donnees saisies dans `chrome.storage.local` en cas d'echec reseau (comme US-107)
 
 **Declenchement du mode manuel :**
+
 ```javascript
 // Dans content-script.js
 const scrapedData = scrapeSite();
 if (!scrapedData.title || !scrapedData.company || !scrapedData.location) {
   // Afficher le bouton "Saisie manuelle" dans le popup
-  chrome.runtime.sendMessage({ type: 'SCRAPING_PARTIAL', data: scrapedData });
+  chrome.runtime.sendMessage({ type: "SCRAPING_PARTIAL", data: scrapedData });
 }
 ```
 
@@ -667,12 +715,15 @@ Complexite : Faible
 # US-109 : Configuration des sites a surveiller
 
 ## En tant que
+
 Utilisateur de l'extension
 
 ## Je veux
+
 Activer ou desactiver la detection sur LinkedIn, Indeed, ou HelloWork
 
 ## Afin de
+
 Eviter les notifications et badges sur les sites que je n'utilise pas
 
 ## Criteres d'acceptation
@@ -684,6 +735,7 @@ Eviter les notifications et badges sur les sites que je n'utilise pas
   - ☑ HelloWork
 - [ ] Par defaut, les 3 sites sont actives (checked)
 - [ ] Au clic sur une checkbox, sauvegarder la configuration dans `chrome.storage.local` :
+
 ```json
 {
   "enabled_sites": {
@@ -693,6 +745,7 @@ Eviter les notifications et badges sur les sites que je n'utilise pas
   }
 }
 ```
+
 - [ ] Si un site est desactive, ne pas afficher l'icone verte ni le badge sur ce site
 - [ ] Afficher un message "Site desactive" dans le popup si l'utilisateur est sur un site desactive
 - [ ] La configuration persiste entre les sessions
@@ -706,13 +759,19 @@ Eviter les notifications et badges sur les sites que je n'utilise pas
 ## Contexte technique
 
 **Extension :**
+
 - Ajouter un onglet "Parametres" dans `popup.html`
 - Lire la config depuis `chrome.storage.local` au chargement du content script
 - Modifier la logique de detection (US-101) pour respecter la config :
+
 ```javascript
 // Dans content-script.js
-chrome.storage.local.get(['enabled_sites'], (result) => {
-  const config = result.enabled_sites || { linkedin: true, indeed: true, hellowork: true };
+chrome.storage.local.get(["enabled_sites"], (result) => {
+  const config = result.enabled_sites || {
+    linkedin: true,
+    indeed: true,
+    hellowork: true,
+  };
 
   if (isLinkedIn() && config.linkedin) {
     // Activer la detection
@@ -727,6 +786,7 @@ chrome.storage.local.get(['enabled_sites'], (result) => {
 ```
 
 **UI Parametres :**
+
 - Design simple avec switches ou checkboxes
 - Message explicatif : "Choisissez les sites sur lesquels vous souhaitez capturer des offres"
 

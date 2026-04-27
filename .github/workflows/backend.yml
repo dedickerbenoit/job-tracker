@@ -4,13 +4,13 @@ on:
   push:
     branches: [main]
     paths:
-      - 'backend/**'
-      - '.github/workflows/backend.yml'
+      - "backend/**"
+      - ".github/workflows/backend.yml"
   pull_request:
     branches: [main]
     paths:
-      - 'backend/**'
-      - '.github/workflows/backend.yml'
+      - "backend/**"
+      - ".github/workflows/backend.yml"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -30,7 +30,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: "8.3"
           tools: composer:v2
           coverage: none
 
@@ -59,7 +59,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: "8.3"
           extensions: mbstring, xml, sqlite3, pdo_sqlite
           tools: composer:v2
           coverage: xdebug
@@ -92,7 +92,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: "8.3"
           tools: composer:v2
           coverage: none
 

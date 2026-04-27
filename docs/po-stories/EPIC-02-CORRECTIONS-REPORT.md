@@ -10,21 +10,23 @@
 
 ### Story Points harmonisés
 
-| Version | Nombre US | Story Points | Statut |
-|---------|-----------|--------------|--------|
-| **Avant** | 7 US | 43 SP (fichier) / 48 SP (roadmap) | ❌ Incohérent |
-| **Après** | 9 US | 48 SP | ✅ Cohérent |
+| Version   | Nombre US | Story Points                      | Statut        |
+| --------- | --------- | --------------------------------- | ------------- |
+| **Avant** | 7 US      | 43 SP (fichier) / 48 SP (roadmap) | ❌ Incohérent |
+| **Après** | 9 US      | 48 SP                             | ✅ Cohérent   |
 
 ---
 
 ## ✅ Corrections P0 (Critiques)
 
 ### 1. Harmonisation des story points
+
 - **Problème** : MVP-ROADMAP indiquait 48 SP, EPIC-02 indiquait 43 SP
 - **Solution** : Ajout de 2 nouvelles US (US-108, US-109) pour atteindre 48 SP
 - **Impact** : Cohérence totale entre roadmap et EPIC
 
 ### 2. Dépendance US-007 (auth extension) manquante
+
 - **Problème** : US-102, US-103, US-104 ne mentionnaient pas US-007 dans leurs dépendances
 - **Solution** : Ajout de `US-007 (auth extension)` dans les dépendances de US-102, US-103, US-104
 - **Impact** : Les développeurs ne peuvent plus démarrer le scraping sans avoir implémenté l'auth
@@ -34,6 +36,7 @@
 ## 🔧 Corrections P1 (Importantes)
 
 ### 3. Stratégie de fallback pour les sélecteurs CSS
+
 - **Problème** : Sélecteurs fragiles sans stratégie de fallback documentée
 - **Solution** :
   - Ajout de sélecteurs alternatifs pour chaque champ (3-4 sélecteurs par champ)
@@ -43,12 +46,13 @@
 - **Impact** : Résilience accrue face aux changements de DOM
 
 **Exemple de code ajouté :**
+
 ```javascript
 const linkedinSelectors = {
   title: [
-    '.top-card-layout__title',
-    '.jobs-unified-top-card__job-title',
-    'h1.t-24'
+    ".top-card-layout__title",
+    ".jobs-unified-top-card__job-title",
+    "h1.t-24",
   ],
   // ...
 };
@@ -65,6 +69,7 @@ function scrapeField(selectors) {
 ```
 
 ### 4. Détection "offre déjà ajoutée"
+
 - **Problème** : Critère non clarifié (comment détecter qu'une offre est déjà ajoutée ?)
 - **Solution** :
   - Cache local des URLs ajoutées dans `chrome.storage.local` (7 jours)
@@ -74,6 +79,7 @@ function scrapeField(selectors) {
 - **Impact** : UX améliorée, évite les doublons involontaires
 
 **Structure de données ajoutée :**
+
 ```json
 {
   "added_urls": {
@@ -86,6 +92,7 @@ function scrapeField(selectors) {
 ```
 
 ### 5. Détection d'URL en SPA sans reload
+
 - **Problème** : Pas de solution technique proposée pour détecter les changements d'URL en SPA
 - **Solution** :
   - Utilisation de `MutationObserver` ou `setInterval(1000)` pour surveiller `window.location.href`
@@ -95,6 +102,7 @@ function scrapeField(selectors) {
 - **Impact** : Extension fonctionnelle sur les SPAs (LinkedIn, Indeed)
 
 ### 6. Vérification du token JWT avant envoi
+
 - **Problème** : Cas du token expiré géré dans US-107 mais pas dans US-105
 - **Solution** : Ajout d'un critère explicite dans US-105 :
   - Vérifier token avant envoi
@@ -103,6 +111,7 @@ function scrapeField(selectors) {
 - **Impact** : Meilleure gestion des sessions expirées
 
 ### 7. Sync automatique au retour de connexion
+
 - **Problème** : Critère ambitieux sans précision technique (comment détecter le "retour de connexion" ?)
 - **Solution** :
   - Event `online` + ping API `/api/health`
@@ -123,6 +132,7 @@ function scrapeField(selectors) {
 **Besoin** : Si le scraping échoue, permettre une saisie manuelle des informations
 
 **Critères principaux :**
+
 - Bouton "Saisie manuelle" si scraping partiel
 - Formulaire avec pré-remplissage des champs réussis
 - Validation front-end + envoi API identique à US-105
@@ -130,6 +140,7 @@ function scrapeField(selectors) {
 **Dépendances** : Bloqué par US-102, US-103, US-104, US-105
 
 **Valeur ajoutée** :
+
 - Excellent fallback pour garantir une UX complète
 - Permet d'ajouter des offres depuis d'autres sites non supportés
 
@@ -143,6 +154,7 @@ function scrapeField(selectors) {
 **Besoin** : Permettre d'activer/désactiver la détection sur LinkedIn/Indeed/HelloWork
 
 **Critères principaux :**
+
 - Onglet "Paramètres" dans le popup
 - 3 checkboxes (LinkedIn, Indeed, HelloWork)
 - Sauvegarde dans `chrome.storage.local`
@@ -151,6 +163,7 @@ function scrapeField(selectors) {
 **Dépendances** : Bloqué par US-101
 
 **Valeur ajoutée** :
+
 - Fonctionnalité simple mais très appréciée
 - Évite les notifications sur les sites non utilisés
 
@@ -158,30 +171,30 @@ function scrapeField(selectors) {
 
 ## 📈 Améliorations apportées par critère d'acceptation
 
-| US | Nouveaux critères | Impact |
-|----|-------------------|--------|
-| **US-101** | Détection SPA (MutationObserver) | ⭐⭐⭐⭐ |
-| **US-102** | Fallback sélecteurs + logging | ⭐⭐⭐⭐⭐ |
-| **US-103** | Fallback sélecteurs + logging | ⭐⭐⭐⭐⭐ |
-| **US-104** | Fallback sélecteurs + logging | ⭐⭐⭐⭐⭐ |
-| **US-105** | Vérification token avant envoi | ⭐⭐⭐⭐ |
-| **US-106** | Cache local des URLs ajoutées | ⭐⭐⭐⭐ |
-| **US-107** | Ping API /health avant sync | ⭐⭐⭐ |
+| US         | Nouveaux critères                | Impact     |
+| ---------- | -------------------------------- | ---------- |
+| **US-101** | Détection SPA (MutationObserver) | ⭐⭐⭐⭐   |
+| **US-102** | Fallback sélecteurs + logging    | ⭐⭐⭐⭐⭐ |
+| **US-103** | Fallback sélecteurs + logging    | ⭐⭐⭐⭐⭐ |
+| **US-104** | Fallback sélecteurs + logging    | ⭐⭐⭐⭐⭐ |
+| **US-105** | Vérification token avant envoi   | ⭐⭐⭐⭐   |
+| **US-106** | Cache local des URLs ajoutées    | ⭐⭐⭐⭐   |
+| **US-107** | Ping API /health avant sync      | ⭐⭐⭐     |
 
 ---
 
 ## 🎯 Checklist de validation finale
 
-| Critère | Avant | Après |
-|---------|-------|-------|
-| Toutes les US sont présentes | ✅ | ✅ |
-| Critères d'acceptation testables | ✅ | ✅ |
-| Dépendances cohérentes | ⚠️ | ✅ |
-| Story points cohérents avec roadmap | ❌ | ✅ |
-| Sélecteurs CSS avec fallback | ❌ | ✅ |
-| Gestion des cas limites | ⚠️ | ✅ |
-| Mode offline robuste | ✅ | ✅ |
-| Tests manuels sur 10+ offres | ✅ | ✅ |
+| Critère                             | Avant | Après |
+| ----------------------------------- | ----- | ----- |
+| Toutes les US sont présentes        | ✅    | ✅    |
+| Critères d'acceptation testables    | ✅    | ✅    |
+| Dépendances cohérentes              | ⚠️    | ✅    |
+| Story points cohérents avec roadmap | ❌    | ✅    |
+| Sélecteurs CSS avec fallback        | ❌    | ✅    |
+| Gestion des cas limites             | ⚠️    | ✅    |
+| Mode offline robuste                | ✅    | ✅    |
+| Tests manuels sur 10+ offres        | ✅    | ✅    |
 
 ---
 
@@ -205,15 +218,18 @@ function scrapeField(selectors) {
 ## 🚀 Prochaines étapes recommandées
 
 ### Phase 1 : Validation (avant dev)
+
 1. ✅ Revue de l'EPIC par l'équipe technique
 2. ✅ Validation des sélecteurs CSS sur les sites réels
 3. ✅ Validation de la faisabilité technique (MutationObserver, etc.)
 
 ### Phase 2 : Développement
+
 1. Sprint 3.1 : US-101, US-102, US-103, US-104
 2. Sprint 3.2 : US-105, US-106, US-107, US-108, US-109
 
 ### Phase 3 : Tests
+
 1. Tests manuels sur 10+ offres par site
 2. Tests de résilience (changement de DOM, offline, token expiré)
 3. Tests cross-browser (Chrome, Edge)
@@ -231,17 +247,18 @@ function scrapeField(selectors) {
 
 ### Risques résiduels
 
-| Risque | Mitigation |
-|--------|-----------|
-| Sélecteurs LinkedIn changent rapidement | Monitoring automatique + alerts |
-| MutationObserver lourd en perf | Throttle à 1 check/seconde |
-| Cache local déborde | Limite à 50 URLs max + nettoyage |
+| Risque                                  | Mitigation                       |
+| --------------------------------------- | -------------------------------- |
+| Sélecteurs LinkedIn changent rapidement | Monitoring automatique + alerts  |
+| MutationObserver lourd en perf          | Throttle à 1 check/seconde       |
+| Cache local déborde                     | Limite à 50 URLs max + nettoyage |
 
 ---
 
 ## ✅ Conclusion
 
 L'EPIC 02 est maintenant **validé et prêt pour le développement** avec :
+
 - ✅ 9 user stories détaillées (48 SP)
 - ✅ Dépendances cohérentes
 - ✅ Stratégies de fallback documentées
@@ -252,4 +269,4 @@ L'EPIC 02 est maintenant **validé et prêt pour le développement** avec :
 
 ---
 
-*Rapport généré le 2026-04-01 par l'agent PO (Claude Opus 4.6)*
+_Rapport généré le 2026-04-01 par l'agent PO (Claude Opus 4.6)_

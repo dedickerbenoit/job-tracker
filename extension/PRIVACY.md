@@ -15,11 +15,11 @@ L'extension JobTracker collecte uniquement les données suivantes, **à l'initia
 
 ## Permissions utilisées
 
-| Permission | Justification |
-|---|---|
-| `activeTab` | Lire le contenu de l'onglet actif lorsque l'utilisateur clique sur l'icône de l'extension |
-| `storage` | Sauvegarder les préférences utilisateur (sites activés) |
-| `host_permissions` (sites d'emploi) | Détecter les pages d'offres d'emploi et permettre le scraping à la demande |
+| Permission                          | Justification                                                                             |
+| ----------------------------------- | ----------------------------------------------------------------------------------------- |
+| `activeTab`                         | Lire le contenu de l'onglet actif lorsque l'utilisateur clique sur l'icône de l'extension |
+| `storage`                           | Sauvegarder les préférences utilisateur (sites activés)                                   |
+| `host_permissions` (sites d'emploi) | Détecter les pages d'offres d'emploi et permettre le scraping à la demande                |
 
 ## Aucune collecte automatique
 
@@ -35,6 +35,7 @@ L'extension **ne scrape jamais automatiquement** les pages web. Le scraping n'es
 ## Vos droits
 
 Conformément au RGPD, vous pouvez :
+
 - **Exporter** toutes vos données depuis votre profil JobTracker
 - **Supprimer** votre compte et toutes les données associées
 - **Désinstaller** l'extension à tout moment — aucune donnée locale ne persiste

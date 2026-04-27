@@ -41,7 +41,9 @@ export function SearchBar() {
       .finally(() => {
         if (!cancelled) setLoading(false);
       });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [debouncedQuery]);
 
   // Close on outside click

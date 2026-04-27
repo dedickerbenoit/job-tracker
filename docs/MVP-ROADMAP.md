@@ -3,6 +3,7 @@
 ## Vue d'ensemble du projet
 
 **JobTracker** est un SaaS gratuit de suivi de candidatures d'emploi, compose de 3 composants :
+
 1. Extension Chrome pour capturer les offres depuis LinkedIn, Indeed, HelloWork
 2. API Backend Laravel pour stocker et gerer les candidatures
 3. Dashboard React pour visualiser et gerer les candidatures
@@ -14,13 +15,13 @@
 
 ## Epics du MVP
 
-| Epic | Titre | User Stories | Story Points | Priorite |
-|------|-------|-------------|--------------|----------|
-| **EPIC 01** | Authentification et gestion de compte | 7 US (US-001 a US-007) | 36 SP | P0 |
-| **EPIC 02** | Extension Chrome - Capture d'offres | 9 US (US-101 a US-109) | 48 SP | P0 |
-| **EPIC 03** | API Backend Laravel - Gestion des candidatures | 8 US (US-201 a US-208) | 38 SP | P0 |
-| **EPIC 04** | Dashboard React - Interface utilisateur | 10 US (US-301 a US-310) | 67 SP | P0 |
-| **TOTAL MVP** | | **34 User Stories** | **189 SP** | |
+| Epic          | Titre                                          | User Stories            | Story Points | Priorite |
+| ------------- | ---------------------------------------------- | ----------------------- | ------------ | -------- |
+| **EPIC 01**   | Authentification et gestion de compte          | 7 US (US-001 a US-007)  | 36 SP        | P0       |
+| **EPIC 02**   | Extension Chrome - Capture d'offres            | 9 US (US-101 a US-109)  | 48 SP        | P0       |
+| **EPIC 03**   | API Backend Laravel - Gestion des candidatures | 8 US (US-201 a US-208)  | 38 SP        | P0       |
+| **EPIC 04**   | Dashboard React - Interface utilisateur        | 10 US (US-301 a US-310) | 67 SP        | P0       |
+| **TOTAL MVP** |                                                | **34 User Stories**     | **189 SP**   |          |
 
 **Estimation de charge** : 189 story points ~ **6-8 semaines** pour 1 developpeur full-stack
 
@@ -33,6 +34,7 @@
 **Objectif** : Mettre en place l'infrastructure et l'authentification
 
 #### Sprint 1.1 : Setup projet + Auth basique
+
 - [ ] **Setup** : Initialiser les 3 repos Git (extension, backend, frontend)
 - [ ] **US-001** : Inscription par email/mot de passe (Backend + Frontend)
 - [ ] **US-002** : Connexion par email/mot de passe (Backend + Frontend)
@@ -41,6 +43,7 @@
 **Livrable** : Application web ou un utilisateur peut s'inscrire, se connecter, et gerer son profil
 
 #### Sprint 1.2 : Social login + Auth extension
+
 - [ ] **US-003** : Connexion via Google OAuth
 - [ ] **US-004** : Connexion via LinkedIn OAuth
 - [ ] **US-006** : Reinitialisation du mot de passe
@@ -55,6 +58,7 @@
 **Objectif** : Developper l'API complete de gestion des candidatures
 
 #### Sprint 2.1 : CRUD candidatures
+
 - [ ] **US-201** : Creation d'une candidature (API)
 - [ ] **US-202** : Liste des candidatures avec filtres et tri
 - [ ] **US-203** : Detail d'une candidature
@@ -64,6 +68,7 @@
 **Livrable** : API REST complete pour le CRUD candidatures (testable via Postman)
 
 #### Sprint 2.2 : Fonctionnalites avancees API
+
 - [ ] **US-206** : Changement de statut d'une candidature
 - [ ] **US-207** : Detection de doublons
 - [ ] **US-208** : Historique des changements (timeline)
@@ -78,6 +83,7 @@
 **Objectif** : Developper l'extension pour capturer les offres
 
 #### Sprint 3.1 : Detection et scraping basique
+
 - [ ] **US-101** : Detection automatique du site d'offres d'emploi
 - [ ] **US-102** : Scraping des informations (LinkedIn)
 - [ ] **US-103** : Scraping des informations (Indeed)
@@ -86,6 +92,7 @@
 **Livrable** : Extension capable de detecter et scraper les 3 sites
 
 #### Sprint 3.2 : Envoi API et gestion erreurs
+
 - [ ] **US-105** : Envoi des donnees vers l'API
 - [ ] **US-106** : Feedback visuel de confirmation
 - [ ] **US-107** : Gestion des erreurs et retry
@@ -101,6 +108,7 @@
 **Objectif** : Developper l'interface utilisateur complete
 
 #### Sprint 4.1 : Structure + Kanban
+
 - [ ] **US-301** : Page d'accueil / Dashboard principale
 - [ ] **US-302** : Vue Kanban avec drag & drop
 - [ ] **US-309** : Detail d'une candidature (modal)
@@ -108,6 +116,7 @@
 **Livrable** : Dashboard avec navigation et vue Kanban fonctionnelle
 
 #### Sprint 4.2 : Liste + Ajout/Edition
+
 - [ ] **US-303** : Vue Liste avec filtres et tri
 - [ ] **US-306** : Ajout manuel d'une candidature
 - [ ] **US-307** : Edition d'une candidature
@@ -117,6 +126,7 @@
 **Livrable** : Dashboard complet avec toutes les actions CRUD
 
 #### Sprint 4.3 : Timeline + Stats
+
 - [ ] **US-304** : Vue Timeline (historique)
 - [ ] **US-305** : Vue Stats (statistiques)
 
@@ -184,6 +194,7 @@ Le MVP est considere termine quand :
 ## Stack technique detaillee
 
 ### Extension Chrome
+
 - **Manifest** : V3
 - **Language** : JavaScript (ES6+)
 - **Scraping** : Vanilla JS (querySelector)
@@ -191,6 +202,7 @@ Le MVP est considere termine quand :
 - **Icons** : Font Awesome ou Heroicons
 
 ### Backend Laravel
+
 - **Version** : Laravel 11
 - **PHP** : 8.2+
 - **Database** : MySQL 8.0 ou PostgreSQL 15
@@ -201,6 +213,7 @@ Le MVP est considere termine quand :
 - **Tests** : PHPUnit + Pest
 
 ### Frontend React
+
 - **Version** : React 18
 - **Build tool** : Vite
 - **Router** : React Router v6
@@ -213,6 +226,7 @@ Le MVP est considere termine quand :
 - **Tests** : Vitest + React Testing Library + Playwright (E2E)
 
 ### Infrastructure
+
 - **Hosting backend** : AWS (EC2 + RDS) ou DigitalOcean
 - **Hosting frontend** : Vercel ou Netlify
 - **Extension** : Chrome Web Store
@@ -280,13 +294,13 @@ Pour mesurer le succes du MVP :
 
 ## Risques et mitigations
 
-| Risque | Impact | Probabilite | Mitigation |
-|--------|--------|-------------|------------|
-| Changement des selecteurs CSS (LinkedIn/Indeed/HelloWork) | Elevee | Haute | Monitoring automatique + fallbacks + logs detailles |
-| Problemes de CORS entre extension et API | Elevee | Moyenne | Configuration CORS correcte + tests exhaustifs |
-| Performance API avec beaucoup d'utilisateurs | Moyenne | Moyenne | Cache Redis + indexes DB + pagination |
-| Bugs de drag & drop (cross-browser) | Moyenne | Moyenne | Tests sur tous les navigateurs + library robuste (dnd-kit) |
-| Complexite de l'auth dans l'extension | Elevee | Faible | POC rapide pour valider le flow token JWT |
+| Risque                                                    | Impact  | Probabilite | Mitigation                                                 |
+| --------------------------------------------------------- | ------- | ----------- | ---------------------------------------------------------- |
+| Changement des selecteurs CSS (LinkedIn/Indeed/HelloWork) | Elevee  | Haute       | Monitoring automatique + fallbacks + logs detailles        |
+| Problemes de CORS entre extension et API                  | Elevee  | Moyenne     | Configuration CORS correcte + tests exhaustifs             |
+| Performance API avec beaucoup d'utilisateurs              | Moyenne | Moyenne     | Cache Redis + indexes DB + pagination                      |
+| Bugs de drag & drop (cross-browser)                       | Moyenne | Moyenne     | Tests sur tous les navigateurs + library robuste (dnd-kit) |
+| Complexite de l'auth dans l'extension                     | Elevee  | Faible      | POC rapide pour valider le flow token JWT                  |
 
 ---
 
@@ -298,4 +312,4 @@ Pour mesurer le succes du MVP :
 
 ---
 
-*Document genere le 2025-03-30 par l'agent PO*
+_Document genere le 2025-03-30 par l'agent PO_

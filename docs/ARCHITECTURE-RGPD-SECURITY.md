@@ -59,13 +59,13 @@ L'architecture 3-tiers proposee est validee et appropriee pour ce projet :
 
 ## 1.2 Choix techniques valides
 
-| Composant | Choix | Justification |
-|-----------|-------|---------------|
-| **BDD** | PostgreSQL 15 | Meilleur que MySQL pour JSON, full-text search, et conformite RGPD (meilleur support des regulations) |
-| **Cache** | Redis 7 | Standard pour Laravel, performant, supporte les queues |
-| **Backend** | Laravel 11 + PHP 8.2 | Mature, securise, excellente doc, Sanctum pour l'auth API |
-| **Frontend** | React 18 + Vite | Performant, ecosysteme riche, bonne DX |
-| **Hosting EU** | Scaleway ou OVH | Hebergeurs europeens, conformes RGPD |
+| Composant      | Choix                | Justification                                                                                         |
+| -------------- | -------------------- | ----------------------------------------------------------------------------------------------------- |
+| **BDD**        | PostgreSQL 15        | Meilleur que MySQL pour JSON, full-text search, et conformite RGPD (meilleur support des regulations) |
+| **Cache**      | Redis 7              | Standard pour Laravel, performant, supporte les queues                                                |
+| **Backend**    | Laravel 11 + PHP 8.2 | Mature, securise, excellente doc, Sanctum pour l'auth API                                             |
+| **Frontend**   | React 18 + Vite      | Performant, ecosysteme riche, bonne DX                                                                |
+| **Hosting EU** | Scaleway ou OVH      | Hebergeurs europeens, conformes RGPD                                                                  |
 
 ## 1.3 Ajustements recommandes
 
@@ -101,27 +101,28 @@ ALTER TABLE users ADD COLUMN last_activity_at TIMESTAMP NULL;  -- Derniere activ
 
 ## 2.1 Donnees personnelles identifiees
 
-| Categorie | Donnees | Base legale | Duree de conservation |
-|-----------|---------|-------------|----------------------|
-| **Identification** | email, prenom, nom | Execution du contrat | Compte actif + 3 ans |
-| **Authentification** | password (hache), tokens | Execution du contrat | Compte actif |
-| **Social login** | google_id, linkedin_id | Consentement | Compte actif |
-| **Profil** | avatar_url | Consentement | Compte actif |
-| **Candidatures** | titre, entreprise, localisation, URL, notes | Execution du contrat | Compte actif + 3 ans |
-| **Technique** | IP, user_agent, logs | Interet legitime | 12 mois max |
+| Categorie            | Donnees                                     | Base legale          | Duree de conservation |
+| -------------------- | ------------------------------------------- | -------------------- | --------------------- |
+| **Identification**   | email, prenom, nom                          | Execution du contrat | Compte actif + 3 ans  |
+| **Authentification** | password (hache), tokens                    | Execution du contrat | Compte actif          |
+| **Social login**     | google_id, linkedin_id                      | Consentement         | Compte actif          |
+| **Profil**           | avatar_url                                  | Consentement         | Compte actif          |
+| **Candidatures**     | titre, entreprise, localisation, URL, notes | Execution du contrat | Compte actif + 3 ans  |
+| **Technique**        | IP, user_agent, logs                        | Interet legitime     | 12 mois max           |
 
 **Classification des donnees :**
+
 - **Donnees directement identifiantes** : email, prenom, nom
 - **Donnees indirectement identifiantes** : adresse IP, user agent
 - **Donnees sensibles** : AUCUNE (pas de donnees de sante, origine, religion, etc.)
 
 ## 2.2 Bases legales utilisees
 
-| Base legale | Utilisation | Justification |
-|-------------|-------------|---------------|
+| Base legale              | Utilisation                                 | Justification                      |
+| ------------------------ | ------------------------------------------- | ---------------------------------- |
 | **Execution du contrat** | Stockage des candidatures, authentification | Necessaire pour fournir le service |
-| **Consentement** | Social login, analytics, newsletter | Optionnel, peut etre retire |
-| **Interet legitime** | Logs de securite, amelioration du service | Necessaire pour la securite |
+| **Consentement**         | Social login, analytics, newsletter         | Optionnel, peut etre retire        |
+| **Interet legitime**     | Logs de securite, amelioration du service   | Necessaire pour la securite        |
 
 ## 2.3 Gestion du consentement
 
@@ -265,11 +266,13 @@ const DataExport = () => {
   const handleExport = async () => {
     setLoading(true);
     try {
-      const response = await api.get('/user/data-export', { responseType: 'blob' });
+      const response = await api.get("/user/data-export", {
+        responseType: "blob",
+      });
       const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.download = `jobtracker-export-${new Date().toISOString().split('T')[0]}.json`;
+      link.download = `jobtracker-export-${new Date().toISOString().split("T")[0]}.json`;
       link.click();
     } finally {
       setLoading(false);
@@ -279,9 +282,12 @@ const DataExport = () => {
   return (
     <div>
       <h2>Exporter mes donnees</h2>
-      <p>Conformement au RGPD, vous pouvez telecharger toutes vos donnees personnelles.</p>
+      <p>
+        Conformement au RGPD, vous pouvez telecharger toutes vos donnees
+        personnelles.
+      </p>
       <button onClick={handleExport} disabled={loading}>
-        {loading ? 'Export en cours...' : 'Telecharger mes donnees (JSON)'}
+        {loading ? "Export en cours..." : "Telecharger mes donnees (JSON)"}
       </button>
     </div>
   );
@@ -361,14 +367,14 @@ class AccountDeletionService
 // pages/profile/DeleteAccount.jsx
 const DeleteAccount = () => {
   const [step, setStep] = useState(1);
-  const [confirmation, setConfirmation] = useState('');
+  const [confirmation, setConfirmation] = useState("");
 
   const handleDelete = async () => {
-    if (confirmation !== 'SUPPRIMER') return;
+    if (confirmation !== "SUPPRIMER") return;
 
-    await api.delete('/user/account');
+    await api.delete("/user/account");
     // Redirection vers page de confirmation
-    navigate('/account-deleted');
+    navigate("/account-deleted");
   };
 
   return (
@@ -399,7 +405,7 @@ const DeleteAccount = () => {
           />
           <button
             onClick={handleDelete}
-            disabled={confirmation !== 'SUPPRIMER'}
+            disabled={confirmation !== "SUPPRIMER"}
           >
             Supprimer definitivement mon compte
           </button>
@@ -441,14 +447,14 @@ Format d'export recommande : **JSON** (standard, lisible, reimportable)
 
 ## 2.7 Duree de conservation
 
-| Donnee | Duree | Action a expiration |
-|--------|-------|---------------------|
-| Compte actif | Illimitee tant que actif | - |
-| Compte inactif | 2 ans sans connexion | Email de relance puis suppression |
-| Compte supprime | 30 jours (grace period) | Suppression definitive |
-| Logs de securite | 12 mois | Suppression automatique |
-| Logs applicatifs | 6 mois | Suppression automatique |
-| Backups | 90 jours | Rotation automatique |
+| Donnee           | Duree                    | Action a expiration               |
+| ---------------- | ------------------------ | --------------------------------- |
+| Compte actif     | Illimitee tant que actif | -                                 |
+| Compte inactif   | 2 ans sans connexion     | Email de relance puis suppression |
+| Compte supprime  | 30 jours (grace period)  | Suppression definitive            |
+| Logs de securite | 12 mois                  | Suppression automatique           |
+| Logs applicatifs | 6 mois                   | Suppression automatique           |
+| Backups          | 90 jours                 | Rotation automatique              |
 
 ### Job Laravel de nettoyage
 
@@ -532,6 +538,7 @@ $schedule->command('users:cleanup-inactive')->daily();
 **Pour JobTracker : DPO NON OBLIGATOIRE**
 
 Raisons :
+
 - Pas une autorite publique
 - Pas de traitement a grande echelle de donnees sensibles
 - Pas de suivi systematique a grande echelle
@@ -540,22 +547,22 @@ Raisons :
 
 ## 2.10 Registre des traitements
 
-| Finalite | Categories de donnees | Base legale | Destinataires | Duree | Mesures de securite |
-|----------|----------------------|-------------|---------------|-------|---------------------|
-| Gestion des comptes utilisateurs | email, nom, prenom, password | Execution contrat | Hebergeur | Compte actif + 3 ans | Chiffrement, acces restreint |
-| Suivi des candidatures | titre, entreprise, notes | Execution contrat | Hebergeur | Compte actif + 3 ans | Chiffrement, acces utilisateur uniquement |
-| Analytics | IP anonymisee, pages vues | Interet legitime | Plausible (EU) | 12 mois | Anonymisation |
-| Securite | IP, logs erreurs | Interet legitime | Sentry (EU) | 12 mois | Retention limitee |
+| Finalite                         | Categories de donnees        | Base legale       | Destinataires  | Duree                | Mesures de securite                       |
+| -------------------------------- | ---------------------------- | ----------------- | -------------- | -------------------- | ----------------------------------------- |
+| Gestion des comptes utilisateurs | email, nom, prenom, password | Execution contrat | Hebergeur      | Compte actif + 3 ans | Chiffrement, acces restreint              |
+| Suivi des candidatures           | titre, entreprise, notes     | Execution contrat | Hebergeur      | Compte actif + 3 ans | Chiffrement, acces utilisateur uniquement |
+| Analytics                        | IP anonymisee, pages vues    | Interet legitime  | Plausible (EU) | 12 mois              | Anonymisation                             |
+| Securite                         | IP, logs erreurs             | Interet legitime  | Sentry (EU)    | 12 mois              | Retention limitee                         |
 
 ## 2.11 Sous-traitants RGPD
 
-| Sous-traitant | Service | Localisation | Donnees traitees | DPA signe |
-|---------------|---------|--------------|------------------|-----------|
-| Scaleway | Hebergement BDD | France | Toutes | Oui |
-| Vercel | Hebergement frontend | EU (Frankfurt) | Logs HTTP | Oui |
-| Plausible | Analytics | EU | IP anonymisee | Oui |
-| Sentry | Monitoring erreurs | EU | Logs erreurs | Oui |
-| Postmark | Emails transactionnels | US (clauses types) | Email | Oui |
+| Sous-traitant | Service                | Localisation       | Donnees traitees | DPA signe |
+| ------------- | ---------------------- | ------------------ | ---------------- | --------- |
+| Scaleway      | Hebergement BDD        | France             | Toutes           | Oui       |
+| Vercel        | Hebergement frontend   | EU (Frankfurt)     | Logs HTTP        | Oui       |
+| Plausible     | Analytics              | EU                 | IP anonymisee    | Oui       |
+| Sentry        | Monitoring erreurs     | EU                 | Logs erreurs     | Oui       |
+| Postmark      | Emails transactionnels | US (clauses types) | Email            | Oui       |
 
 **Exigence** : Signer un DPA (Data Processing Agreement) avec chaque sous-traitant.
 
@@ -686,6 +693,7 @@ class SecurityHeaders
 ```
 
 **Pourquoi Argon2id ?**
+
 - Resistant aux attaques GPU (memory-hard)
 - Resistant aux side-channel attacks
 - Recommande par OWASP
@@ -978,12 +986,12 @@ class StoreApplicationRequest extends FormRequest
 
 ### Quand effectuer un audit ?
 
-| Phase | Type d'audit | Frequence |
-|-------|--------------|-----------|
-| Avant lancement | Pentest complet | 1 fois |
-| Post-lancement | Scan automatise | Mensuel |
-| Apres changement majeur | Audit cible | A chaque release majeure |
-| Annuel | Audit externe complet | 1 fois / an |
+| Phase                   | Type d'audit          | Frequence                |
+| ----------------------- | --------------------- | ------------------------ |
+| Avant lancement         | Pentest complet       | 1 fois                   |
+| Post-lancement          | Scan automatise       | Mensuel                  |
+| Apres changement majeur | Audit cible           | A chaque release majeure |
+| Annuel                  | Audit externe complet | 1 fois / an              |
 
 ### Outils recommandes
 
@@ -993,7 +1001,7 @@ name: Security Scan
 
 on:
   schedule:
-    - cron: '0 0 * * 0'  # Chaque dimanche
+    - cron: "0 0 * * 0" # Chaque dimanche
   push:
     branches: [main]
 
@@ -1070,12 +1078,12 @@ find ${BACKUP_DIR} -name "*.enc" -mtime +7 -delete
 
 ### Plan de reprise d'activite (PRA)
 
-| Scenario | RTO (Recovery Time Objective) | RPO (Recovery Point Objective) |
-|----------|-------------------------------|--------------------------------|
-| Panne serveur | 15 minutes | 0 (failover auto) |
-| Corruption BDD | 1 heure | 24 heures (dernier backup) |
-| Panne datacenter | 4 heures | 24 heures |
-| Attaque ransomware | 24 heures | 24 heures (backup hors-ligne) |
+| Scenario           | RTO (Recovery Time Objective) | RPO (Recovery Point Objective) |
+| ------------------ | ----------------------------- | ------------------------------ |
+| Panne serveur      | 15 minutes                    | 0 (failover auto)              |
+| Corruption BDD     | 1 heure                       | 24 heures (dernier backup)     |
+| Panne datacenter   | 4 heures                      | 24 heures                      |
+| Attaque ransomware | 24 heures                     | 24 heures (backup hors-ligne)  |
 
 ## 3.8 Logs et monitoring securise
 
@@ -1131,8 +1139,8 @@ function anonymizeIp(string $ip): string
 ```json
 {
   "permissions": [
-    "storage",      // Stocker le token
-    "activeTab"     // Acceder a l'onglet actif uniquement
+    "storage", // Stocker le token
+    "activeTab" // Acceder a l'onglet actif uniquement
   ],
   "host_permissions": [
     "https://www.linkedin.com/jobs/*",
@@ -1150,14 +1158,17 @@ function anonymizeIp(string $ip): string
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // Verifier que le message vient d'un content script autorise
   const allowedOrigins = [
-    'https://www.linkedin.com',
-    'https://fr.indeed.com',
-    'https://www.indeed.com',
-    'https://www.hellowork.com'
+    "https://www.linkedin.com",
+    "https://fr.indeed.com",
+    "https://www.indeed.com",
+    "https://www.hellowork.com",
   ];
 
-  if (!sender.tab || !allowedOrigins.some(origin => sender.tab.url.startsWith(origin))) {
-    console.error('Message from unauthorized origin');
+  if (
+    !sender.tab ||
+    !allowedOrigins.some((origin) => sender.tab.url.startsWith(origin))
+  ) {
+    console.error("Message from unauthorized origin");
     return false;
   }
 
@@ -1177,7 +1188,7 @@ class SecureAPI {
   }
 
   async getToken() {
-    const { token } = await chrome.storage.local.get('token');
+    const { token } = await chrome.storage.local.get("token");
     return token;
   }
 
@@ -1185,37 +1196,37 @@ class SecureAPI {
     const token = await this.getToken();
 
     if (!token) {
-      throw new Error('Not authenticated');
+      throw new Error("Not authenticated");
     }
 
     const response = await fetch(`${this.baseUrl}${endpoint}`, {
       ...options,
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-        'X-Requested-With': 'XMLHttpRequest',
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        "X-Requested-With": "XMLHttpRequest",
         ...options.headers,
       },
     });
 
     if (response.status === 401) {
       // Token expire, nettoyer et demander reconnexion
-      await chrome.storage.local.remove('token');
-      throw new Error('Token expired');
+      await chrome.storage.local.remove("token");
+      throw new Error("Token expired");
     }
 
     return response.json();
   }
 
   async createApplication(data) {
-    return this.request('/applications', {
-      method: 'POST',
+    return this.request("/applications", {
+      method: "POST",
       body: JSON.stringify(data),
     });
   }
 }
 
-export const api = new SecureAPI('https://api.jobtracker.com/api');
+export const api = new SecureAPI("https://api.jobtracker.com/api");
 ```
 
 ## 4.2 Stockage securise du token
@@ -1229,12 +1240,15 @@ class SecureStorage {
   async setToken(token) {
     await chrome.storage.local.set({
       token,
-      tokenCreatedAt: Date.now()
+      tokenCreatedAt: Date.now(),
     });
   }
 
   async getToken() {
-    const { token, tokenCreatedAt } = await chrome.storage.local.get(['token', 'tokenCreatedAt']);
+    const { token, tokenCreatedAt } = await chrome.storage.local.get([
+      "token",
+      "tokenCreatedAt",
+    ]);
 
     // Verifier si le token n'est pas trop vieux (24h)
     if (tokenCreatedAt && Date.now() - tokenCreatedAt > 24 * 60 * 60 * 1000) {
@@ -1246,7 +1260,7 @@ class SecureStorage {
   }
 
   async clearToken() {
-    await chrome.storage.local.remove(['token', 'tokenCreatedAt', 'user']);
+    await chrome.storage.local.remove(["token", "tokenCreatedAt", "user"]);
   }
 
   async setUser(user) {
@@ -1255,8 +1269,8 @@ class SecureStorage {
       user: {
         id: user.id,
         firstName: user.first_name,
-        email: user.email // Pour l'affichage uniquement
-      }
+        email: user.email, // Pour l'affichage uniquement
+      },
     });
   }
 }
@@ -1266,13 +1280,13 @@ export const storage = new SecureStorage();
 
 ## 4.3 Risques specifiques aux extensions
 
-| Risque | Impact | Mitigation |
-|--------|--------|------------|
-| XSS dans le content script | Eleve | Utiliser textContent, jamais innerHTML |
-| Vol de token par une autre extension | Moyen | chrome.storage est isole par extension |
-| Man-in-the-middle | Eleve | HTTPS obligatoire, certificate pinning optionnel |
-| Injection de code malveillant | Eleve | CSP strict, pas d'eval() |
-| Phishing via popup | Moyen | Design reconnaissable, indicateur de connexion |
+| Risque                               | Impact | Mitigation                                       |
+| ------------------------------------ | ------ | ------------------------------------------------ |
+| XSS dans le content script           | Eleve  | Utiliser textContent, jamais innerHTML           |
+| Vol de token par une autre extension | Moyen  | chrome.storage est isole par extension           |
+| Man-in-the-middle                    | Eleve  | HTTPS obligatoire, certificate pinning optionnel |
+| Injection de code malveillant        | Eleve  | CSP strict, pas d'eval()                         |
+| Phishing via popup                   | Moyen  | Design reconnaissable, indicateur de connexion   |
 
 ### Content Security Policy pour l'extension
 
@@ -1291,22 +1305,26 @@ export const storage = new SecureStorage();
 // content/scrapers/linkedin.js
 export function scrapeLinkedIn() {
   // TOUJOURS utiliser textContent, JAMAIS innerHTML
-  const title = document.querySelector('.top-card-layout__title');
+  const title = document.querySelector(".top-card-layout__title");
 
   return {
-    title: title?.textContent?.trim() || '',
+    title: title?.textContent?.trim() || "",
     // Sanitizer les donnees avant de les envoyer
-    company: sanitize(document.querySelector('.topcard__org-name-link')?.textContent),
-    location: sanitize(document.querySelector('.topcard__flavor--bullet')?.textContent),
+    company: sanitize(
+      document.querySelector(".topcard__org-name-link")?.textContent,
+    ),
+    location: sanitize(
+      document.querySelector(".topcard__flavor--bullet")?.textContent,
+    ),
   };
 }
 
 function sanitize(text) {
-  if (!text) return '';
+  if (!text) return "";
   // Supprimer les caracteres de controle et normaliser
   return text
     .trim()
-    .replace(/[\x00-\x1F\x7F]/g, '')
+    .replace(/[\x00-\x1F\x7F]/g, "")
     .substring(0, 1000); // Limiter la taille
 }
 ```
@@ -1319,21 +1337,21 @@ function sanitize(text) {
 
 ### Ce qui est LEGAL
 
-| Action | Legalite | Justification |
-|--------|----------|---------------|
-| Lire le contenu d'une page publique | Legal | Donnees publiquement accessibles |
-| Extraire des infos avec action utilisateur | Legal | L'utilisateur initie l'action |
-| Stocker les donnees pour usage personnel | Legal | Usage prive |
-| Afficher les donnees dans une app tierce | Legal | Pas de reproduction massive |
+| Action                                     | Legalite | Justification                    |
+| ------------------------------------------ | -------- | -------------------------------- |
+| Lire le contenu d'une page publique        | Legal    | Donnees publiquement accessibles |
+| Extraire des infos avec action utilisateur | Legal    | L'utilisateur initie l'action    |
+| Stocker les donnees pour usage personnel   | Legal    | Usage prive                      |
+| Afficher les donnees dans une app tierce   | Legal    | Pas de reproduction massive      |
 
 ### Ce qui est ILLEGAL ou RISQUE
 
-| Action | Legalite | Risque |
-|--------|----------|--------|
-| Scraping automatise massif | Illegal | Violation des CGU, acces frauduleux |
-| Contourner les protections (captcha, rate limit) | Illegal | Acces frauduleux (article 323-1 Code Penal) |
-| Revendre les donnees | Illegal | Violation RGPD, droit des bases de donnees |
-| Collecter sans consentement | Illegal | Violation RGPD |
+| Action                                           | Legalite | Risque                                      |
+| ------------------------------------------------ | -------- | ------------------------------------------- |
+| Scraping automatise massif                       | Illegal  | Violation des CGU, acces frauduleux         |
+| Contourner les protections (captcha, rate limit) | Illegal  | Acces frauduleux (article 323-1 Code Penal) |
+| Revendre les donnees                             | Illegal  | Violation RGPD, droit des bases de donnees  |
+| Collecter sans consentement                      | Illegal  | Violation RGPD                              |
 
 ## 5.2 Protections juridiques pour JobTracker
 
@@ -1345,7 +1363,7 @@ function sanitize(text) {
 
 chrome.action.onClicked.addListener((tab) => {
   // Seulement quand l'utilisateur clique sur l'icone
-  chrome.tabs.sendMessage(tab.id, { type: 'SCRAPE_PAGE' });
+  chrome.tabs.sendMessage(tab.id, { type: "SCRAPE_PAGE" });
 });
 ```
 
@@ -1402,12 +1420,12 @@ async function checkRobotsTxt(url) {
 
 ## 5.3 Risques et mitigations
 
-| Risque | Probabilite | Impact | Mitigation |
-|--------|-------------|--------|------------|
-| Lettre de cease & desist | Faible | Moyen | CGU claires, pas de scraping massif |
-| Blocage de l'extension | Faible | Eleve | Architecture resiliente, fallback manuel |
-| Action en justice | Tres faible | Eleve | Consultation juridique, assurance RC Pro |
-| Changement des selecteurs | Haute | Faible | Monitoring, mise a jour rapide |
+| Risque                    | Probabilite | Impact | Mitigation                               |
+| ------------------------- | ----------- | ------ | ---------------------------------------- |
+| Lettre de cease & desist  | Faible      | Moyen  | CGU claires, pas de scraping massif      |
+| Blocage de l'extension    | Faible      | Eleve  | Architecture resiliente, fallback manuel |
+| Action en justice         | Tres faible | Eleve  | Consultation juridique, assurance RC Pro |
+| Changement des selecteurs | Haute       | Faible | Monitoring, mise a jour rapide           |
 
 ### Recommandations
 
@@ -1424,16 +1442,17 @@ async function checkRobotsTxt(url) {
 
 ### Option 1 : Scaleway (Recommandee)
 
-| Service | Specification | Prix mensuel |
-|---------|--------------|--------------|
-| **Compute** | DEV1-S (2 vCPU, 2GB RAM) | ~7 EUR |
-| **Database** | PostgreSQL Basic (1 vCPU, 2GB RAM, 20GB) | ~15 EUR |
-| **Redis** | Managed Redis S (1GB) | ~10 EUR |
-| **Object Storage** | 50GB | ~2 EUR |
-| **Load Balancer** | LB-S | ~10 EUR |
-| **TOTAL** | | **~44 EUR/mois** |
+| Service            | Specification                            | Prix mensuel     |
+| ------------------ | ---------------------------------------- | ---------------- |
+| **Compute**        | DEV1-S (2 vCPU, 2GB RAM)                 | ~7 EUR           |
+| **Database**       | PostgreSQL Basic (1 vCPU, 2GB RAM, 20GB) | ~15 EUR          |
+| **Redis**          | Managed Redis S (1GB)                    | ~10 EUR          |
+| **Object Storage** | 50GB                                     | ~2 EUR           |
+| **Load Balancer**  | LB-S                                     | ~10 EUR          |
+| **TOTAL**          |                                          | **~44 EUR/mois** |
 
 **Avantages** :
+
 - Hebergeur francais, 100% RGPD compliant
 - Datacenters en France
 - Support en francais
@@ -1441,35 +1460,39 @@ async function checkRobotsTxt(url) {
 
 ### Option 2 : OVH Cloud
 
-| Service | Specification | Prix mensuel |
-|---------|--------------|--------------|
-| **VPS** | Starter (2 vCPU, 4GB RAM) | ~12 EUR |
-| **Database** | MySQL Essential | ~12 EUR |
-| **Object Storage** | 100GB | ~3 EUR |
-| **TOTAL** | | **~27 EUR/mois** |
+| Service            | Specification             | Prix mensuel     |
+| ------------------ | ------------------------- | ---------------- |
+| **VPS**            | Starter (2 vCPU, 4GB RAM) | ~12 EUR          |
+| **Database**       | MySQL Essential           | ~12 EUR          |
+| **Object Storage** | 100GB                     | ~3 EUR           |
+| **TOTAL**          |                           | **~27 EUR/mois** |
 
 **Avantages** :
+
 - Moins cher
 - Francais, RGPD compliant
 
 **Inconvenients** :
+
 - Interface moins moderne
 - Pas de Redis manage (a installer sur le VPS)
 
 ### Option 3 : Vercel + PlanetScale + Upstash
 
-| Service | Specification | Prix mensuel |
-|---------|--------------|--------------|
-| **Frontend** | Vercel Pro | ~20 USD |
-| **Database** | PlanetScale Scaler | ~29 USD |
-| **Redis** | Upstash Pro | ~10 USD |
-| **TOTAL** | | **~59 USD/mois** |
+| Service      | Specification      | Prix mensuel     |
+| ------------ | ------------------ | ---------------- |
+| **Frontend** | Vercel Pro         | ~20 USD          |
+| **Database** | PlanetScale Scaler | ~29 USD          |
+| **Redis**    | Upstash Pro        | ~10 USD          |
+| **TOTAL**    |                    | **~59 USD/mois** |
 
 **Avantages** :
+
 - DX excellente
 - Scaling automatique
 
 **Inconvenients** :
+
 - Plus cher
 - Serveurs US (attention RGPD)
 
@@ -1507,25 +1530,25 @@ async function checkRobotsTxt(url) {
 
 ## 6.3 Services tiers recommandes
 
-| Service | Recommandation | Prix | Justification RGPD |
-|---------|----------------|------|-------------------|
-| **Analytics** | Plausible | 9 EUR/mois | EU, pas de cookies |
-| **Error tracking** | Sentry (EU) | Gratuit (5K events) | Serveurs EU disponibles |
-| **Email transactionnel** | Postmark | 10 USD/mois | DPA disponible |
-| **Monitoring** | Better Uptime | Gratuit | EU |
-| **CI/CD** | GitHub Actions | Gratuit | - |
-| **DNS** | Cloudflare | Gratuit | DPA disponible |
+| Service                  | Recommandation | Prix                | Justification RGPD      |
+| ------------------------ | -------------- | ------------------- | ----------------------- |
+| **Analytics**            | Plausible      | 9 EUR/mois          | EU, pas de cookies      |
+| **Error tracking**       | Sentry (EU)    | Gratuit (5K events) | Serveurs EU disponibles |
+| **Email transactionnel** | Postmark       | 10 USD/mois         | DPA disponible          |
+| **Monitoring**           | Better Uptime  | Gratuit             | EU                      |
+| **CI/CD**                | GitHub Actions | Gratuit             | -                       |
+| **DNS**                  | Cloudflare     | Gratuit             | DPA disponible          |
 
 ## 6.4 Estimation des couts (MVP)
 
-| Poste | Mensuel | Annuel |
-|-------|---------|--------|
-| Infrastructure Scaleway | 44 EUR | 528 EUR |
-| Vercel Pro (frontend) | 0 EUR (gratuit hobby) | 0 EUR |
-| Domaine (.com) | 1 EUR | 12 EUR |
-| Plausible Analytics | 9 EUR | 108 EUR |
-| Postmark (emails) | 10 EUR | 120 EUR |
-| **TOTAL** | **~64 EUR** | **~768 EUR** |
+| Poste                   | Mensuel               | Annuel       |
+| ----------------------- | --------------------- | ------------ |
+| Infrastructure Scaleway | 44 EUR                | 528 EUR      |
+| Vercel Pro (frontend)   | 0 EUR (gratuit hobby) | 0 EUR        |
+| Domaine (.com)          | 1 EUR                 | 12 EUR       |
+| Plausible Analytics     | 9 EUR                 | 108 EUR      |
+| Postmark (emails)       | 10 EUR                | 120 EUR      |
+| **TOTAL**               | **~64 EUR**           | **~768 EUR** |
 
 **Note** : Ces couts sont pour un MVP avec ~100-500 utilisateurs. Ajuster selon la croissance.
 
@@ -1619,6 +1642,7 @@ async function checkRobotsTxt(url) {
 ## A. Modele de DPA (Data Processing Agreement)
 
 A telecharger et faire signer par chaque sous-traitant :
+
 - Template CNIL : https://www.cnil.fr/fr/sous-traitance-exemple-de-clauses
 
 ## B. Modele de registre des traitements
@@ -1633,5 +1657,5 @@ A telecharger et faire signer par chaque sous-traitant :
 
 ---
 
-*Document genere le 2025-03-30 par l'agent Architecte*
-*Version 1.0*
+_Document genere le 2025-03-30 par l'agent Architecte_
+_Version 1.0_

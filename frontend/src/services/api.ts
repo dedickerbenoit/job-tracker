@@ -1,5 +1,5 @@
-import axios from 'axios';
-import type { InternalAxiosRequestConfig } from 'axios';
+import axios from "axios";
+import type { InternalAxiosRequestConfig } from "axios";
 import type {
   Application,
   ApplicationEvent,
@@ -16,15 +16,15 @@ import type {
   UpdateApplicationData,
   ApplicationStatus,
   User,
-} from '@/types';
+} from "@/types";
 
 // ── Axios instance ──
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api/v1";
 
 const api = axios.create({
   baseURL: BASE_URL,
-  headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+  headers: { "Content-Type": "application/json", Accept: "application/json" },
   withCredentials: true, // Enable cookies for Sanctum SPA mode
   withXSRFToken: true, // Automatically include XSRF token from cookies
 });
@@ -41,12 +41,13 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      const isSilent = (error.config as SilentRequestConfig | undefined)?.silent === true;
-      import('@/stores/authStore').then(({ useAuthStore }) => {
+      const isSilent =
+        (error.config as SilentRequestConfig | undefined)?.silent === true;
+      import("@/stores/authStore").then(({ useAuthStore }) => {
         const { clearAuth, openAuthModal } = useAuthStore.getState();
         clearAuth();
         if (!isSilent) {
-          openAuthModal('login');
+          openAuthModal("login");
         }
       });
     }
@@ -56,10 +57,12 @@ api.interceptors.response.use(
 
 // ── Helper: clean undefined params ──
 
-function cleanParams(params: Record<string, unknown>): Record<string, string | number> {
+function cleanParams(
+  params: Record<string, unknown>,
+): Record<string, string | number> {
   const cleaned: Record<string, string | number> = {};
   for (const [key, value] of Object.entries(params)) {
-    if (value !== undefined && value !== null && value !== '') {
+    if (value !== undefined && value !== null && value !== "") {
       cleaned[key] = value as string | number;
     }
   }
@@ -69,8 +72,13 @@ function cleanParams(params: Record<string, unknown>): Record<string, string | n
 // ── Applications API ──
 
 export const applicationApi = {
-  list(filters: ApplicationFilters = {}): Promise<PaginatedResponse<Application>> {
-    return api.get('/applications', { params: cleanParams(filters as Record<string, unknown>) })
+  list(
+    filters: ApplicationFilters = {},
+  ): Promise<PaginatedResponse<Application>> {
+    return api
+      .get("/applications", {
+        params: cleanParams(filters as Record<string, unknown>),
+      })
       .then((r) => r.data);
   },
 
@@ -79,11 +87,13 @@ export const applicationApi = {
   },
 
   create(data: CreateApplicationData): Promise<CreateApplicationResponse> {
-    return api.post('/applications', data).then((r) => r.data);
+    return api.post("/applications", data).then((r) => r.data);
   },
 
   update(id: number, data: UpdateApplicationData): Promise<Application> {
-    return api.put(`/applications/${id}`, data).then((r) => r.data.data ?? r.data);
+    return api
+      .put(`/applications/${id}`, data)
+      .then((r) => r.data.data ?? r.data);
   },
 
   delete(id: number): Promise<void> {
@@ -91,16 +101,23 @@ export const applicationApi = {
   },
 
   updateStatus(id: number, status: ApplicationStatus): Promise<Application> {
-    return api.patch(`/applications/${id}/status`, { status }).then((r) => r.data.data ?? r.data);
+    return api
+      .patch(`/applications/${id}/status`, { status })
+      .then((r) => r.data.data ?? r.data);
   },
 
-  timeline(filters: TimelineFilters = {}): Promise<PaginatedResponse<ApplicationEvent>> {
-    return api.get('/applications/timeline', { params: cleanParams(filters as Record<string, unknown>) })
+  timeline(
+    filters: TimelineFilters = {},
+  ): Promise<PaginatedResponse<ApplicationEvent>> {
+    return api
+      .get("/applications/timeline", {
+        params: cleanParams(filters as Record<string, unknown>),
+      })
       .then((r) => r.data);
   },
 
   stats(): Promise<StatsData> {
-    return api.get('/applications/stats').then((r) => r.data.data ?? r.data);
+    return api.get("/applications/stats").then((r) => r.data.data ?? r.data);
   },
 };
 
@@ -114,7 +131,9 @@ export const applicationApi = {
 export async function getCsrfCookie(): Promise<void> {
   // Sanctum CSRF endpoint is at /sanctum/csrf-cookie (not /api/v1/sanctum/csrf-cookie)
   // Strip versioned path first, then fallback to unversioned (for custom VITE_API_URL without /v1)
-  const csrfUrl = BASE_URL.replace('/api/v1', '').replace('/api', '') + '/sanctum/csrf-cookie';
+  const csrfUrl =
+    BASE_URL.replace("/api/v1", "").replace("/api", "") +
+    "/sanctum/csrf-cookie";
   await axios.get(csrfUrl, { withCredentials: true });
 }
 
@@ -122,11 +141,11 @@ export async function getCsrfCookie(): Promise<void> {
 
 export const accountApi = {
   exportData(): Promise<DataExport> {
-    return api.get('/account/data-export').then((r) => r.data.data ?? r.data);
+    return api.get("/account/data-export").then((r) => r.data.data ?? r.data);
   },
 
   deleteAccount(): Promise<void> {
-    return api.delete('/account').then(() => undefined);
+    return api.delete("/account").then(() => undefined);
   },
 };
 
@@ -135,29 +154,35 @@ export const accountApi = {
 export const authApi = {
   async login(data: LoginData): Promise<AuthResponse> {
     await getCsrfCookie();
-    return api.post('/auth/login', data).then((r) => r.data);
+    return api.post("/auth/login", data).then((r) => r.data);
   },
 
   async register(data: RegisterData): Promise<AuthResponse> {
     await getCsrfCookie();
-    return api.post('/auth/register', data).then((r) => r.data);
+    return api.post("/auth/register", data).then((r) => r.data);
   },
 
   logout(): Promise<void> {
-    return api.post('/auth/logout').then(() => undefined);
+    return api.post("/auth/logout").then(() => undefined);
   },
 
   me(): Promise<User> {
     // silent: 401 here is expected for anonymous visitors — do not open modal
     return api
-      .get('/auth/me', { silent: true } as SilentRequestConfig)
+      .get("/auth/me", { silent: true } as SilentRequestConfig)
       .then((r) => r.data.data);
   },
 
   async tokenLogin(token: string): Promise<User> {
     await getCsrfCookie();
-    return api.post('/auth/token-login', {}, {
-      headers: { Authorization: `Bearer ${token}` },
-    }).then((r) => r.data.data.user);
+    return api
+      .post(
+        "/auth/token-login",
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      )
+      .then((r) => r.data.data.user);
   },
 };

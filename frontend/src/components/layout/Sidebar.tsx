@@ -22,7 +22,10 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
         collapsed ? "w-16" : "w-56",
       )}
     >
-      <nav aria-label={t.sidebar.navLabel} className="flex flex-1 flex-col gap-1 p-3">
+      <nav
+        aria-label={t.sidebar.navLabel}
+        className="flex flex-1 flex-col gap-1 p-3"
+      >
         {navItems.map((item) => (
           <NavLink
             key={item.to}
