@@ -126,19 +126,45 @@
       }
     }
 
-    // Location: <p> containing · near the company link
-    var anchor = companyLink || scope.querySelector("[data-display-contents]");
-    if (anchor) {
-      var section = anchor.closest("div");
-      // Walk up a few levels to get the job info container
-      for (var j = 0; j < 4 && section; j++) section = section.parentElement;
-      if (section) {
-        var paragraphs = section.querySelectorAll("p");
-        for (var k = 0; k < paragraphs.length; k++) {
-          var text = window.cleanText(paragraphs[k].textContent);
-          if (text.includes("\u00B7") && text.length < 200) {
-            location = text.split("\u00B7")[0].trim();
-            break;
+    // Location: first span.tvm__text--low-emphasis inside the tertiary
+    // description container (current LinkedIn layout).
+    // Try scoped search first, then fall back to document-wide search
+    // (on listing pages the container may sit outside the detail pane).
+    var tertiaryContainer =
+      scope.querySelector(
+        ".job-details-jobs-unified-top-card__tertiary-description-container",
+      ) ||
+      document.querySelector(
+        ".job-details-jobs-unified-top-card__tertiary-description-container",
+      );
+    if (tertiaryContainer) {
+      // The first .tvm__text--low-emphasis in the container is the location;
+      // subsequent ones hold recruiter / time info — querySelector returns
+      // the first match in DOM order.
+      var locSpan = tertiaryContainer.querySelector(
+        ".tvm__text.tvm__text--low-emphasis",
+      );
+      if (locSpan) {
+        location = window.cleanText(locSpan.textContent);
+      }
+    }
+
+    // Fallback: <p> containing · near the company link
+    if (!location) {
+      var anchor =
+        companyLink || scope.querySelector("[data-display-contents]");
+      if (anchor) {
+        var section = anchor.closest("div");
+        // Walk up a few levels to get the job info container
+        for (var j = 0; j < 4 && section; j++) section = section.parentElement;
+        if (section) {
+          var paragraphs = section.querySelectorAll("p");
+          for (var k = 0; k < paragraphs.length; k++) {
+            var text = window.cleanText(paragraphs[k].textContent);
+            if (text.includes("\u00B7") && text.length < 200) {
+              location = text.split("\u00B7")[0].trim();
+              break;
+            }
           }
         }
       }
@@ -202,6 +228,7 @@
         title: h.title,
         company: h.company,
         location: h.location,
+
         description: h.description,
         url: canonicalUrl,
         source: "linkedin",
@@ -242,6 +269,7 @@
           title: h.title || "",
           company: h.company || "",
           location: h.location || "",
+
           description: h.description || "",
           url: canonicalUrl,
           source: "linkedin",
@@ -255,6 +283,7 @@
 
     var loc = window.extractField(
       [
+        ".job-details-jobs-unified-top-card__tertiary-description-container > div:first-child .tvm__text.tvm__text--low-emphasis",
         ".job-details-jobs-unified-top-card__bullet",
         "span.topcard__flavor--bullet",
       ],
@@ -279,6 +308,7 @@
       title: title.value || h.title || "",
       company: company.value || h.company || "",
       location: loc.value || h.location || "",
+
       description: desc.value || h.description || "",
       url: canonicalUrl,
       source: "linkedin",
