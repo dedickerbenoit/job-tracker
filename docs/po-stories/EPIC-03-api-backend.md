@@ -31,12 +31,15 @@ P0 - Backend core de l'application
 # US-201 : Creation d'une candidature (API)
 
 ## En tant que
+
 Client API (extension ou dashboard)
 
 ## Je veux
+
 Creer une nouvelle candidature via l'API
 
 ## Afin de
+
 Sauvegarder une offre d'emploi dans le systeme
 
 ## Criteres d'acceptation
@@ -54,6 +57,7 @@ Sauvegarder une offre d'emploi dans le systeme
 - [ ] La candidature est liee a l'utilisateur authentifie (`user_id`)
 - [ ] Retourne un JSON avec la candidature creee (201 Created)
 - [ ] Retourne un warning si une candidature similaire existe (meme URL ou meme titre+entreprise) :
+
 ```json
 {
   "id": 123,
@@ -64,6 +68,7 @@ Sauvegarder une offre d'emploi dans le systeme
   ]
 }
 ```
+
 - [ ] En cas d'erreur de validation : 422 Unprocessable Entity avec details
 - [ ] Timestamp `created_at` et `updated_at` automatiques
 
@@ -79,6 +84,7 @@ Sauvegarder une offre d'emploi dans le systeme
 ## Contexte technique
 
 **Backend :**
+
 - Route : `Route::post('/applications', [ApplicationController::class, 'store'])->middleware('auth:sanctum');`
 - Controller : `ApplicationController@store`
 - Request : `StoreApplicationRequest` avec validation
@@ -86,6 +92,7 @@ Sauvegarder une offre d'emploi dans le systeme
 - Service : `ApplicationService` pour la logique de detection de doublons
 
 **Migration :**
+
 ```sql
 CREATE TABLE applications (
     id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
@@ -108,6 +115,7 @@ CREATE TABLE applications (
 ```
 
 **Detection de doublons :**
+
 ```php
 // Verifier si URL existe deja pour cet utilisateur
 $existing = Application::where('user_id', $userId)
@@ -142,12 +150,15 @@ Complexite : Moyenne
 # US-202 : Liste des candidatures avec filtres et tri
 
 ## En tant que
+
 Client API (dashboard)
 
 ## Je veux
+
 Recuperer la liste de mes candidatures avec possibilite de filtrer et trier
 
 ## Afin de
+
 Afficher les candidatures dans le dashboard selon differentes vues
 
 ## Criteres d'acceptation
@@ -168,6 +179,7 @@ Afficher les candidatures dans le dashboard selon differentes vues
   - `company` : ordre alphabetique
   - `status` : ordre des statuts
 - [ ] Format de reponse :
+
 ```json
 {
   "data": [
@@ -191,6 +203,7 @@ Afficher les candidatures dans le dashboard selon differentes vues
   }
 }
 ```
+
 - [ ] Performance : reponse < 200ms meme avec 1000+ candidatures
 
 ## Definition of Done
@@ -205,11 +218,13 @@ Afficher les candidatures dans le dashboard selon differentes vues
 ## Contexte technique
 
 **Backend :**
+
 - Route : `Route::get('/applications', [ApplicationController::class, 'index'])->middleware('auth:sanctum');`
 - Utilisation de Query Builder ou Eloquent avec scopes
 - Resource Laravel pour formater la reponse (`ApplicationResource`)
 
 **Optimisations :**
+
 - Index sur `user_id`, `status`, `created_at`
 - Eager loading si necessaire
 - Cache des compteurs de statut
@@ -234,12 +249,15 @@ Complexite : Moyenne
 # US-203 : Detail d'une candidature
 
 ## En tant que
+
 Client API (dashboard)
 
 ## Je veux
+
 Recuperer le detail complet d'une candidature
 
 ## Afin de
+
 Afficher toutes les informations d'une candidature specifique
 
 ## Criteres d'acceptation
@@ -248,6 +266,7 @@ Afficher toutes les informations d'une candidature specifique
 - [ ] Retourne la candidature uniquement si elle appartient a l'utilisateur authentifie
 - [ ] Si la candidature n'existe pas ou n'appartient pas a l'utilisateur : 404 Not Found
 - [ ] Format de reponse avec tous les champs :
+
 ```json
 {
   "id": 123,
@@ -276,9 +295,11 @@ Afficher toutes les informations d'une candidature specifique
 ## Contexte technique
 
 **Backend :**
+
 - Route : `Route::get('/applications/{application}', [ApplicationController::class, 'show'])->middleware('auth:sanctum');`
 - Utilisation de Route Model Binding
 - Policy Laravel pour l'autorisation :
+
 ```php
 public function view(User $user, Application $application)
 {
@@ -304,12 +325,15 @@ Complexite : Faible
 # US-204 : Mise a jour d'une candidature
 
 ## En tant que
+
 Client API (dashboard)
 
 ## Je veux
+
 Mettre a jour les informations d'une candidature
 
 ## Afin de
+
 Corriger ou completer les donnees
 
 ## Criteres d'acceptation
@@ -336,6 +360,7 @@ Corriger ou completer les donnees
 ## Contexte technique
 
 **Backend :**
+
 - Route : `Route::put('/applications/{application}', [ApplicationController::class, 'update'])->middleware('auth:sanctum');`
 - Request : `UpdateApplicationRequest`
 - Policy : `ApplicationPolicy@update`
@@ -358,12 +383,15 @@ Complexite : Faible
 # US-205 : Suppression d'une candidature
 
 ## En tant que
+
 Client API (dashboard)
 
 ## Je veux
+
 Supprimer une candidature
 
 ## Afin de
+
 Nettoyer ma liste de candidatures
 
 ## Criteres d'acceptation
@@ -386,6 +414,7 @@ Nettoyer ma liste de candidatures
 ## Contexte technique
 
 **Backend :**
+
 - Route : `Route::delete('/applications/{application}', [ApplicationController::class, 'destroy'])->middleware('auth:sanctum');`
 - Policy : `ApplicationPolicy@delete`
 
@@ -407,12 +436,15 @@ Complexite : Faible
 # US-206 : Changement de statut d'une candidature
 
 ## En tant que
+
 Client API (dashboard - Kanban)
 
 ## Je veux
+
 Changer le statut d'une candidature rapidement
 
 ## Afin de
+
 Permettre le drag & drop dans le Kanban
 
 ## Criteres d'acceptation
@@ -435,10 +467,12 @@ Permettre le drag & drop dans le Kanban
 ## Contexte technique
 
 **Backend :**
+
 - Route : `Route::patch('/applications/{application}/status', [ApplicationController::class, 'updateStatus'])->middleware('auth:sanctum');`
 - Request : `UpdateStatusRequest`
 
 **Historique :**
+
 - Creation d'un enregistrement dans la table `application_events` (US-208)
 
 ## Dependances
@@ -460,12 +494,15 @@ Complexite : Faible
 # US-207 : Detection de doublons
 
 ## En tant que
+
 Systeme API
 
 ## Je veux
+
 Detecter les candidatures en doublon lors de la creation
 
 ## Afin de
+
 Eviter que l'utilisateur ajoute plusieurs fois la meme offre par erreur
 
 ## Criteres d'acceptation
@@ -478,6 +515,7 @@ Eviter que l'utilisateur ajoute plusieurs fois la meme offre par erreur
 - [ ] Si doublon similaire : retourne un warning `similar_application` avec les candidatures similaires (max 5)
 - [ ] Le warning n'empeche PAS la creation (c'est a l'utilisateur de decider)
 - [ ] Format du warning :
+
 ```json
 {
   "id": 123,
@@ -486,7 +524,13 @@ Eviter que l'utilisateur ajoute plusieurs fois la meme offre par erreur
     "type": "duplicate_url",
     "message": "Cette URL existe deja dans vos candidatures",
     "duplicates": [
-      { "id": 45, "title": "...", "company": "...", "status": "applied", "created_at": "..." }
+      {
+        "id": 45,
+        "title": "...",
+        "company": "...",
+        "status": "applied",
+        "created_at": "..."
+      }
     ]
   }
 }
@@ -502,11 +546,13 @@ Eviter que l'utilisateur ajoute plusieurs fois la meme offre par erreur
 ## Contexte technique
 
 **Backend :**
+
 - Service : `ApplicationDuplicateDetector`
 - Utilisation de Levenshtein distance ou similar_text pour la similarite de titre
 - Optimisation avec index sur `url` et `company`
 
 **Algo de similarite :**
+
 ```php
 $similarity = similar_text($title1, $title2);
 if ($similarity > 80) {
@@ -534,12 +580,15 @@ Complexite : Moyenne
 # US-208 : Historique des changements (timeline)
 
 ## En tant que
+
 Utilisateur
 
 ## Je veux
+
 Consulter l'historique de toutes les actions sur mes candidatures
 
 ## Afin de
+
 Suivre l'evolution de ma recherche d'emploi
 
 ## Criteres d'acceptation
@@ -552,6 +601,7 @@ Suivre l'evolution de ma recherche d'emploi
   - `updated` : mise a jour des informations
   - `deleted` : candidature supprimee
 - [ ] Format de reponse :
+
 ```json
 {
   "data": [
@@ -579,6 +629,7 @@ Suivre l'evolution de ma recherche d'emploi
   ]
 }
 ```
+
 - [ ] Pagination : 100 evenements par page
 - [ ] Filtres supportes :
   - `application_id` : historique d'une candidature specifique
@@ -596,9 +647,11 @@ Suivre l'evolution de ma recherche d'emploi
 ## Contexte technique
 
 **Backend :**
+
 - Route : `Route::get('/applications/timeline', [TimelineController::class, 'index'])->middleware('auth:sanctum');`
 - Model : `ApplicationEvent`
 - Migration :
+
 ```sql
 CREATE TABLE application_events (
     id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
@@ -615,7 +668,9 @@ CREATE TABLE application_events (
 ```
 
 **Observers :**
+
 - Laravel Observer sur le model `Application` pour enregistrer automatiquement les evenements :
+
 ```php
 class ApplicationObserver
 {

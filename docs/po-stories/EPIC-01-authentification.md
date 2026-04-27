@@ -29,12 +29,15 @@ P0 - Bloquant pour toutes les autres fonctionnalites
 # US-001 : Inscription par email et mot de passe
 
 ## En tant que
+
 Nouvel utilisateur
 
 ## Je veux
+
 Creer un compte avec mon email et un mot de passe
 
 ## Afin de
+
 Pouvoir acceder a l'application et sauvegarder mes candidatures
 
 ## Criteres d'acceptation
@@ -65,6 +68,7 @@ Pouvoir acceder a l'application et sauvegarder mes candidatures
 ## Contexte technique
 
 **Backend :**
+
 - Route POST `/api/auth/register`
 - Controller `AuthController@register`
 - Model `User` avec fillable : `first_name`, `last_name`, `email`, `password`
@@ -73,6 +77,7 @@ Pouvoir acceder a l'application et sauvegarder mes candidatures
 - Retourne un token JWT + user data
 
 **Frontend :**
+
 - Page `/register` avec formulaire React
 - Composant `RegisterForm.jsx`
 - Gestion de l'etat avec React Hook Form ou Formik
@@ -80,6 +85,7 @@ Pouvoir acceder a l'application et sauvegarder mes candidatures
 - Stockage du token dans localStorage ou cookie httpOnly
 
 **Base de donnees :**
+
 ```sql
 CREATE TABLE users (
     id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
@@ -113,12 +119,15 @@ Complexite : Moyenne
 # US-002 : Connexion par email et mot de passe
 
 ## En tant que
+
 Utilisateur inscrit
 
 ## Je veux
+
 Me connecter avec mon email et mon mot de passe
 
 ## Afin de
+
 Acceder a mon dashboard et mes candidatures
 
 ## Criteres d'acceptation
@@ -149,6 +158,7 @@ Acceder a mon dashboard et mes candidatures
 ## Contexte technique
 
 **Backend :**
+
 - Route POST `/api/auth/login`
 - Controller `AuthController@login`
 - Utilisation de Laravel Sanctum pour les tokens
@@ -156,6 +166,7 @@ Acceder a mon dashboard et mes candidatures
 - Retourne : `{ token, user: { id, email, first_name, last_name } }`
 
 **Frontend :**
+
 - Page `/login` avec formulaire React
 - Composant `LoginForm.jsx`
 - Stockage du token dans localStorage
@@ -180,12 +191,15 @@ Complexite : Faible
 # US-003 : Connexion via Google OAuth
 
 ## En tant que
+
 Utilisateur
 
 ## Je veux
+
 Me connecter avec mon compte Google
 
 ## Afin de
+
 Gagner du temps et ne pas creer un nouveau mot de passe
 
 ## Criteres d'acceptation
@@ -212,6 +226,7 @@ Gagner du temps et ne pas creer un nouveau mot de passe
 ## Contexte technique
 
 **Backend :**
+
 - Package Laravel Socialite
 - Route GET `/api/auth/google/redirect`
 - Route GET `/api/auth/google/callback`
@@ -221,17 +236,20 @@ Gagner du temps et ne pas creer un nouveau mot de passe
 - Si email inexistant : creer un nouveau user
 
 **Frontend :**
+
 - Bouton avec icone Google
 - Redirection vers `/api/auth/google/redirect`
 - Gestion du callback avec le token
 
 **Base de donnees :**
+
 ```sql
 ALTER TABLE users ADD COLUMN google_id VARCHAR(255) NULL UNIQUE;
 ALTER TABLE users ADD COLUMN avatar_url VARCHAR(500) NULL;
 ```
 
 **Configuration :**
+
 - Google Cloud Console : creer un projet OAuth
 - Variables `.env` : `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`
 
@@ -254,12 +272,15 @@ Complexite : Moyenne
 # US-004 : Connexion via LinkedIn OAuth
 
 ## En tant que
+
 Utilisateur chercheur d'emploi
 
 ## Je veux
+
 Me connecter avec mon compte LinkedIn
 
 ## Afin de
+
 Utiliser le meme compte que celui que j'utilise pour postuler
 
 ## Criteres d'acceptation
@@ -286,6 +307,7 @@ Utiliser le meme compte que celui que j'utilise pour postuler
 ## Contexte technique
 
 **Backend :**
+
 - Package Laravel Socialite avec provider LinkedIn
 - Route GET `/api/auth/linkedin/redirect`
 - Route GET `/api/auth/linkedin/callback`
@@ -293,16 +315,19 @@ Utiliser le meme compte que celui que j'utilise pour postuler
 - Stockage du `linkedin_id` dans la table users
 
 **Frontend :**
+
 - Bouton avec icone LinkedIn (couleur #0077B5)
 - Redirection vers `/api/auth/linkedin/redirect`
 - Gestion du callback avec le token
 
 **Base de donnees :**
+
 ```sql
 ALTER TABLE users ADD COLUMN linkedin_id VARCHAR(255) NULL UNIQUE;
 ```
 
 **Configuration :**
+
 - LinkedIn Developer Portal : creer une app OAuth
 - Variables `.env` : `LINKEDIN_CLIENT_ID`, `LINKEDIN_CLIENT_SECRET`, `LINKEDIN_REDIRECT_URI`
 
@@ -325,12 +350,15 @@ Complexite : Moyenne
 # US-005 : Gestion du profil utilisateur
 
 ## En tant que
+
 Utilisateur connecte
 
 ## Je veux
+
 Consulter et modifier mes informations personnelles
 
 ## Afin de
+
 Garder mes informations a jour
 
 ## Criteres d'acceptation
@@ -358,6 +386,7 @@ Garder mes informations a jour
 ## Contexte technique
 
 **Backend :**
+
 - Route GET `/api/user/profile` (auth middleware)
 - Route PUT `/api/user/profile` (auth middleware)
 - Route POST `/api/user/avatar` (upload)
@@ -366,6 +395,7 @@ Garder mes informations a jour
 - Stockage des avatars dans `storage/app/public/avatars`
 
 **Frontend :**
+
 - Page `/profile` avec React
 - Composant `ProfileForm.jsx`
 - Upload de fichier avec preview
@@ -390,12 +420,15 @@ Complexite : Moyenne
 # US-006 : Reinitialisation du mot de passe
 
 ## En tant que
+
 Utilisateur ayant oublie son mot de passe
 
 ## Je veux
+
 Recevoir un lien par email pour reinitialiser mon mot de passe
 
 ## Afin de
+
 Retrouver l'acces a mon compte
 
 ## Criteres d'acceptation
@@ -423,6 +456,7 @@ Retrouver l'acces a mon compte
 ## Contexte technique
 
 **Backend :**
+
 - Route POST `/api/auth/forgot-password`
 - Route POST `/api/auth/reset-password`
 - Controller `PasswordResetController`
@@ -431,11 +465,13 @@ Retrouver l'acces a mon compte
 - Rate limiting : 1 email par 5 minutes par email
 
 **Frontend :**
+
 - Page `/forgot-password`
 - Page `/reset-password`
 - Composants React
 
 **Base de donnees :**
+
 ```sql
 CREATE TABLE password_resets (
     email VARCHAR(255) PRIMARY KEY,
@@ -464,12 +500,15 @@ Complexite : Moyenne
 # US-007 : Authentification dans l'extension Chrome
 
 ## En tant que
+
 Utilisateur de l'extension Chrome
 
 ## Je veux
+
 Me connecter dans l'extension pour pouvoir sauvegarder des offres
 
 ## Afin de
+
 Utiliser l'extension sans avoir a ouvrir le dashboard a chaque fois
 
 ## Criteres d'acceptation
@@ -493,6 +532,7 @@ Utiliser l'extension sans avoir a ouvrir le dashboard a chaque fois
 ## Contexte technique
 
 **Extension :**
+
 - Fichier `popup.html` avec UI de connexion
 - Fichier `popup.js` pour la logique
 - Utilisation de `chrome.storage.local` pour stocker le token
@@ -500,12 +540,14 @@ Utiliser l'extension sans avoir a ouvrir le dashboard a chaque fois
 - Ecoute du postMessage depuis le dashboard apres connexion
 
 **Flow technique :**
+
 1. Extension ouvre le dashboard avec un param `?source=extension`
 2. Apres connexion, le dashboard envoie le token via `window.postMessage`
 3. L'extension ecoute le message et stocke le token
 4. L'extension peut ensuite faire des requetes API avec le token
 
 **Securite :**
+
 - Valider l'origine du postMessage (meme domaine uniquement)
 - Token stocke de maniere securisee dans chrome.storage.local
 - Refresh token pour eviter de se reconnecter trop souvent

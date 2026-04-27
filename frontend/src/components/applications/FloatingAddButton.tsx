@@ -20,7 +20,9 @@ export function FloatingAddButton({ onClick }: FloatingAddButtonProps) {
       >
         <Plus className="h-6 w-6" />
       </TooltipTrigger>
-      <TooltipContent side="left">{t.application.addApplication}</TooltipContent>
+      <TooltipContent side="left">
+        {t.application.addApplication}
+      </TooltipContent>
     </Tooltip>
   );
 }

@@ -8,11 +8,11 @@
 
 ## Synthese executive
 
-| Domaine | Score | Critique | Eleve | Moyen | Faible |
-|---------|-------|----------|-------|-------|--------|
-| **Securite (OWASP)** | **68/100** | 2 | 5 | 8 | 5 |
-| **RGPD** | **25/100** | 11 bloquants | 8 importants | 5 mineurs | - |
-| **SEO** | **55/100** *(ajuste app privee)* | 3 bloquants | 5 importants | 6 mineurs | - |
+| Domaine              | Score                            | Critique     | Eleve        | Moyen     | Faible |
+| -------------------- | -------------------------------- | ------------ | ------------ | --------- | ------ |
+| **Securite (OWASP)** | **68/100**                       | 2            | 5            | 8         | 5      |
+| **RGPD**             | **25/100**                       | 11 bloquants | 8 importants | 5 mineurs | -      |
+| **SEO**              | **55/100** _(ajuste app privee)_ | 3 bloquants  | 5 importants | 6 mineurs | -      |
 
 **Verdict** : Le projet dispose d'une base technique saine (policies, validation, SQL parametre) mais il manque des elements essentiels pour une mise en production, notamment cote RGPD ou quasi rien n'est implemente malgre une documentation d'architecture tres complete.
 
@@ -40,11 +40,13 @@
 - **Description** : `APP_DEBUG=true` dans le `.env` ET le `.env.example`. En production, Laravel expose les stack traces completes, variables d'environnement (APP_KEY, credentials BDD), queries SQL via les pages d'erreur.
 - **Impact** : Fuite de secrets (APP_KEY, credentials BDD, chemins serveur).
 - **Correction** :
+
 ```env
 # .env.example
 APP_ENV=production
 APP_DEBUG=false
 ```
+
 - **Effort** : 5 min
 
 ---
@@ -58,6 +60,7 @@ APP_DEBUG=false
 - **Description** : Le package `fruitcake/php-cors` est installe mais aucun fichier de configuration n'est publie. Les defaults pourraient autoriser toutes les origines (`allowed_origins: ['*']`).
 - **Impact** : Requetes cross-origin malveillantes exploitant le token de l'utilisateur authentifie.
 - **Correction** :
+
 ```php
 // config/cors.php
 return [
@@ -70,6 +73,7 @@ return [
     'supports_credentials' => true,
 ];
 ```
+
 - **Effort** : 15 min
 
 ### SEC-004 -- Absence de headers de securite HTTP
@@ -79,6 +83,7 @@ return [
 - **Description** : Aucun header de securite configure : CSP, X-Frame-Options, X-Content-Type-Options, HSTS, Referrer-Policy, Permissions-Policy.
 - **Impact** : Clickjacking, MIME-type sniffing, pas de HSTS.
 - **Correction** : Creer `app/Http/Middleware/SecurityHeaders.php` qui ajoute :
+
 ```
 X-Frame-Options: DENY
 X-Content-Type-Options: nosniff
@@ -88,12 +93,15 @@ Referrer-Policy: strict-origin-when-cross-origin
 Content-Security-Policy: default-src 'self'
 Permissions-Policy: camera=(), microphone=(), geolocation=()
 ```
+
 L'enregistrer dans `bootstrap/app.php` :
+
 ```php
 ->withMiddleware(function (Middleware $middleware): void {
     $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
 })
 ```
+
 - **Effort** : 30 min
 
 ### SEC-005 -- Autorisation manquante sur timeline et stats
@@ -103,6 +111,7 @@ L'enregistrer dans `bootstrap/app.php` :
 - **Description** : Les methodes `timeline()` et `stats()` n'appellent pas `$this->authorize()` contrairement a toutes les autres methodes CRUD. Bien que les donnees soient scopees par `$request->user()`, c'est une inconsistance architecturale.
 - **Impact** : Risque faible actuel, mais la coherence est rompue.
 - **Correction** :
+
 ```php
 public function timeline(Request $request): AnonymousResourceCollection
 {
@@ -116,6 +125,7 @@ public function stats(Request $request): JsonResponse
     // ...
 }
 ```
+
 - **Effort** : 5 min
 
 ### SEC-006 -- Pas de validation from_date / to_date
@@ -125,12 +135,14 @@ public function stats(Request $request): JsonResponse
 - **Description** : `from_date` et `to_date` sont injectes dans des clauses `where('created_at', '>=', ...)` sans validation de format. Bien que Eloquent utilise des parametres lies, des valeurs malformees pourraient causer des erreurs SQL selon le driver.
 - **Impact** : Injection potentielle selon le driver DB, erreurs imprevisibles.
 - **Correction** :
+
 ```php
 $request->validate([
     'from_date' => ['nullable', 'date', 'date_format:Y-m-d'],
     'to_date' => ['nullable', 'date', 'date_format:Y-m-d', 'after_or_equal:from_date'],
 ]);
 ```
+
 - **Effort** : 10 min
 
 ### SEC-008 -- Politique de mot de passe insuffisante
@@ -140,6 +152,7 @@ $request->validate([
 - **Description** : Validation `'min:8'` sans exigence de complexite. Pas de verification HaveIBeenPwned. "12345678" ou "password" sont acceptes.
 - **Impact** : Brute-force trivial.
 - **Correction** :
+
 ```php
 use Illuminate\Validation\Rules\Password;
 
@@ -149,6 +162,7 @@ use Illuminate\Validation\Rules\Password;
     ->numbers()
     ->uncompromised(), 'confirmed'],
 ```
+
 - **Effort** : 10 min
 
 ---
@@ -209,24 +223,27 @@ use Illuminate\Validation\Rules\Password;
 - **Localisation** : `backend/app/Http/Controllers/AuthController.php:35-55`
 - **Description** : Aucun log des tentatives de connexion echouees, creations de comptes, deconnexions. Pas de rotation des logs.
 - **Correction** :
+
 ```php
 Log::warning('Failed login attempt', ['email' => $validated['email'], 'ip' => $request->ip()]);
 Log::info('Successful login', ['user_id' => $user->id, 'ip' => $request->ip()]);
 ```
+
 Configurer `LOG_STACK=daily`.
+
 - **Effort** : 1h
 
 ---
 
 ## 1.4 Vulnerabilites faibles (P3)
 
-| ID | Probleme | Localisation | Correction | Effort |
-|----|----------|-------------|------------|--------|
-| SEC-016 | Pas de CSP dans extension manifest | `extension/manifest.json` | Ajouter `content_security_policy` explicite | 5 min |
-| SEC-017 | `host_permissions` localhost en prod | `extension/manifest.json:15` | Build system avec URL par environnement | 30 min |
-| SEC-019 | Pas de `$fillable`/`$guarded` sur Application | `backend/app/Models/Application.php` | `protected $guarded = ['id', 'user_id'];` | 5 min |
-| SEC-020 | Pas de prefix token Sanctum | `backend/config/sanctum.php:65` | `'token_prefix' => 'jt_'` | 1 min |
-| SEC-007 | Validation direction tri (deja OK) | `ApplicationController.php:49-55` | Documenter la validation existante | 5 min |
+| ID      | Probleme                                      | Localisation                         | Correction                                  | Effort |
+| ------- | --------------------------------------------- | ------------------------------------ | ------------------------------------------- | ------ |
+| SEC-016 | Pas de CSP dans extension manifest            | `extension/manifest.json`            | Ajouter `content_security_policy` explicite | 5 min  |
+| SEC-017 | `host_permissions` localhost en prod          | `extension/manifest.json:15`         | Build system avec URL par environnement     | 30 min |
+| SEC-019 | Pas de `$fillable`/`$guarded` sur Application | `backend/app/Models/Application.php` | `protected $guarded = ['id', 'user_id'];`   | 5 min  |
+| SEC-020 | Pas de prefix token Sanctum                   | `backend/config/sanctum.php:65`      | `'token_prefix' => 'jt_'`                   | 1 min  |
+| SEC-007 | Validation direction tri (deja OK)            | `ApplicationController.php:49-55`    | Documenter la validation existante          | 5 min  |
 
 ---
 
@@ -258,39 +275,44 @@ Configurer `LOG_STACK=daily`.
 ## 2.1 Donnees personnelles identifiees
 
 ### Table `users`
-| Champ | Type | Sensibilite |
-|-------|------|-------------|
-| `email` | Directement identifiante | Eleve |
-| `first_name` | Directement identifiante | Eleve |
-| `last_name` | Directement identifiante | Eleve |
-| `password` (hache) | Authentification | Critique |
-| `google_id` | Identifiant tiers | Moyen |
-| `linkedin_id` | Identifiant tiers | Moyen |
-| `avatar_url` | Donnee de profil | Faible |
+
+| Champ              | Type                     | Sensibilite |
+| ------------------ | ------------------------ | ----------- |
+| `email`            | Directement identifiante | Eleve       |
+| `first_name`       | Directement identifiante | Eleve       |
+| `last_name`        | Directement identifiante | Eleve       |
+| `password` (hache) | Authentification         | Critique    |
+| `google_id`        | Identifiant tiers        | Moyen       |
+| `linkedin_id`      | Identifiant tiers        | Moyen       |
+| `avatar_url`       | Donnee de profil         | Faible      |
 
 ### Table `sessions`
-| Champ | Type | Sensibilite |
-|-------|------|-------------|
-| `ip_address` | Indirectement identifiante | Moyen |
-| `user_agent` | Indirectement identifiante | Faible |
+
+| Champ        | Type                       | Sensibilite |
+| ------------ | -------------------------- | ----------- |
+| `ip_address` | Indirectement identifiante | Moyen       |
+| `user_agent` | Indirectement identifiante | Faible      |
 
 ### Table `applications`
-| Champ | Type | Sensibilite |
-|-------|------|-------------|
-| `notes` | Donnee personnelle libre | Moyen |
-| `description` | Contenu scrape | Faible |
+
+| Champ         | Type                     | Sensibilite |
+| ------------- | ------------------------ | ----------- |
+| `notes`       | Donnee personnelle libre | Moyen       |
+| `description` | Contenu scrape           | Faible      |
 
 ### Table `application_events`
-| Champ | Type | Sensibilite |
-|-------|------|-------------|
+
+| Champ             | Type     | Sensibilite                  |
+| ----------------- | -------- | ---------------------------- |
 | `metadata` (JSON) | Variable | Moyen (contenu non controle) |
 
 ### Chrome Extension
-| Donnee | Stockage | Sensibilite |
-|--------|----------|-------------|
-| Token d'authentification | `chrome.storage.session` | Critique |
-| Donnees scrapees | Memoire puis API | Faible |
-| Preferences sites actifs | `chrome.storage.local` | Faible |
+
+| Donnee                   | Stockage                 | Sensibilite |
+| ------------------------ | ------------------------ | ----------- |
+| Token d'authentification | `chrome.storage.session` | Critique    |
+| Donnees scrapees         | Memoire puis API         | Faible      |
+| Preferences sites actifs | `chrome.storage.local`   | Faible      |
 
 ---
 
@@ -386,28 +408,28 @@ Configurer `LOG_STACK=daily`.
 
 ## 2.3 Elements IMPORTANTS (a planifier rapidement)
 
-| ID | Probleme | Localisation | Effort |
-|----|----------|-------------|--------|
-| I01 | Token JWT dans localStorage (vulnerable XSS) | `frontend/src/stores/authStore.ts` | 8-12h |
-| I02 | Absence de headers de securite | `backend/bootstrap/app.php` | 2-3h |
-| I03 | Absence de configuration CORS | `backend/config/` | 1-2h |
-| I04 | Sessions non chiffrees (`SESSION_ENCRYPT=false`) | `backend/.env.example:33` | 15 min |
-| I05 | Cookie de session non securise | `backend/config/session.php:172` | 15 min |
-| I06 | Extension : token transmis en HTTP | `extension/utils/api.js:3` | 2-3h |
-| I07 | Pas de rate limiting sur endpoints authentifies | `backend/routes/api.php` | 1h |
-| I08 | Extension : permission `tabs` potentiellement excessive | `extension/manifest.json:6` | 2-4h |
+| ID  | Probleme                                                | Localisation                       | Effort |
+| --- | ------------------------------------------------------- | ---------------------------------- | ------ |
+| I01 | Token JWT dans localStorage (vulnerable XSS)            | `frontend/src/stores/authStore.ts` | 8-12h  |
+| I02 | Absence de headers de securite                          | `backend/bootstrap/app.php`        | 2-3h   |
+| I03 | Absence de configuration CORS                           | `backend/config/`                  | 1-2h   |
+| I04 | Sessions non chiffrees (`SESSION_ENCRYPT=false`)        | `backend/.env.example:33`          | 15 min |
+| I05 | Cookie de session non securise                          | `backend/config/session.php:172`   | 15 min |
+| I06 | Extension : token transmis en HTTP                      | `extension/utils/api.js:3`         | 2-3h   |
+| I07 | Pas de rate limiting sur endpoints authentifies         | `backend/routes/api.php`           | 1h     |
+| I08 | Extension : permission `tabs` potentiellement excessive | `extension/manifest.json:6`        | 2-4h   |
 
 ---
 
 ## 2.4 Elements MINEURS
 
-| ID | Probleme | Correction | Effort |
-|----|----------|------------|--------|
-| M01 | Mot de passe min 8 (OWASP recommande 12) | Augmenter + complexite | 2h |
-| M02 | Bcrypt au lieu d'Argon2id | Configurer `config/hashing.php` | 30 min |
-| M03 | Notes/description non chiffrees | Cast `encrypted` sur Application | 30 min |
-| M04 | Logs en mode debug | `LOG_LEVEL=warning` en production | 15 min |
-| M05 | Pas de page profil utilisateur | Creer page avec modif infos, export, suppression | 8-12h |
+| ID  | Probleme                                 | Correction                                       | Effort |
+| --- | ---------------------------------------- | ------------------------------------------------ | ------ |
+| M01 | Mot de passe min 8 (OWASP recommande 12) | Augmenter + complexite                           | 2h     |
+| M02 | Bcrypt au lieu d'Argon2id                | Configurer `config/hashing.php`                  | 30 min |
+| M03 | Notes/description non chiffrees          | Cast `encrypted` sur Application                 | 30 min |
+| M04 | Logs en mode debug                       | `LOG_LEVEL=warning` en production                | 15 min |
+| M05 | Pas de page profil utilisateur           | Creer page avec modif infos, export, suppression | 8-12h  |
 
 ---
 
@@ -415,54 +437,54 @@ Configurer `LOG_STACK=daily`.
 
 ### Information et transparence
 
-| Item | Statut |
-|------|--------|
-| Politique de confidentialite accessible | ABSENT |
-| Mentions legales | ABSENT |
-| Information sur les donnees collectees | ABSENT |
+| Item                                        | Statut |
+| ------------------------------------------- | ------ |
+| Politique de confidentialite accessible     | ABSENT |
+| Mentions legales                            | ABSENT |
+| Information sur les donnees collectees      | ABSENT |
 | Information sur les droits des utilisateurs | ABSENT |
-| Coordonnees du responsable de traitement | ABSENT |
-| Droit de reclamation CNIL | ABSENT |
+| Coordonnees du responsable de traitement    | ABSENT |
+| Droit de reclamation CNIL                   | ABSENT |
 
 ### Consentement
 
-| Item | Statut |
-|------|--------|
-| Consentement explicite a l'inscription | ABSENT |
-| Preuve de consentement enregistree | ABSENT |
-| Possibilite de retirer le consentement | ABSENT |
+| Item                                         | Statut                         |
+| -------------------------------------------- | ------------------------------ |
+| Consentement explicite a l'inscription       | ABSENT                         |
+| Preuve de consentement enregistree           | ABSENT                         |
+| Possibilite de retirer le consentement       | ABSENT                         |
 | Banniere cookies (si cookies non essentiels) | N/A (pas de cookies analytics) |
 
 ### Droits des personnes
 
-| Item | Statut |
-|------|--------|
-| Droit d'acces -- export donnees (art. 15) | ABSENT |
-| Droit de rectification (art. 16) | ABSENT (pas de page profil) |
-| Droit a l'effacement (art. 17) | ABSENT |
-| Droit a la portabilite (art. 20) | ABSENT |
-| Droit d'opposition (art. 21) | ABSENT |
-| Droit a la limitation (art. 18) | ABSENT |
+| Item                                      | Statut                      |
+| ----------------------------------------- | --------------------------- |
+| Droit d'acces -- export donnees (art. 15) | ABSENT                      |
+| Droit de rectification (art. 16)          | ABSENT (pas de page profil) |
+| Droit a l'effacement (art. 17)            | ABSENT                      |
+| Droit a la portabilite (art. 20)          | ABSENT                      |
+| Droit d'opposition (art. 21)              | ABSENT                      |
+| Droit a la limitation (art. 18)           | ABSENT                      |
 
 ### Securite des donnees
 
-| Item | Statut |
-|------|--------|
-| HTTPS en production | NON CONFIGURE |
-| Chiffrement au repos (champs sensibles) | NON CONFIGURE |
-| Headers de securite | ABSENT |
-| Cookie securise | NON CONFIGURE |
-| Sessions chiffrees | NON (`SESSION_ENCRYPT=false`) |
-| Rate limiting API | PARTIEL (auth seulement) |
-| CORS configure | ABSENT |
+| Item                                    | Statut                        |
+| --------------------------------------- | ----------------------------- |
+| HTTPS en production                     | NON CONFIGURE                 |
+| Chiffrement au repos (champs sensibles) | NON CONFIGURE                 |
+| Headers de securite                     | ABSENT                        |
+| Cookie securise                         | NON CONFIGURE                 |
+| Sessions chiffrees                      | NON (`SESSION_ENCRYPT=false`) |
+| Rate limiting API                       | PARTIEL (auth seulement)      |
+| CORS configure                          | ABSENT                        |
 
 ### Conservation
 
-| Item | Statut |
-|------|--------|
-| Durees definies | Documentation uniquement |
-| Purge automatique | ABSENT |
-| Soft delete pour comptes | ABSENT |
+| Item                     | Statut                   |
+| ------------------------ | ------------------------ |
+| Durees definies          | Documentation uniquement |
+| Purge automatique        | ABSENT                   |
+| Soft delete pour comptes | ABSENT                   |
 
 ---
 
@@ -491,9 +513,11 @@ Configurer `LOG_STACK=daily`.
 - **Localisation** : `frontend/index.html`
 - **Description** : Aucune balise `<meta name="robots">`. Le `robots.txt` backend autorise tout. Les pages privees risquent d'etre indexees.
 - **Correction** :
+
 ```html
 <meta name="robots" content="noindex, nofollow" />
 ```
+
 - **Effort** : 1 min
 
 ### SEO-004 -- Aucune `<meta name="description">`
@@ -506,6 +530,7 @@ Configurer `LOG_STACK=daily`.
 
 - **Localisation** : `backend/public/robots.txt` (trop permissif), `frontend/public/robots.txt` (absent)
 - **Correction** :
+
 ```
 # backend/public/robots.txt
 User-agent: *
@@ -516,6 +541,7 @@ User-agent: *
 Disallow: /dashboard/
 Allow: /
 ```
+
 - **Effort** : 5 min
 
 ### SEO-006 -- HTTPS non configure
@@ -535,6 +561,7 @@ Allow: /
 ## 3.2 Corrections `index.html` recommandees
 
 Le fichier `frontend/index.html` actuel :
+
 ```html
 <html lang="en">
   <head>
@@ -543,62 +570,68 @@ Le fichier `frontend/index.html` actuel :
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>frontend</title>
   </head>
+</html>
 ```
 
 Devrait devenir :
+
 ```html
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex, nofollow" />
-    <meta name="description" content="JobTracker - Tableau de bord de suivi de candidatures" />
+    <meta
+      name="description"
+      content="JobTracker - Tableau de bord de suivi de candidatures"
+    />
     <meta name="theme-color" content="#863bff" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>JobTracker</title>
   </head>
+</html>
 ```
 
 ---
 
 ## 3.3 Ameliorations recommandees
 
-| # | Action | Effort | Priorite |
-|---|--------|--------|----------|
-| 1 | Titre dynamique par page (hook `useDocumentTitle`) | 20 min | Moyenne |
-| 2 | Optimiser code splitting Vite (`manualChunks`) | 30 min | Moyenne |
-| 3 | Hierarchie H1/H2 correcte dans les pages | 15 min | Moyenne |
-| 4 | Headers HTTP securite (`X-Frame-Options`, etc.) | 15 min | Moyenne |
-| 5 | Balises Open Graph minimales | 5 min | Basse |
-| 6 | Preload font Geist | 5 min | Basse |
-| 7 | Web App Manifest (PWA-ready) | 15 min | Basse |
+| #   | Action                                             | Effort | Priorite |
+| --- | -------------------------------------------------- | ------ | -------- |
+| 1   | Titre dynamique par page (hook `useDocumentTitle`) | 20 min | Moyenne  |
+| 2   | Optimiser code splitting Vite (`manualChunks`)     | 30 min | Moyenne  |
+| 3   | Hierarchie H1/H2 correcte dans les pages           | 15 min | Moyenne  |
+| 4   | Headers HTTP securite (`X-Frame-Options`, etc.)    | 15 min | Moyenne  |
+| 5   | Balises Open Graph minimales                       | 5 min  | Basse    |
+| 6   | Preload font Geist                                 | 5 min  | Basse    |
+| 7   | Web App Manifest (PWA-ready)                       | 15 min | Basse    |
 
 ---
 
 ## 3.4 Non pertinent pour ce projet
 
-| Element | Raison |
-|---------|--------|
-| SSR / Pre-rendering | Aucune page publique a indexer |
-| sitemap.xml | Rien a lister |
-| Donnees structurees Schema.org | Contenu prive |
-| Canonical URLs | Pas de contenu duplique |
-| hreflang | Application monolingue |
+| Element                        | Raison                         |
+| ------------------------------ | ------------------------------ |
+| SSR / Pre-rendering            | Aucune page publique a indexer |
+| sitemap.xml                    | Rien a lister                  |
+| Donnees structurees Schema.org | Contenu prive                  |
+| Canonical URLs                 | Pas de contenu duplique        |
+| hreflang                       | Application monolingue         |
 
 ---
 
 ## 3.5 Performance du build actuel
 
-| Fichier | Taille |
-|---------|--------|
-| `index-*.js` (chunk principal) | ~385 Ko |
-| `StatsView-*.js` (recharts inclus) | ~375 Ko |
-| `react-*.js` (chunk React) | ~86 Ko |
-| `fr-*.js` (date-fns locale) | ~73 Ko |
-| `select-*.js` | ~71 Ko |
-| `KanbanView-*.js` | ~46 Ko |
-| `index-*.css` | ~57 Ko |
-| **Total JS** | **~1.1 Mo** (non compresse) |
+| Fichier                            | Taille                      |
+| ---------------------------------- | --------------------------- |
+| `index-*.js` (chunk principal)     | ~385 Ko                     |
+| `StatsView-*.js` (recharts inclus) | ~375 Ko                     |
+| `react-*.js` (chunk React)         | ~86 Ko                      |
+| `fr-*.js` (date-fns locale)        | ~73 Ko                      |
+| `select-*.js`                      | ~71 Ko                      |
+| `KanbanView-*.js`                  | ~46 Ko                      |
+| `index-*.css`                      | ~57 Ko                      |
+| **Total JS**                       | **~1.1 Mo** (non compresse) |
 
 Points positifs : les 4 pages principales sont lazy-loaded via `React.lazy()`, infinite scroll via `react-intersection-observer`.
 
@@ -608,54 +641,55 @@ Points positifs : les 4 pages principales sont lazy-loaded via `React.lazy()`, i
 
 ## Phase 1 -- Quick wins securite + SEO (~2h)
 
-| # | Action | Domaine | Effort |
-|---|--------|---------|--------|
-| 1 | `APP_DEBUG=false` dans `.env.example` | Securite | 5 min |
-| 2 | Regenerer `APP_KEY` si exposee | Securite | 5 min |
-| 3 | Publier `config/cors.php` avec whitelist | Securite | 15 min |
-| 4 | Creer middleware `SecurityHeaders` | Securite | 30 min |
-| 5 | Corriger `index.html` (title, lang, robots, description) | SEO | 5 min |
-| 6 | Creer/corriger `robots.txt` frontend + backend | SEO | 5 min |
-| 7 | `SESSION_ENCRYPT=true` + `SESSION_SECURE_COOKIE=true` | Securite | 1 min |
-| 8 | Valider `from_date`/`to_date` | Securite | 10 min |
-| 9 | `$this->authorize()` sur timeline/stats | Securite | 5 min |
-| 10 | Rate limiting routes authentifiees | Securite | 5 min |
-| 11 | Password policy renforcee | Securite | 10 min |
-| 12 | Prefix token Sanctum `jt_` | Securite | 1 min |
-| 13 | `$guarded` sur Application | Securite | 5 min |
-| 14 | Limite taille description/notes | Securite | 5 min |
+| #   | Action                                                   | Domaine  | Effort |
+| --- | -------------------------------------------------------- | -------- | ------ |
+| 1   | `APP_DEBUG=false` dans `.env.example`                    | Securite | 5 min  |
+| 2   | Regenerer `APP_KEY` si exposee                           | Securite | 5 min  |
+| 3   | Publier `config/cors.php` avec whitelist                 | Securite | 15 min |
+| 4   | Creer middleware `SecurityHeaders`                       | Securite | 30 min |
+| 5   | Corriger `index.html` (title, lang, robots, description) | SEO      | 5 min  |
+| 6   | Creer/corriger `robots.txt` frontend + backend           | SEO      | 5 min  |
+| 7   | `SESSION_ENCRYPT=true` + `SESSION_SECURE_COOKIE=true`    | Securite | 1 min  |
+| 8   | Valider `from_date`/`to_date`                            | Securite | 10 min |
+| 9   | `$this->authorize()` sur timeline/stats                  | Securite | 5 min  |
+| 10  | Rate limiting routes authentifiees                       | Securite | 5 min  |
+| 11  | Password policy renforcee                                | Securite | 10 min |
+| 12  | Prefix token Sanctum `jt_`                               | Securite | 1 min  |
+| 13  | `$guarded` sur Application                               | Securite | 5 min  |
+| 14  | Limite taille description/notes                          | Securite | 5 min  |
 
 ## Phase 2 -- RGPD obligatoire (~35-42h)
 
-| # | Action | Effort |
-|---|--------|--------|
-| 1 | Politique de confidentialite + mentions legales | 6-8h |
-| 2 | Checkboxes consentement inscription + table `user_consents` | 6-8h |
-| 3 | Page profil (modification infos, changement mdp) | 8-12h |
-| 4 | Suppression de compte (SoftDeletes + job purge) | 8-12h |
-| 5 | Export de donnees (endpoint + bouton frontend) | 4-6h |
-| 6 | Jobs de purge automatique (sessions, tokens, comptes inactifs) | 6-8h |
-| 7 | Formaliser registre des traitements | 3-4h |
-| 8 | Politique de confidentialite extension Chrome Web Store | 3-4h |
-| 9 | Corriger scraping automatique de l'extension | 4-6h |
+| #   | Action                                                         | Effort |
+| --- | -------------------------------------------------------------- | ------ |
+| 1   | Politique de confidentialite + mentions legales                | 6-8h   |
+| 2   | Checkboxes consentement inscription + table `user_consents`    | 6-8h   |
+| 3   | Page profil (modification infos, changement mdp)               | 8-12h  |
+| 4   | Suppression de compte (SoftDeletes + job purge)                | 8-12h  |
+| 5   | Export de donnees (endpoint + bouton frontend)                 | 4-6h   |
+| 6   | Jobs de purge automatique (sessions, tokens, comptes inactifs) | 6-8h   |
+| 7   | Formaliser registre des traitements                            | 3-4h   |
+| 8   | Politique de confidentialite extension Chrome Web Store        | 3-4h   |
+| 9   | Corriger scraping automatique de l'extension                   | 4-6h   |
 
 ## Phase 3 -- Hardening + optimisations (~8h)
 
-| # | Action | Effort |
-|---|--------|--------|
-| 1 | Logging evenements securite (login, echecs, actions sensibles) | 1h |
-| 2 | Migration token localStorage vers cookies HttpOnly | 2-4h |
-| 3 | Reduction expiration Sanctum (24h) | 5 min |
-| 4 | Optimisation Vite (manualChunks, compression) | 30 min |
-| 5 | CSP extension Chrome + URL configurable | 30 min |
-| 6 | Titre dynamique par page | 20 min |
-| 7 | `Object.defineProperty` sur fonctions globales extension | 45 min |
+| #   | Action                                                         | Effort |
+| --- | -------------------------------------------------------------- | ------ |
+| 1   | Logging evenements securite (login, echecs, actions sensibles) | 1h     |
+| 2   | Migration token localStorage vers cookies HttpOnly             | 2-4h   |
+| 3   | Reduction expiration Sanctum (24h)                             | 5 min  |
+| 4   | Optimisation Vite (manualChunks, compression)                  | 30 min |
+| 5   | CSP extension Chrome + URL configurable                        | 30 min |
+| 6   | Titre dynamique par page                                       | 20 min |
+| 7   | `Object.defineProperty` sur fonctions globales extension       | 45 min |
 
 ---
 
 # 5. TESTS MANQUANTS
 
 Aucun test automatise n'a ete detecte dans le projet :
+
 - Pas de tests PHPUnit backend
 - Pas de tests Jest/Vitest frontend
 - Pas de tests E2E
@@ -669,6 +703,7 @@ Cela constitue un risque additionnel pour la production. A minima, des tests sur
 ## Fichiers audites
 
 ### Backend
+
 - `app/Http/Controllers/ApplicationController.php`
 - `app/Http/Controllers/AuthController.php`
 - `app/Http/Requests/Auth/RegisterRequest.php`
@@ -688,6 +723,7 @@ Cela constitue un risque additionnel pour la production. A minima, des tests sur
 - `.env` et `.env.example`
 
 ### Frontend
+
 - `index.html`
 - `vite.config.ts`
 - `src/App.tsx`
@@ -703,6 +739,7 @@ Cela constitue un risque additionnel pour la production. A minima, des tests sur
 - `src/pages/StatsView.tsx`
 
 ### Extension Chrome
+
 - `manifest.json`
 - `utils/api.js`
 - `content/content.js`
@@ -714,6 +751,7 @@ Cela constitue un risque additionnel pour la production. A minima, des tests sur
 - `popup/popup.js`
 
 ## Outils utilises
+
 - Analyse statique du code source (grep, read)
 - Verification git (fichiers trackes, .gitignore)
 - Analyse des dependances (composer.lock, package.json)

@@ -8,7 +8,6 @@ import { ApplicationModal } from "@/components/applications/ApplicationModal";
 import { ApplicationDetailModal } from "@/components/applications/ApplicationDetailModal";
 import { useApplicationStore } from "@/stores/applicationStore";
 
-
 export function DashboardLayout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -48,7 +47,6 @@ export function DashboardLayout() {
           onClose={() => setSelectedApplication(null)}
         />
       )}
-
     </div>
   );
 }

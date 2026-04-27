@@ -35,12 +35,15 @@ P0 - Interface core de l'application
 # US-301 : Page d'accueil / Dashboard principale
 
 ## En tant que
+
 Utilisateur connecte
 
 ## Je veux
+
 Acceder a une page d'accueil avec un apercu de mes candidatures
 
 ## Afin de
+
 Voir rapidement l'etat de ma recherche d'emploi
 
 ## Criteres d'acceptation
@@ -70,12 +73,14 @@ Voir rapidement l'etat de ma recherche d'emploi
 ## Contexte technique
 
 **Frontend :**
+
 - Page : `src/pages/Dashboard.jsx`
 - Composants :
   - `Header.jsx`
   - `Sidebar.jsx`
   - `FloatingAddButton.jsx`
 - React Router :
+
 ```jsx
 <Route path="/dashboard" element={<DashboardLayout />}>
   <Route index element={<Navigate to="/dashboard/kanban" />} />
@@ -106,12 +111,15 @@ Complexite : Moyenne
 # US-302 : Vue Kanban avec drag & drop
 
 ## En tant que
+
 Utilisateur
 
 ## Je veux
+
 Visualiser mes candidatures dans un Kanban et les deplacer par drag & drop
 
 ## Afin de
+
 Mettre a jour le statut de mes candidatures facilement
 
 ## Criteres d'acceptation
@@ -154,6 +162,7 @@ Mettre a jour le statut de mes candidatures facilement
 ## Contexte technique
 
 **Frontend :**
+
 - Composant : `src/pages/KanbanView.jsx`
 - Sous-composants :
   - `KanbanColumn.jsx`
@@ -163,6 +172,7 @@ Mettre a jour le statut de mes candidatures facilement
 - API calls : axios avec gestion des erreurs
 
 **Flow drag & drop :**
+
 1. User drag une carte
 2. User drop dans une nouvelle colonne
 3. Confirmation modale si necessaire
@@ -191,12 +201,15 @@ Complexite : Elevee
 # US-303 : Vue Liste avec filtres et tri
 
 ## En tant que
+
 Utilisateur
 
 ## Je veux
+
 Voir toutes mes candidatures dans un tableau avec possibilite de filtrer et trier
 
 ## Afin de
+
 Trouver rapidement une candidature specifique
 
 ## Criteres d'acceptation
@@ -234,6 +247,7 @@ Trouver rapidement une candidature specifique
 ## Contexte technique
 
 **Frontend :**
+
 - Composant : `src/pages/ListView.jsx`
 - Sous-composants :
   - `FilterBar.jsx`
@@ -263,12 +277,15 @@ Complexite : Moyenne a Elevee
 # US-304 : Vue Timeline (historique)
 
 ## En tant que
+
 Utilisateur
 
 ## Je veux
+
 Voir un historique chronologique de toutes mes actions
 
 ## Afin de
+
 Suivre l'evolution de ma recherche d'emploi dans le temps
 
 ## Criteres d'acceptation
@@ -300,12 +317,14 @@ Suivre l'evolution de ma recherche d'emploi dans le temps
 ## Contexte technique
 
 **Frontend :**
+
 - Composant : `src/pages/TimelineView.jsx`
 - Sous-composant : `TimelineEvent.jsx`
 - API call : GET `/api/applications/timeline`
 - Infinite scroll : react-intersection-observer
 
 **Design :**
+
 - Ligne verticale avec des points (icones) pour chaque evenement
 - Cartes evenements alignees a gauche avec timestamp a droite
 
@@ -327,12 +346,15 @@ Complexite : Moyenne
 # US-305 : Vue Stats (statistiques)
 
 ## En tant que
+
 Utilisateur
 
 ## Je veux
+
 Visualiser des statistiques sur mes candidatures
 
 ## Afin de
+
 Mesurer l'efficacite de ma recherche d'emploi
 
 ## Criteres d'acceptation
@@ -366,6 +388,7 @@ Mesurer l'efficacite de ma recherche d'emploi
 ## Contexte technique
 
 **Frontend :**
+
 - Composant : `src/pages/StatsView.jsx`
 - Sous-composants :
   - `MetricCard.jsx`
@@ -376,8 +399,10 @@ Mesurer l'efficacite de ma recherche d'emploi
 - API call : GET `/api/applications/stats` (endpoint a creer)
 
 **Backend (nouvelle US) :**
+
 - Route : GET `/api/applications/stats`
 - Retourne des donnees agregees :
+
 ```json
 {
   "total": 127,
@@ -429,12 +454,15 @@ Complexite : Elevee
 # US-306 : Ajout manuel d'une candidature
 
 ## En tant que
+
 Utilisateur
 
 ## Je veux
+
 Ajouter une candidature manuellement depuis le dashboard
 
 ## Afin de
+
 Sauvegarder une offre trouvee hors LinkedIn/Indeed/HelloWork
 
 ## Criteres d'acceptation
@@ -469,6 +497,7 @@ Sauvegarder une offre trouvee hors LinkedIn/Indeed/HelloWork
 ## Contexte technique
 
 **Frontend :**
+
 - Composant : `src/components/AddApplicationModal.jsx`
 - Form library : React Hook Form ou Formik
 - Validation : yup ou zod
@@ -493,12 +522,15 @@ Complexite : Moyenne
 # US-307 : Edition d'une candidature
 
 ## En tant que
+
 Utilisateur
 
 ## Je veux
+
 Modifier les informations d'une candidature existante
 
 ## Afin de
+
 Corriger ou completer les donnees
 
 ## Criteres d'acceptation
@@ -524,6 +556,7 @@ Corriger ou completer les donnees
 ## Contexte technique
 
 **Frontend :**
+
 - Composant : `src/components/EditApplicationModal.jsx`
 - Reutilisation du meme formulaire que AddApplicationModal (composant generique)
 - API call : PUT `/api/applications/{id}`
@@ -546,12 +579,15 @@ Complexite : Moyenne
 # US-308 : Suppression d'une candidature
 
 ## En tant que
+
 Utilisateur
 
 ## Je veux
+
 Supprimer une candidature
 
 ## Afin de
+
 Nettoyer ma liste
 
 ## Criteres d'acceptation
@@ -576,6 +612,7 @@ Nettoyer ma liste
 ## Contexte technique
 
 **Frontend :**
+
 - Composant : `src/components/DeleteConfirmationModal.jsx`
 - API call : DELETE `/api/applications/{id}`
 
@@ -597,12 +634,15 @@ Complexite : Faible
 # US-309 : Detail d'une candidature (modal)
 
 ## En tant que
+
 Utilisateur
 
 ## Je veux
+
 Consulter le detail complet d'une candidature
 
 ## Afin de
+
 Voir toutes les informations et l'historique
 
 ## Criteres d'acceptation
@@ -636,6 +676,7 @@ Voir toutes les informations et l'historique
 ## Contexte technique
 
 **Frontend :**
+
 - Composant : `src/components/ApplicationDetailModal.jsx`
 - API call : GET `/api/applications/{id}` (inclure l'historique)
 
@@ -658,12 +699,15 @@ Complexite : Moyenne
 # US-310 : Recherche fulltext
 
 ## En tant que
+
 Utilisateur
 
 ## Je veux
+
 Rechercher une candidature par mot-cle
 
 ## Afin de
+
 Trouver rapidement une offre specifique
 
 ## Criteres d'acceptation
@@ -688,6 +732,7 @@ Trouver rapidement une offre specifique
 ## Contexte technique
 
 **Frontend :**
+
 - Composant : `src/components/SearchBar.jsx`
 - API call : GET `/api/applications?search=keyword`
 - Debounce : lodash.debounce ou custom hook

@@ -50,9 +50,7 @@ export function ApplicationModal({
       }
       onClose();
     } catch {
-      toast.error(
-        isEdit ? t.toast.errorUpdating : t.toast.errorCreating,
-      );
+      toast.error(isEdit ? t.toast.errorUpdating : t.toast.errorCreating);
     } finally {
       setLoading(false);
     }
@@ -63,7 +61,9 @@ export function ApplicationModal({
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>
-            {isEdit ? t.application.editApplication : t.application.addApplication}
+            {isEdit
+              ? t.application.editApplication
+              : t.application.addApplication}
           </DialogTitle>
         </DialogHeader>
         <ApplicationForm

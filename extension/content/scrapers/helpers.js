@@ -2,7 +2,7 @@
 // Loaded before site-specific scrapers via manifest content_scripts order
 
 (function () {
-  'use strict';
+  "use strict";
 
   /**
    * Try multiple CSS selectors and return the first non-empty match.
@@ -20,31 +20,37 @@
   }
 
   // Expose defineGlobal for scrapers loaded after helpers.js
-  defineGlobal('defineGlobal', defineGlobal);
+  defineGlobal("defineGlobal", defineGlobal);
 
-  defineGlobal('extractField', function (selectors, property = 'textContent', scope = document) {
-    const root = scope || document;
-    for (const selector of selectors) {
-      try {
-        const el = root.querySelector(selector);
-        if (el) {
-          const raw = property === 'href' ? el.href : el[property] || el.getAttribute(property);
-          const value = typeof raw === 'string' ? window.cleanText(raw) : raw;
-          if (value) return { value, selector };
+  defineGlobal(
+    "extractField",
+    function (selectors, property = "textContent", scope = document) {
+      const root = scope || document;
+      for (const selector of selectors) {
+        try {
+          const el = root.querySelector(selector);
+          if (el) {
+            const raw =
+              property === "href"
+                ? el.href
+                : el[property] || el.getAttribute(property);
+            const value = typeof raw === "string" ? window.cleanText(raw) : raw;
+            if (value) return { value, selector };
+          }
+        } catch (e) {
+          // Invalid selector, skip
         }
-      } catch (e) {
-        // Invalid selector, skip
       }
-    }
-    return { value: null, selector: null };
-  });
+      return { value: null, selector: null };
+    },
+  );
 
   /**
    * Clean whitespace: trim + collapse multiple spaces/newlines.
    */
-  defineGlobal('cleanText', function (text) {
-    if (!text) return '';
-    return text.replace(/\s+/g, ' ').trim();
+  defineGlobal("cleanText", function (text) {
+    if (!text) return "";
+    return text.replace(/\s+/g, " ").trim();
   });
 
   /**
@@ -52,11 +58,11 @@
    * @param {string} url - The URL to clean
    * @param {string[]} paramsToKeep - Query params to preserve (empty = remove all)
    */
-  defineGlobal('cleanUrl', function (url, paramsToKeep = []) {
+  defineGlobal("cleanUrl", function (url, paramsToKeep = []) {
     try {
       const parsed = new URL(url);
       if (paramsToKeep.length === 0) {
-        parsed.search = '';
+        parsed.search = "";
       } else {
         const keep = new URLSearchParams();
         for (const key of paramsToKeep) {
@@ -64,9 +70,9 @@
             keep.set(key, parsed.searchParams.get(key));
           }
         }
-        parsed.search = keep.toString() ? '?' + keep.toString() : '';
+        parsed.search = keep.toString() ? "?" + keep.toString() : "";
       }
-      parsed.hash = '';
+      parsed.hash = "";
       return parsed.toString();
     } catch (e) {
       return url;
@@ -83,7 +89,7 @@
    * @param {string} siteLabel - Human-readable site name for logs
    * @returns {Document|Element}
    */
-  defineGlobal('findDetailScope', function (selectors, siteLabel) {
+  defineGlobal("findDetailScope", function (selectors, siteLabel) {
     for (var i = 0; i < selectors.length; i++) {
       try {
         var el = document.querySelector(selectors[i]);
@@ -93,8 +99,9 @@
       }
     }
     console.warn(
-      '[JobTracker] Detail pane not found on ' + siteLabel +
-      ' listing page — DOM may have changed. Falling back to document scope.'
+      "[JobTracker] Detail pane not found on " +
+        siteLabel +
+        " listing page — DOM may have changed. Falling back to document scope.",
     );
     return document;
   });
@@ -102,15 +109,15 @@
   /**
    * Log scraping results for debugging.
    */
-  defineGlobal('logScrapingResult', function (site, data, failedFields) {
+  defineGlobal("logScrapingResult", function (site, data, failedFields) {
     console.group(`[JobTracker] ${site} scraping result`);
     if (data) {
-      console.log('Data:', data);
+      console.log("Data:", data);
     } else {
-      console.warn('Scraping failed - no data extracted');
+      console.warn("Scraping failed - no data extracted");
     }
     if (failedFields && failedFields.length > 0) {
-      console.warn('Failed fields:', failedFields);
+      console.warn("Failed fields:", failedFields);
     }
     console.groupEnd();
   });

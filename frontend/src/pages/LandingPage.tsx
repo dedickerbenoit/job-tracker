@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { ChromeIcon } from '@/components/icons/ChromeIcon';
-import { ExtensionComingSoonModal } from '@/components/ExtensionComingSoonModal';
-import { Footer } from '@/components/layout/Footer';
-import { t } from '@/lib/i18n';
+import { useState, useEffect, useCallback } from "react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { ChromeIcon } from "@/components/icons/ChromeIcon";
+import { ExtensionComingSoonModal } from "@/components/ExtensionComingSoonModal";
+import { Footer } from "@/components/layout/Footer";
+import { t } from "@/lib/i18n";
 import {
   Columns3,
   Clock,
@@ -15,7 +15,7 @@ import {
   ChevronDown,
   Menu,
   X,
-} from 'lucide-react';
+} from "lucide-react";
 
 // ---------------------------------------------------------------------------
 // Scroll-reveal hook
@@ -37,7 +37,10 @@ function useReveal(): [(el: HTMLElement | null) => void, string] {
     obs.observe(el);
   }, []);
 
-  return [callbackRef, visible ? 'landing-reveal landing-visible' : 'landing-reveal'];
+  return [
+    callbackRef,
+    visible ? "landing-reveal landing-visible" : "landing-reveal",
+  ];
 }
 
 // ---------------------------------------------------------------------------
@@ -49,20 +52,22 @@ function LandingNavbar() {
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 10);
-    window.addEventListener('scroll', handler, { passive: true });
-    return () => window.removeEventListener('scroll', handler);
+    window.addEventListener("scroll", handler, { passive: true });
+    return () => window.removeEventListener("scroll", handler);
   }, []);
 
   const navLinks = [
-    { href: '#features', label: t.landing.nav.features },
-    { href: '#how-it-works', label: t.landing.nav.howItWorks },
-    { href: '#faq', label: t.landing.nav.faq },
+    { href: "#features", label: t.landing.nav.features },
+    { href: "#how-it-works", label: t.landing.nav.howItWorks },
+    { href: "#faq", label: t.landing.nav.faq },
   ];
 
   return (
     <nav
       className={`fixed top-0 right-0 left-0 z-50 transition-all duration-300 ${
-        scrolled ? 'bg-background/80 shadow-sm backdrop-blur-md' : 'bg-transparent'
+        scrolled
+          ? "bg-background/80 shadow-sm backdrop-blur-md"
+          : "bg-transparent"
       }`}
     >
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
@@ -144,7 +149,12 @@ function Hero({ onExtensionClick }: { onExtensionClick: () => void }) {
               {t.landing.hero.ctaDashboard}
             </Button>
           </Link>
-          <Button variant="outline" size="lg" className="h-12 px-6 text-base" onClick={onExtensionClick}>
+          <Button
+            variant="outline"
+            size="lg"
+            className="h-12 px-6 text-base"
+            onClick={onExtensionClick}
+          >
             <ChromeIcon className="mr-2 size-5" />
             {t.landing.hero.ctaExtension}
           </Button>
@@ -161,8 +171,8 @@ function LogosBanner() {
   const [revealRef, revealClass] = useReveal();
 
   const logos = [
-    { name: 'LinkedIn', color: '#0A66C2' },
-    { name: 'Indeed', color: '#2164F3' },
+    { name: "LinkedIn", color: "#0A66C2" },
+    { name: "Indeed", color: "#2164F3" },
   ];
 
   return (
@@ -223,7 +233,9 @@ function Features() {
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
             {t.landing.features.title}
           </h2>
-          <p className="mt-4 text-muted-foreground">{t.landing.features.subtitle}</p>
+          <p className="mt-4 text-muted-foreground">
+            {t.landing.features.subtitle}
+          </p>
         </div>
 
         <div className="mt-16 grid gap-8 sm:grid-cols-2">
@@ -236,7 +248,9 @@ function Features() {
                 <f.icon className="size-6 text-primary" />
               </div>
               <h3 className="text-lg font-semibold">{f.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.description}</p>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                {f.description}
+              </p>
             </div>
           ))}
         </div>
@@ -268,7 +282,9 @@ function HowItWorks() {
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
             {t.landing.howItWorks.title}
           </h2>
-          <p className="mt-4 text-muted-foreground">{t.landing.howItWorks.subtitle}</p>
+          <p className="mt-4 text-muted-foreground">
+            {t.landing.howItWorks.subtitle}
+          </p>
         </div>
 
         <div className="mt-16 grid gap-10 sm:grid-cols-3">
@@ -278,7 +294,9 @@ function HowItWorks() {
                 {i + 1}
               </div>
               <h3 className="text-lg font-semibold">{step.title}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">{step.description}</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {step.description}
+              </p>
             </div>
           ))}
         </div>
@@ -300,7 +318,9 @@ function Screenshot() {
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
             {t.landing.screenshot.title}
           </h2>
-          <p className="mt-4 text-muted-foreground">{t.landing.screenshot.subtitle}</p>
+          <p className="mt-4 text-muted-foreground">
+            {t.landing.screenshot.subtitle}
+          </p>
         </div>
 
         {/* Mockup frame */}
@@ -317,10 +337,26 @@ function Screenshot() {
           {/* Kanban mockup */}
           <div className="grid grid-cols-2 gap-4 p-6 sm:grid-cols-4">
             {[
-              { label: t.status.to_apply, count: 3, color: 'bg-blue-100 dark:bg-blue-900/30' },
-              { label: t.status.applied, count: 5, color: 'bg-indigo-100 dark:bg-indigo-900/30' },
-              { label: t.status.interview, count: 2, color: 'bg-amber-100 dark:bg-amber-900/30' },
-              { label: t.status.offer, count: 1, color: 'bg-emerald-100 dark:bg-emerald-900/30' },
+              {
+                label: t.status.to_apply,
+                count: 3,
+                color: "bg-blue-100 dark:bg-blue-900/30",
+              },
+              {
+                label: t.status.applied,
+                count: 5,
+                color: "bg-indigo-100 dark:bg-indigo-900/30",
+              },
+              {
+                label: t.status.interview,
+                count: 2,
+                color: "bg-amber-100 dark:bg-amber-900/30",
+              },
+              {
+                label: t.status.offer,
+                count: 1,
+                color: "bg-emerald-100 dark:bg-emerald-900/30",
+              },
             ].map((col) => (
               <div key={col.label} className={`rounded-xl ${col.color} p-3`}>
                 <div className="mb-3 flex items-center justify-between">
@@ -361,17 +397,19 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
         {question}
         <ChevronDown
           className={`size-4 shrink-0 text-muted-foreground transition-transform duration-200 ${
-            open ? 'rotate-180' : ''
+            open ? "rotate-180" : ""
           }`}
         />
       </button>
       <div
         className={`grid transition-all duration-200 ${
-          open ? 'grid-rows-[1fr] pb-5' : 'grid-rows-[0fr]'
+          open ? "grid-rows-[1fr] pb-5" : "grid-rows-[0fr]"
         }`}
       >
         <div className="overflow-hidden">
-          <p className="text-sm leading-relaxed text-muted-foreground">{answer}</p>
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            {answer}
+          </p>
         </div>
       </div>
     </div>
@@ -413,14 +451,21 @@ function FinalCta({ onExtensionClick }: { onExtensionClick: () => void }) {
         <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
           {t.landing.finalCta.title}
         </h2>
-        <p className="mt-4 text-lg text-muted-foreground">{t.landing.finalCta.subtitle}</p>
+        <p className="mt-4 text-lg text-muted-foreground">
+          {t.landing.finalCta.subtitle}
+        </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
           <Link to="/dashboard">
             <Button size="lg" className="h-12 px-6 text-base">
               {t.landing.finalCta.ctaDashboard}
             </Button>
           </Link>
-          <Button variant="outline" size="lg" className="h-12 px-6 text-base" onClick={onExtensionClick}>
+          <Button
+            variant="outline"
+            size="lg"
+            className="h-12 px-6 text-base"
+            onClick={onExtensionClick}
+          >
             <ChromeIcon className="mr-2 size-5" />
             {t.landing.finalCta.ctaExtension}
           </Button>
@@ -448,7 +493,10 @@ export default function LandingPage() {
       <FinalCta onExtensionClick={() => setExtensionModalOpen(true)} />
       <Footer />
 
-      <ExtensionComingSoonModal open={extensionModalOpen} onClose={() => setExtensionModalOpen(false)} />
+      <ExtensionComingSoonModal
+        open={extensionModalOpen}
+        onClose={() => setExtensionModalOpen(false)}
+      />
     </div>
   );
 }
