@@ -1,15 +1,13 @@
 export default {
   "frontend/**/*.{ts,tsx}": (filenames) => {
-    const files = filenames.map((f) => f.replace(/^.*\/frontend\//, "")).join(" ");
     return [
-      `cd frontend && npx eslint --fix ${files}`,
+      `frontend/node_modules/.bin/eslint -c frontend/eslint.config.js --fix ${filenames.join(" ")}`,
       `npx prettier --write ${filenames.join(" ")}`,
     ];
   },
   "extension/**/*.js": (filenames) => {
-    const files = filenames.map((f) => f.replace(/^.*\/extension\//, "")).join(" ");
     return [
-      `cd extension && npx eslint --fix ${files}`,
+      `extension/node_modules/.bin/eslint -c extension/eslint.config.mjs --fix ${filenames.join(" ")}`,
       `npx prettier --write ${filenames.join(" ")}`,
     ];
   },
