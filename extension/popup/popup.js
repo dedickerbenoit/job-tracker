@@ -42,6 +42,7 @@ const elements = {
   fieldTitle: document.getElementById("field-title"),
   fieldCompany: document.getElementById("field-company"),
   fieldLocation: document.getElementById("field-location"),
+
   fieldUrl: document.getElementById("field-url"),
   fieldSource: document.getElementById("field-source"),
   fieldStatus: document.getElementById("field-status"),
@@ -50,6 +51,7 @@ const elements = {
   labelFieldTitle: document.getElementById("label-field-title"),
   labelFieldCompany: document.getElementById("label-field-company"),
   labelFieldLocation: document.getElementById("label-field-location"),
+
   labelFieldUrl: document.getElementById("label-field-url"),
   labelFieldSource: document.getElementById("label-field-source"),
   labelFieldStatus: document.getElementById("label-field-status"),
@@ -61,8 +63,6 @@ const elements = {
   btnLogout: document.getElementById("btn-logout"),
   btnManual: document.getElementById("btn-manual"),
   btnScrape: document.getElementById("btn-scrape"),
-  btnSettings: document.getElementById("btn-settings"),
-  btnSettingsBack: document.getElementById("btn-settings-back"),
   btnSubmit: document.getElementById("btn-submit"),
   btnDashboard: document.getElementById("btn-dashboard"),
   btnOpenDashboard: document.getElementById("btn-open-dashboard"),
@@ -81,7 +81,6 @@ const elements = {
 };
 
 let currentTabUrl = "";
-let isAuthenticated = false;
 let hasSubmitted = false;
 
 // --- Init ---
@@ -98,7 +97,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 function applyTranslations() {
   // Header tooltips
   elements.btnDashboard.title = t.ui.header.dashboard;
-  elements.btnSettings.title = t.ui.header.settings;
   elements.btnLogout.title = t.ui.header.logout;
 
   // Auth section
@@ -120,6 +118,7 @@ function applyTranslations() {
   elements.fieldCompany.placeholder = t.ui.form.companyPlaceholder;
   elements.labelFieldLocation.textContent = t.ui.form.locationLabel;
   elements.fieldLocation.placeholder = t.ui.form.locationPlaceholder;
+
   elements.labelFieldUrl.textContent = t.ui.form.urlLabel;
   elements.fieldUrl.placeholder = t.ui.form.urlPlaceholder;
   elements.labelFieldSource.textContent = t.ui.form.sourceLabel;
@@ -150,11 +149,6 @@ function applyTranslations() {
 
   // Manual entry
   elements.btnManual.textContent = t.ui.manual.button;
-
-  // Settings panel
-  elements.settingsTitle.textContent = t.ui.settingsPanel.title;
-  elements.settingsEnabledSites.textContent = t.ui.settingsPanel.enabledSites;
-  elements.btnSettingsBack.textContent = t.ui.settingsPanel.back;
 }
 
 // --- Auth ---
@@ -176,7 +170,6 @@ async function checkAuth() {
 }
 
 function setAuthenticated(user) {
-  isAuthenticated = true;
   elements.sectionAuth.classList.add("hidden");
   elements.sectionJob.classList.remove("hidden");
   elements.sectionManual.classList.remove("hidden");
@@ -187,7 +180,6 @@ function setAuthenticated(user) {
 }
 
 function showAuthSection() {
-  isAuthenticated = false;
   elements.sectionAuth.classList.remove("hidden");
   elements.sectionJob.classList.add("hidden");
   elements.sectionManual.classList.add("hidden");
@@ -276,6 +268,7 @@ function showScrapedData(data) {
   elements.fieldTitle.value = data.title || "";
   elements.fieldCompany.value = data.company || "";
   elements.fieldLocation.value = data.location || "";
+
   elements.fieldUrl.value = data.url || "";
   elements.fieldSource.value = data.source || "manual";
   elements.fieldDescription.value = data.description || "";
@@ -287,6 +280,7 @@ function showManualForm() {
   elements.fieldTitle.value = "";
   elements.fieldCompany.value = "";
   elements.fieldLocation.value = "";
+
   elements.fieldUrl.value = currentTabUrl;
   elements.fieldSource.value = "manual";
   elements.fieldStatus.value = DEFAULT_STATUS;
@@ -357,6 +351,7 @@ async function handleSubmit(e) {
     title: elements.fieldTitle.value,
     company: elements.fieldCompany.value,
     location: elements.fieldLocation.value,
+
     url: elements.fieldUrl.value,
     source: elements.fieldSource.value,
     description: elements.fieldDescription.value,
@@ -415,17 +410,6 @@ async function saveSettings() {
   showToast(t.settings.saved, "success");
 }
 
-function toggleSettingsPanel() {
-  const isVisible = !elements.sectionSettings.classList.contains("hidden");
-  elements.sectionSettings.classList.toggle("hidden", isVisible);
-  if (isAuthenticated) {
-    elements.sectionJob.classList.toggle("hidden", !isVisible);
-    elements.sectionManual.classList.toggle("hidden", !isVisible);
-  } else {
-    elements.sectionAuth.classList.toggle("hidden", !isVisible);
-  }
-}
-
 // --- Events ---
 
 function bindEvents() {
@@ -435,8 +419,6 @@ function bindEvents() {
   elements.btnOpenDashboard.addEventListener("click", openDashboard);
   elements.btnScrape.addEventListener("click", handleScrape);
   elements.btnManual.addEventListener("click", showManualForm);
-  elements.btnSettings.addEventListener("click", toggleSettingsPanel);
-  elements.btnSettingsBack.addEventListener("click", toggleSettingsPanel);
 
   // Settings checkboxes auto-save
   elements.settingLinkedin.addEventListener("change", saveSettings);
