@@ -81,7 +81,6 @@ const elements = {
 };
 
 let currentTabUrl = "";
-let isAuthenticated = false;
 let hasSubmitted = false;
 
 // --- Init ---
@@ -171,7 +170,6 @@ async function checkAuth() {
 }
 
 function setAuthenticated(user) {
-  isAuthenticated = true;
   elements.sectionAuth.classList.add("hidden");
   elements.sectionJob.classList.remove("hidden");
   elements.sectionManual.classList.remove("hidden");
@@ -182,7 +180,6 @@ function setAuthenticated(user) {
 }
 
 function showAuthSection() {
-  isAuthenticated = false;
   elements.sectionAuth.classList.remove("hidden");
   elements.sectionJob.classList.add("hidden");
   elements.sectionManual.classList.add("hidden");
