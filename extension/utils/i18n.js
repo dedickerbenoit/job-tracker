@@ -57,6 +57,7 @@ const fr = {
       companyPlaceholder: "Ex: Acme Corp",
       locationLabel: "Localisation",
       locationPlaceholder: "Ex: Paris, France",
+
       urlLabel: "URL de l'offre",
       urlPlaceholder: "https://...",
       sourceLabel: "Source",
@@ -83,11 +84,6 @@ const fr = {
     },
     manual: {
       button: "Saisie manuelle",
-    },
-    settingsPanel: {
-      title: "Paramètres",
-      enabledSites: "Sites activés",
-      back: "Retour",
     },
   },
 };
