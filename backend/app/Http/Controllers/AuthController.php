@@ -10,6 +10,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\PersonalAccessToken;
 
 class AuthController extends Controller
@@ -66,6 +68,20 @@ class AuthController extends Controller
     {
         $validated = $request->validated();
 
+        // Per-email rate limiting to mitigate distributed brute-force attacks
+        // (complements the IP-based throttle:5,1 middleware on the route)
+        $throttleKey = 'login:'.Str::lower($validated['email']);
+
+        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            Log::warning('Login locked out by email', ['email' => $validated['email'], 'ip' => $request->ip()]);
+
+            return response()->json([
+                'message' => "Trop de tentatives. Reessayez dans {$seconds} secondes.",
+                'errors' => ['email' => ["Trop de tentatives. Reessayez dans {$seconds} secondes."]],
+            ], 429);
+        }
+
         // Support both SPA mode (session cookies) and token mode (Chrome extension)
         // In token mode we explicitly avoid Auth::attempt() so that no session
         // cookie is set on the browser. Otherwise the extension's login would
@@ -80,6 +96,7 @@ class AuthController extends Controller
             : Auth::attempt($validated);
 
         if (! $authenticated) {
+            RateLimiter::hit($throttleKey, 60);
             Log::warning('Failed login attempt', ['email' => $validated['email'], 'ip' => $request->ip()]);
 
             return response()->json([
@@ -87,6 +104,8 @@ class AuthController extends Controller
                 'errors' => ['email' => ['Identifiants invalides']],
             ], 422);
         }
+
+        RateLimiter::clear($throttleKey);
 
         $user = Auth::user();
 
