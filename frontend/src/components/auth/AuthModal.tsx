@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Dialog,
   DialogContent,
@@ -355,10 +355,21 @@ function RegisterForm() {
 export function AuthModal() {
   const showAuthModal = useAuthStore((s) => s.showAuthModal);
   const authModalTab = useAuthStore((s) => s.authModalTab);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const closeAuthModal = useAuthStore((s) => s.closeAuthModal);
   const openAuthModal = useAuthStore((s) => s.openAuthModal);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleClose = () => {
+    closeAuthModal();
+    if (!isAuthenticated && location.pathname !== "/") {
+      navigate("/");
+    }
+  };
+
   return (
-    <Dialog open={showAuthModal} onOpenChange={(v) => !v && closeAuthModal()}>
+    <Dialog open={showAuthModal} onOpenChange={(v) => !v && handleClose()}>
       <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
