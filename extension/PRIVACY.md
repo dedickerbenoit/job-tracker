@@ -42,4 +42,4 @@ Conformément au RGPD, vous pouvez :
 
 ## Contact
 
-Pour toute question : [email@example.com]
+Pour toute question : dedickerbenoi@gmail.com
