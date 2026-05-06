@@ -20,9 +20,10 @@ class SecurityHeaders
         if (str_starts_with($request->path(), 'api/')) {
             $response->headers->set('Content-Security-Policy', "default-src 'none'; frame-ancestors 'none'");
         } else {
-            // SPA pages — Tailwind/shadcn needs inline styles
+            // SPA pages — Tailwind/shadcn needs inline styles, and the
+            // handoff bootstrap script (index.html) is whitelisted by hash.
             $response->headers->set('Content-Security-Policy',
-                "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'");
+                "default-src 'self'; script-src 'self' 'sha256-5nButBmZwTcCeivs05z3N5YCcnrYnMW8Qui9ROwPXcM='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'");
         }
 
         if ($request->secure()) {
