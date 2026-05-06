@@ -9,7 +9,9 @@
   let currentSite = null;
   let _lastJobKey = null;
 
-  console.log("[JobTracker] Content script loaded on", location.hostname);
+  if (window.__JOBTRACKER_DEBUG__) {
+    console.log("[JobTracker] Content script loaded on", location.hostname);
+  }
 
   // --- Message listener ---
 
@@ -19,10 +21,12 @@
       isListingPage = !!message.listing;
 
       if (isListingPage) {
-        console.log(
-          "[JobTracker] Listing page mode activated for",
-          currentSite,
-        );
+        if (window.__JOBTRACKER_DEBUG__) {
+          console.log(
+            "[JobTracker] Listing page mode activated for",
+            currentSite,
+          );
+        }
         // Reset _lastJobKey so first panel scrape goes through
         _lastJobKey = null;
       }
@@ -50,9 +54,11 @@
     for (let i = 0; i < maxRetries; i++) {
       const data = scrapeCurrentSite(site, listing);
       if (data && data.title && data.company) return data;
-      console.log(
-        `[JobTracker] Scrape attempt ${i + 1}/${maxRetries} - DOM not ready, retrying...`,
-      );
+      if (window.__JOBTRACKER_DEBUG__) {
+        console.log(
+          `[JobTracker] Scrape attempt ${i + 1}/${maxRetries} - DOM not ready, retrying...`,
+        );
+      }
       await new Promise((r) => setTimeout(r, delayMs));
     }
     const lastAttempt = scrapeCurrentSite(site, listing);
@@ -78,7 +84,9 @@
           ? window.scrapeHelloWork(listing)
           : null;
       default:
-        console.warn("[JobTracker] Unknown site:", site);
+        if (window.__JOBTRACKER_DEBUG__) {
+          console.warn("[JobTracker] Unknown site:", site);
+        }
         return null;
     }
   }
@@ -94,7 +102,9 @@
       urlDebounceTimer = setTimeout(() => {
         lastUrl = location.href;
         _lastJobKey = null;
-        console.log("[JobTracker] SPA navigation detected:", lastUrl);
+        if (window.__JOBTRACKER_DEBUG__) {
+          console.log("[JobTracker] SPA navigation detected:", lastUrl);
+        }
         chrome.runtime.sendMessage({ type: "URL_CHANGED", url: lastUrl });
       }, 300);
     }
