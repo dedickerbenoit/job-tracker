@@ -98,11 +98,13 @@
         // Invalid selector, skip
       }
     }
-    console.warn(
-      "[JobTracker] Detail pane not found on " +
-        siteLabel +
-        " listing page — DOM may have changed. Falling back to document scope.",
-    );
+    if (window.__JOBTRACKER_DEBUG__) {
+      console.warn(
+        "[JobTracker] Detail pane not found on " +
+          siteLabel +
+          " listing page — DOM may have changed. Falling back to document scope.",
+      );
+    }
     return document;
   });
 
@@ -110,6 +112,7 @@
    * Log scraping results for debugging.
    */
   defineGlobal("logScrapingResult", function (site, data, failedFields) {
+    if (!window.__JOBTRACKER_DEBUG__) return;
     console.group(`[JobTracker] ${site} scraping result`);
     if (data) {
       console.log("Data:", data);
