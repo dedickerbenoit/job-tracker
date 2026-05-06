@@ -5,17 +5,15 @@ import {
   setInSession,
   removeFromSession,
 } from "./storage.js";
-
-// TODO: Make this configurable
-const isProduction = true;
+import { IS_PRODUCTION } from "../config.js";
 
 const PROD_BASE = "https://jobtracker-bd.fly.dev";
 
-const DEFAULT_API_URL = isProduction
+const DEFAULT_API_URL = IS_PRODUCTION
   ? `${PROD_BASE}/api/v1`
   : "http://localhost:8000/api/v1";
 
-const DEFAULT_DASHBOARD_URL = isProduction
+const DEFAULT_DASHBOARD_URL = IS_PRODUCTION
   ? PROD_BASE
   : "http://localhost:5173";
 

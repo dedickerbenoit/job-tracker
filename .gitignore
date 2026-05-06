@@ -18,6 +18,8 @@ vendor/
 
 # Build
 /frontend/dist/
+/extension/config.js
+/extension/manifest.json
 
 # Laravel
 /backend/storage/*.key
