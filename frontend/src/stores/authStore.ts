@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { toast } from "sonner";
-import { authApi } from "@/services/api";
+import { authApi, setOnUnauthorized } from "@/services/api";
 import { t } from "@/lib/i18n";
 import type { User, LoginData, RegisterData } from "@/types";
 
@@ -118,3 +118,12 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ user: null, isAuthenticated: false });
   },
 }));
+
+// Wire up the 401 interceptor callback now that the store exists.
+setOnUnauthorized((silent) => {
+  const { clearAuth, openAuthModal } = useAuthStore.getState();
+  clearAuth();
+  if (!silent) {
+    openAuthModal("login");
+  }
+});

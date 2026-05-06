@@ -36,6 +36,15 @@ interface SilentRequestConfig extends InternalAxiosRequestConfig {
   silent?: boolean;
 }
 
+// Callback set by the auth store to handle 401 responses.
+// Avoids a circular chunk dependency (api → authStore → api) that breaks
+// the production build when Rolldown splits authStore into its own chunk.
+let onUnauthorized: ((silent: boolean) => void) | null = null;
+
+export function setOnUnauthorized(cb: (silent: boolean) => void): void {
+  onUnauthorized = cb;
+}
+
 // Error interceptor — clear auth on 401 and open login modal
 api.interceptors.response.use(
   (response) => response,
@@ -43,13 +52,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       const isSilent =
         (error.config as SilentRequestConfig | undefined)?.silent === true;
-      import("@/stores/authStore").then(({ useAuthStore }) => {
-        const { clearAuth, openAuthModal } = useAuthStore.getState();
-        clearAuth();
-        if (!isSilent) {
-          openAuthModal("login");
-        }
-      });
+      onUnauthorized?.(isSilent);
     }
     return Promise.reject(error);
   },
