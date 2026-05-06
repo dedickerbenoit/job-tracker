@@ -19,7 +19,9 @@ vendor/
 # Build
 /frontend/dist/
 /extension/config.js
+/extension/debug.js
 /extension/manifest.json
+/extension/*.zip
 
 # Laravel
 /backend/storage/*.key

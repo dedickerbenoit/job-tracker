@@ -1,11 +1,14 @@
 import { detectJobSite } from "../utils/detector.js";
 import { isSiteEnabled } from "../utils/settings.js";
+import { IS_PRODUCTION } from "../config.js";
 
 const currentTabStates = {};
 const pendingHandles = new Set();
 
 chrome.runtime.onInstalled.addListener(() => {
-  console.log("[JobTracker] Extension installed");
+  if (!IS_PRODUCTION) {
+    console.log("[JobTracker] Extension installed");
+  }
 });
 
 // --- Tab listeners ---
