@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "JobTracker",
   "version": "0.1.0",
-  "description": "Track job applications from LinkedIn, Indeed and HelloWork",
+  "description": "Save job offers from LinkedIn & Indeed in one click. Track your applications and never lose an opportunity.",
   "permissions": ["storage", "activeTab", "tabs"],
   "host_permissions": [
     "https://www.linkedin.com/*",
@@ -30,14 +30,20 @@
     {
       "matches": ["https://www.linkedin.com/*", "https://*.linkedin.com/*"],
       "js": [
+        "debug.js",
         "content/scrapers/helpers.js",
         "content/scrapers/linkedin.js",
         "content/content.js"
       ]
     },
     {
-      "matches": ["https://www.indeed.com/*", "https://*.indeed.com/*", "https://*.indeed.fr/*"],
+      "matches": [
+        "https://www.indeed.com/*",
+        "https://*.indeed.com/*",
+        "https://*.indeed.fr/*"
+      ],
       "js": [
+        "debug.js",
         "content/scrapers/helpers.js",
         "content/scrapers/indeed.js",
         "content/content.js"
@@ -46,6 +52,7 @@
     {
       "matches": ["https://www.hellowork.com/*", "https://*.hellowork.com/*"],
       "js": [
+        "debug.js",
         "content/scrapers/helpers.js",
         "content/scrapers/hellowork.js",
         "content/content.js"
