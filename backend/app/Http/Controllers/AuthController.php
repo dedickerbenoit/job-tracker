@@ -262,7 +262,7 @@ class AuthController extends Controller
         $user = $request->user();
 
         return response()->json([
-            'data' => $user->only('id', 'first_name', 'last_name', 'email', 'avatar_url'),
+            'data' => $user->only('id', 'first_name', 'last_name', 'email', 'avatar_url', 'suspended_at'),
         ]);
     }
 }

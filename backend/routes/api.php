@@ -29,12 +29,17 @@ Route::prefix('v1')->group(function () {
         Route::get('auth/me', [AuthController::class, 'me']);
 
         // RGPD — Account management (accessible even when suspended)
-        Route::get('account/data-export', [AccountController::class, 'exportData'])
-            ->middleware('throttle:3,1');
-        Route::get('account/consents', [AccountController::class, 'consents']);
-        Route::post('account/consents/revoke', [AccountController::class, 'revokeConsent']);
-        Route::post('account/suspend', [AccountController::class, 'suspendAccount']);
-        Route::delete('account', [AccountController::class, 'deleteAccount']);
+        Route::prefix('account')->controller(AccountController::class)->group(function () {
+            Route::get('data-export', 'exportData')->middleware('throttle:3,1');
+            Route::prefix('consents')->group(function () {
+                Route::get('/', 'consents');
+                Route::post('revoke', 'revokeConsent');
+                Route::post('grant', 'grantConsent');
+            });
+            Route::post('reactivate', 'reactivateAccount');
+            Route::post('suspend', 'suspendAccount');
+            Route::delete('/', 'deleteAccount');
+        });
 
         // All routes below require an active (non-suspended) account
         Route::middleware('not-suspended')->group(function () {

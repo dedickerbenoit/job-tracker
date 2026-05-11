@@ -158,6 +158,16 @@ export const accountApi = {
       .then(() => undefined);
   },
 
+  grantConsent(consentType: "terms" | "privacy"): Promise<void> {
+    return api
+      .post("/account/consents/grant", { consent_type: consentType })
+      .then(() => undefined);
+  },
+
+  reactivateAccount(): Promise<void> {
+    return api.post("/account/reactivate").then(() => undefined);
+  },
+
   suspendAccount(): Promise<void> {
     return api.post("/account/suspend").then(() => undefined);
   },

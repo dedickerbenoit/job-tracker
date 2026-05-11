@@ -6,6 +6,7 @@ export interface User {
   last_name: string;
   email: string;
   avatar_url: string | null;
+  suspended_at: string | null;
 }
 
 export interface LoginData {

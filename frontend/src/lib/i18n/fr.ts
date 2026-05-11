@@ -260,7 +260,7 @@ const fr = {
     memberSince: "Membre depuis le",
     consents: "Gestion des consentements",
     consentsDescription:
-      "Vous pouvez révoquer vos consentements à tout moment. La révocation n'entraîne pas la suppression de votre compte.",
+      "Vous pouvez révoquer vos consentements à tout moment. La révocation entraîne la suspension de votre compte.",
     consentTerms: "Conditions générales d'utilisation",
     consentPrivacy: "Politique de confidentialité",
     consentActive: "Actif",
@@ -268,11 +268,33 @@ const fr = {
     revokeConsent: "Révoquer",
     revokeConsentConfirmTitle: "Révoquer ce consentement ?",
     revokeConsentConfirmDescription:
-      "La révocation de ce consentement sera enregistrée. Cela n'entraîne pas la suppression de votre compte.",
+      "La révocation de ce consentement entraînera la suspension de votre compte. Vos données seront conservées mais l'accès à vos candidatures sera limité.",
     revokeConsentConfirm: "Oui, révoquer",
     revoking: "Révocation...",
     revokeSuccess: "Consentement révoqué.",
     revokeError: "Erreur lors de la révocation.",
+    grantConsent: "Redonner mon consentement",
+    grantConsentConfirmTitle: "Redonner votre consentement ?",
+    grantConsentConfirmDescription:
+      "En redonnant votre consentement, vous acceptez à nouveau les conditions associées. Ce consentement sera enregistré avec votre adresse IP.",
+    grantConsentConfirm: "Oui, je consens",
+    granting: "Enregistrement...",
+    grantSuccess: "Consentement enregistré.",
+    grantError: "Erreur lors de l'enregistrement du consentement.",
+    reactivateAccount: "Réactiver mon compte",
+    reactivateDescription:
+      "Votre compte est suspendu. Vérifiez vos consentements ci-dessous puis réactivez votre compte.",
+    reactivateConfirmTitle: "Réactiver votre compte ?",
+    reactivateConfirmDescription:
+      "Vous retrouverez l'accès complet à vos candidatures.",
+    reactivateConfirm: "Oui, réactiver",
+    reactivating: "Réactivation...",
+    reactivateSuccess: "Votre compte a été réactivé.",
+    reactivateError: "Erreur lors de la réactivation.",
+    reactivateMissingConsents:
+      "Veuillez d'abord redonner tous vos consentements.",
+    accountSuspendedBanner:
+      "Votre compte est suspendu. L'accès à vos candidatures est limité.",
     exportData: "Exporter mes données",
     exportDescription:
       "Téléchargez une copie de toutes vos données personnelles (profil, candidatures, événements) au format JSON.",
@@ -281,10 +303,10 @@ const fr = {
     exportError: "Erreur lors de l'export de vos données.",
     suspendAccount: "Suspendre mon compte",
     suspendDescription:
-      "Vos données seront conservées mais leur traitement sera limité (droit à la limitation, art. 18 RGPD). Contactez-nous pour réactiver votre compte.",
+      "Vos données seront conservées mais leur traitement sera limité (droit à la limitation, art. 18 RGPD). Vous pourrez réactiver votre compte à tout moment.",
     suspendConfirmTitle: "Suspendre votre compte ?",
     suspendConfirmDescription:
-      "Votre compte sera immédiatement suspendu. Vos données resteront stockées mais ne seront plus traitées. Pour réactiver votre compte, contactez dedickerbenoit@gmail.com.",
+      "Votre compte sera immédiatement suspendu. Vos données resteront stockées mais ne seront plus traitées. Vous pourrez le réactiver depuis votre page Compte.",
     suspendConfirm: "Oui, suspendre mon compte",
     suspending: "Suspension...",
     suspendSuccess: "Votre compte a été suspendu.",
