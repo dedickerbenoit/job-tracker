@@ -22,25 +22,31 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
-        // Auth routes (protected)
+        // Auth routes (protected) — accessible even when suspended
         Route::post('auth/logout', [AuthController::class, 'logout']);
         Route::post('auth/create-handoff-token', [AuthController::class, 'createHandoffToken'])
             ->middleware('throttle:10,1');
         Route::get('auth/me', [AuthController::class, 'me']);
 
-        // Custom routes BEFORE apiResource to avoid {application} param conflict
-        Route::get('applications/timeline', [ApplicationController::class, 'timeline'])
-            ->name('applications.timeline');
-        Route::get('applications/stats', [ApplicationController::class, 'stats'])
-            ->name('applications.stats');
-        Route::patch('applications/{application}/status', [ApplicationController::class, 'updateStatus'])
-            ->name('applications.update-status');
-
-        Route::apiResource('applications', ApplicationController::class);
-
-        // RGPD — Account management
+        // RGPD — Account management (accessible even when suspended)
         Route::get('account/data-export', [AccountController::class, 'exportData'])
             ->middleware('throttle:3,1');
+        Route::get('account/consents', [AccountController::class, 'consents']);
+        Route::post('account/consents/revoke', [AccountController::class, 'revokeConsent']);
+        Route::post('account/suspend', [AccountController::class, 'suspendAccount']);
         Route::delete('account', [AccountController::class, 'deleteAccount']);
+
+        // All routes below require an active (non-suspended) account
+        Route::middleware('not-suspended')->group(function () {
+            // Custom routes BEFORE apiResource to avoid {application} param conflict
+            Route::get('applications/timeline', [ApplicationController::class, 'timeline'])
+                ->name('applications.timeline');
+            Route::get('applications/stats', [ApplicationController::class, 'stats'])
+                ->name('applications.stats');
+            Route::patch('applications/{application}/status', [ApplicationController::class, 'updateStatus'])
+                ->name('applications.update-status');
+
+            Route::apiResource('applications', ApplicationController::class);
+        });
     });
 });

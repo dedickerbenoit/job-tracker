@@ -258,12 +258,37 @@ const fr = {
     lastName: "Nom",
     email: "Adresse e-mail",
     memberSince: "Membre depuis le",
+    consents: "Gestion des consentements",
+    consentsDescription:
+      "Vous pouvez révoquer vos consentements à tout moment. La révocation n'entraîne pas la suppression de votre compte.",
+    consentTerms: "Conditions générales d'utilisation",
+    consentPrivacy: "Politique de confidentialité",
+    consentActive: "Actif",
+    consentRevoked: "Révoqué",
+    revokeConsent: "Révoquer",
+    revokeConsentConfirmTitle: "Révoquer ce consentement ?",
+    revokeConsentConfirmDescription:
+      "La révocation de ce consentement sera enregistrée. Cela n'entraîne pas la suppression de votre compte.",
+    revokeConsentConfirm: "Oui, révoquer",
+    revoking: "Révocation...",
+    revokeSuccess: "Consentement révoqué.",
+    revokeError: "Erreur lors de la révocation.",
     exportData: "Exporter mes données",
     exportDescription:
       "Téléchargez une copie de toutes vos données personnelles (profil, candidatures, événements) au format JSON.",
     exporting: "Export en cours...",
     exportSuccess: "Vos données ont été téléchargées.",
     exportError: "Erreur lors de l'export de vos données.",
+    suspendAccount: "Suspendre mon compte",
+    suspendDescription:
+      "Vos données seront conservées mais leur traitement sera limité (droit à la limitation, art. 18 RGPD). Contactez-nous pour réactiver votre compte.",
+    suspendConfirmTitle: "Suspendre votre compte ?",
+    suspendConfirmDescription:
+      "Votre compte sera immédiatement suspendu. Vos données resteront stockées mais ne seront plus traitées. Pour réactiver votre compte, contactez dedickerbenoit@gmail.com.",
+    suspendConfirm: "Oui, suspendre mon compte",
+    suspending: "Suspension...",
+    suspendSuccess: "Votre compte a été suspendu.",
+    suspendError: "Erreur lors de la suspension du compte.",
     deleteAccount: "Supprimer mon compte",
     deleteDescription:
       "Cette action est irréversible. Toutes vos données seront supprimées après un délai de 30 jours.",

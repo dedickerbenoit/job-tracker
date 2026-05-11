@@ -4,7 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int $id
+ * @property int|null $user_id
+ * @property string $consent_type
+ * @property Carbon $consented_at
+ * @property string|null $ip_address
+ * @property string|null $user_agent
+ * @property Carbon|null $revoked_at
+ */
 class UserConsent extends Model
 {
     public $timestamps = false;

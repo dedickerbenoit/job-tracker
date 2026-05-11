@@ -20,6 +20,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property string|null $password
  * @property Carbon|null $email_verified_at
  * @property string|null $remember_token
+ * @property Carbon|null $suspended_at
  * @property string|null $google_id
  * @property string|null $linkedin_id
  * @property string|null $avatar_url
@@ -36,12 +37,13 @@ class User extends Authenticatable
 
     protected $fillable = ['first_name', 'last_name', 'email', 'password'];
 
-    protected $hidden = ['password', 'remember_token'];
+    protected $hidden = ['password', 'remember_token', 'google_id', 'linkedin_id'];
 
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
+            'suspended_at' => 'datetime',
             'password' => 'hashed',
         ];
     }

@@ -13,7 +13,7 @@ export default {
   },
   "backend/**/*.php": (filenames) => {
     const files = filenames.map((f) => f.replace(/^.*\/backend\//, "")).join(" ");
-    return [`cd backend && vendor/bin/pint ${files}`];
+    return [`bash -c "cd backend && vendor/bin/pint ${files}"`];
   },
   "**/*.{json,yml,yaml,css,html,md}": (filenames) => {
     return [`npx prettier --write ${filenames.join(" ")}`];
