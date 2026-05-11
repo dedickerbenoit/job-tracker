@@ -4,6 +4,30 @@
  */
 
 const fr = {
+  seo: {
+    siteUrl: "https://jobtracker-bd.fly.dev",
+    landing: {
+      title: "JobTracker — Organisez votre recherche d'emploi",
+      description:
+        "Suivez vos candidatures, entretiens et offres en un seul endroit avec le kanban et la timeline JobTracker. Gratuit et sans limite.",
+    },
+    privacy: {
+      title: "Politique de confidentialité — JobTracker",
+      description:
+        "Découvrez comment JobTracker protège vos données personnelles : collecte, stockage, droits RGPD et cookies.",
+    },
+    legal: {
+      title: "Mentions légales — JobTracker",
+      description:
+        "Mentions légales de JobTracker : éditeur, hébergeur, propriété intellectuelle et protection des données.",
+    },
+    notFound: {
+      title: "Page introuvable — JobTracker",
+      description:
+        "La page que vous recherchez n'existe pas ou a été déplacée.",
+    },
+  },
+
   common: {
     cancel: "Annuler",
     save: "Enregistrer",
@@ -539,6 +563,12 @@ const fr = {
       status: "On met les derniers coups de polish avant le lancement.",
       close: "Fermer",
     },
+  },
+
+  notFound: {
+    title: "Page introuvable",
+    description: "La page que vous recherchez n'existe pas ou a été déplacée.",
+    backHome: "Retour à l'accueil",
   },
 
   a11y: {

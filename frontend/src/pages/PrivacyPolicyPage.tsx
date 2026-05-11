@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { t } from "@/lib/i18n";
 
 export default function PrivacyPolicyPage() {
@@ -6,6 +7,16 @@ export default function PrivacyPolicyPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
+      <Helmet>
+        <title>{t.seo.privacy.title}</title>
+        <meta name="description" content={t.seo.privacy.description} />
+        <link rel="canonical" href={`${t.seo.siteUrl}/privacy`} />
+        <meta property="og:title" content={t.seo.privacy.title} />
+        <meta property="og:description" content={t.seo.privacy.description} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`${t.seo.siteUrl}/privacy`} />
+        <meta name="twitter:card" content="summary" />
+      </Helmet>
       <h1 className="mb-8 text-3xl font-bold">{t.privacy.pageTitle}</h1>
       <p className="mb-4 text-sm text-muted-foreground">
         {t.privacy.lastUpdated}
