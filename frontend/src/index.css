@@ -159,3 +159,73 @@
   opacity: 1;
   transform: translateY(0);
 }
+
+/* ── Landing page micro-animations ── */
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+}
+
+@keyframes float-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.pulse-ring {
+  animation: pulse-ring 2s infinite;
+}
+
+.float-up {
+  animation: float-up 0.4s ease-out;
+}
+
+/* Dotted background pattern */
+.dotted-bg {
+  background-image: radial-gradient(
+    circle,
+    oklch(0.85 0 0) 1px,
+    transparent 1px
+  );
+  background-size: 20px 20px;
+}
+
+/* Glow shadow for demo card */
+.glow {
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.04),
+    0 1px 3px rgba(0, 0, 0, 0.04),
+    0 24px 48px -12px rgba(0, 0, 0, 0.18);
+}
+
+/* Mono font utility */
+.font-mono-jb {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+}
