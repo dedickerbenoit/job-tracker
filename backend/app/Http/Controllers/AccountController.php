@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\UserConsent;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -56,7 +57,8 @@ class AccountController extends Controller
 
         $user = $request->user();
 
-        $consent = $user->consents()
+        $consent = UserConsent::query()
+            ->where('user_id', $user->id)
             ->where('consent_type', $validated['consent_type'])
             ->whereNull('revoked_at')
             ->latest('consented_at')
