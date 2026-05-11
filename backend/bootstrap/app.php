@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureAccountNotSuspended;
 use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -14,7 +15,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->trustProxies(at: '*');
+
         $middleware->append(SecurityHeaders::class);
+
+        $middleware->alias([
+            'not-suspended' => EnsureAccountNotSuspended::class,
+        ]);
 
         // Enable Sanctum SPA mode for stateful authentication with HttpOnly cookies
         $middleware->api(prepend: [
