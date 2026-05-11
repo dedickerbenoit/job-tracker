@@ -1,6 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Download, Pause, ShieldCheck, ShieldOff, Trash2 } from "lucide-react";
+import {
+  AlertTriangle,
+  Download,
+  Pause,
+  RefreshCw,
+  ShieldCheck,
+  ShieldOff,
+  Trash2,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,17 +26,32 @@ import type { Consent } from "@/types";
 export default function AccountPage() {
   const user = useAuthStore((s) => s.user);
   const clearAuth = useAuthStore((s) => s.clearAuth);
+  const refreshUser = useAuthStore((s) => s.refreshUser);
   const navigate = useNavigate();
   const [consents, setConsents] = useState<Consent[]>([]);
   const [revoking, setRevoking] = useState<string | null>(null);
   const [showRevokeDialog, setShowRevokeDialog] = useState<
     "terms" | "privacy" | null
   >(null);
+  const [granting, setGranting] = useState<string | null>(null);
+  const [showGrantDialog, setShowGrantDialog] = useState<
+    "terms" | "privacy" | null
+  >(null);
+  const [reactivating, setReactivating] = useState(false);
+  const [showReactivateDialog, setShowReactivateDialog] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [suspending, setSuspending] = useState(false);
   const [showSuspendDialog, setShowSuspendDialog] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  const isSuspended = !!user?.suspended_at;
+
+  const hasActiveConsent = (type: "terms" | "privacy") =>
+    consents.some((c) => c.consent_type === type && !c.revoked_at);
+
+  const allConsentsActive =
+    hasActiveConsent("terms") && hasActiveConsent("privacy");
 
   const loadConsents = useCallback(async () => {
     try {
@@ -55,11 +78,54 @@ export default function AccountPage() {
             : c,
         ),
       );
+      // Revocation triggers auto-suspension on backend — refresh user
+      await refreshUser();
     } catch {
       toast.error(t.rgpd.revokeError);
     } finally {
       setRevoking(null);
       setShowRevokeDialog(null);
+    }
+  };
+
+  const handleGrant = async (consentType: "terms" | "privacy") => {
+    setGranting(consentType);
+    try {
+      await accountApi.grantConsent(consentType);
+      toast.success(t.rgpd.grantSuccess);
+      // Add the new consent to local state
+      setConsents((prev) => [
+        ...prev,
+        {
+          id: Date.now(), // Temporary ID until next reload
+          consent_type: consentType,
+          consented_at: new Date().toISOString(),
+          revoked_at: null,
+        },
+      ]);
+    } catch {
+      toast.error(t.rgpd.grantError);
+    } finally {
+      setGranting(null);
+      setShowGrantDialog(null);
+    }
+  };
+
+  const handleReactivate = async () => {
+    if (!allConsentsActive) {
+      toast.error(t.rgpd.reactivateMissingConsents);
+      return;
+    }
+    setReactivating(true);
+    try {
+      await accountApi.reactivateAccount();
+      toast.success(t.rgpd.reactivateSuccess);
+      await refreshUser();
+    } catch {
+      toast.error(t.rgpd.reactivateError);
+    } finally {
+      setReactivating(false);
+      setShowReactivateDialog(false);
     }
   };
 
@@ -120,6 +186,31 @@ export default function AccountPage() {
     <div className="mx-auto max-w-2xl space-y-6">
       <h1 className="text-2xl font-bold">{t.rgpd.myAccount}</h1>
 
+      {/* Suspended account banner + reactivation */}
+      {isSuspended && (
+        <div className="rounded-lg border border-orange-500/30 bg-orange-50 p-6 dark:bg-orange-950/20">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-orange-600" />
+            <div className="flex-1 space-y-3">
+              <p className="text-sm font-medium text-orange-800 dark:text-orange-200">
+                {t.rgpd.accountSuspendedBanner}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {t.rgpd.reactivateDescription}
+              </p>
+              <Button
+                onClick={() => setShowReactivateDialog(true)}
+                disabled={!allConsentsActive || reactivating}
+                className="bg-orange-600 hover:bg-orange-700"
+              >
+                <RefreshCw className="mr-2 h-4 w-4" />
+                {reactivating ? t.rgpd.reactivating : t.rgpd.reactivateAccount}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Personal info */}
       <div className="rounded-lg border bg-card p-6">
         <h2 className="mb-4 text-lg font-semibold">{t.rgpd.personalInfo}</h2>
@@ -161,10 +252,7 @@ export default function AccountPage() {
         </p>
         <div className="space-y-3">
           {(["terms", "privacy"] as const).map((type) => {
-            const consent = consents.find(
-              (c) => c.consent_type === type && !c.revoked_at,
-            );
-            const isRevoked = !consent;
+            const isActive = hasActiveConsent(type);
             const label =
               type === "terms" ? t.rgpd.consentTerms : t.rgpd.consentPrivacy;
 
@@ -174,19 +262,19 @@ export default function AccountPage() {
                 className="flex items-center justify-between rounded border p-3"
               >
                 <div className="flex items-center gap-2">
-                  {isRevoked ? (
-                    <ShieldOff className="h-4 w-4 text-muted-foreground" />
-                  ) : (
+                  {isActive ? (
                     <ShieldCheck className="h-4 w-4 text-green-600" />
+                  ) : (
+                    <ShieldOff className="h-4 w-4 text-muted-foreground" />
                   )}
                   <span className="text-sm font-medium">{label}</span>
                   <span
-                    className={`text-xs ${isRevoked ? "text-muted-foreground" : "text-green-600"}`}
+                    className={`text-xs ${isActive ? "text-green-600" : "text-muted-foreground"}`}
                   >
-                    {isRevoked ? t.rgpd.consentRevoked : t.rgpd.consentActive}
+                    {isActive ? t.rgpd.consentActive : t.rgpd.consentRevoked}
                   </span>
                 </div>
-                {!isRevoked && (
+                {isActive ? (
                   <Button
                     variant="outline"
                     size="sm"
@@ -195,6 +283,16 @@ export default function AccountPage() {
                   >
                     {revoking === type ? t.rgpd.revoking : t.rgpd.revokeConsent}
                   </Button>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowGrantDialog(type)}
+                    disabled={granting === type}
+                    className="border-green-500/50 text-green-700 hover:bg-green-50"
+                  >
+                    {granting === type ? t.rgpd.granting : t.rgpd.grantConsent}
+                  </Button>
                 )}
               </div>
             );
@@ -202,23 +300,25 @@ export default function AccountPage() {
         </div>
       </div>
 
-      {/* Suspend account (right to restriction) */}
-      <div className="rounded-lg border border-orange-500/30 bg-card p-6">
-        <h2 className="mb-2 text-lg font-semibold text-orange-600">
-          {t.rgpd.suspendAccount}
-        </h2>
-        <p className="mb-4 text-sm text-muted-foreground">
-          {t.rgpd.suspendDescription}
-        </p>
-        <Button
-          variant="outline"
-          className="border-orange-500/50 text-orange-600 hover:bg-orange-50"
-          onClick={() => setShowSuspendDialog(true)}
-        >
-          <Pause className="mr-2 h-4 w-4" />
-          {t.rgpd.suspendAccount}
-        </Button>
-      </div>
+      {/* Suspend account (right to restriction) — hidden when already suspended */}
+      {!isSuspended && (
+        <div className="rounded-lg border border-orange-500/30 bg-card p-6">
+          <h2 className="mb-2 text-lg font-semibold text-orange-600">
+            {t.rgpd.suspendAccount}
+          </h2>
+          <p className="mb-4 text-sm text-muted-foreground">
+            {t.rgpd.suspendDescription}
+          </p>
+          <Button
+            variant="outline"
+            className="border-orange-500/50 text-orange-600 hover:bg-orange-50"
+            onClick={() => setShowSuspendDialog(true)}
+          >
+            <Pause className="mr-2 h-4 w-4" />
+            {t.rgpd.suspendAccount}
+          </Button>
+        </div>
+      )}
 
       {/* Delete account */}
       <div className="rounded-lg border border-destructive/30 bg-card p-6">
@@ -256,6 +356,63 @@ export default function AccountPage() {
               disabled={revoking !== null}
             >
               {revoking ? t.rgpd.revoking : t.rgpd.revokeConsentConfirm}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Grant consent confirmation dialog */}
+      <Dialog
+        open={showGrantDialog !== null}
+        onOpenChange={() => setShowGrantDialog(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t.rgpd.grantConsentConfirmTitle}</DialogTitle>
+            <DialogDescription>
+              {t.rgpd.grantConsentConfirmDescription}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-3 pt-4">
+            <Button variant="outline" onClick={() => setShowGrantDialog(null)}>
+              {t.common.cancel}
+            </Button>
+            <Button
+              onClick={() => showGrantDialog && handleGrant(showGrantDialog)}
+              disabled={granting !== null}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              {granting ? t.rgpd.granting : t.rgpd.grantConsentConfirm}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reactivate confirmation dialog */}
+      <Dialog
+        open={showReactivateDialog}
+        onOpenChange={setShowReactivateDialog}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t.rgpd.reactivateConfirmTitle}</DialogTitle>
+            <DialogDescription>
+              {t.rgpd.reactivateConfirmDescription}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-3 pt-4">
+            <Button
+              variant="outline"
+              onClick={() => setShowReactivateDialog(false)}
+            >
+              {t.common.cancel}
+            </Button>
+            <Button
+              onClick={handleReactivate}
+              disabled={reactivating}
+              className="bg-orange-600 hover:bg-orange-700"
+            >
+              {reactivating ? t.rgpd.reactivating : t.rgpd.reactivateConfirm}
             </Button>
           </div>
         </DialogContent>

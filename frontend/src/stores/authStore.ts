@@ -14,6 +14,7 @@ interface AuthState {
   authModalTab: AuthModalTab;
 
   initialize: () => Promise<void>;
+  refreshUser: () => Promise<void>;
   login: (data: LoginData) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   logout: () => Promise<void>;
@@ -78,6 +79,15 @@ export const useAuthStore = create<AuthState>((set) => ({
     })();
 
     return initPromise;
+  },
+
+  refreshUser: async () => {
+    try {
+      const user = await authApi.me();
+      set({ user, isAuthenticated: true });
+    } catch {
+      // Ignore — user state unchanged
+    }
   },
 
   login: async (data) => {
