@@ -515,91 +515,183 @@ const fr = {
 
   landing: {
     nav: {
+      tryIt: "Essayer",
       features: "Fonctionnalités",
       howItWorks: "Comment ça marche",
       faq: "FAQ",
       cta: "Commencer gratuitement",
     },
     hero: {
-      title: `Fini le chaos dans ta recherche d'emploi`,
-      subtitle: `Centralise toutes tes candidatures, suis leur avancement en temps réel et décroche le job de tes rêves — sans prise de tête.`,
-      ctaDashboard: "Lancer le dashboard",
-      ctaExtension: `Installer l'extension Chrome`,
+      eyebrow: "Gratuit \u00b7 sans carte bancaire",
+      title: "Fini le chaos dans ta ",
+      titleHighlight: "recherche d'emploi",
+      subtitle:
+        "Centralise toutes tes candidatures, suis leur avancement et ne rate plus jamais une relance.",
+      subtitleBold: "Essaie en 30 secondes",
+      subtitleEnd: " \u2014 sans inscription.",
+      ctaTry: "Essayer maintenant",
+      ctaRegister: "Créer un compte",
+      trustFree: "100% gratuit",
+      trustEncrypted: "Données chiffrées",
+      trustRgpd: "RGPD compliant",
+      demoCaption:
+        "\u2191 Une démo interactive \u2014 pas une vidéo. Vas-y, clique.",
     },
     logos: {
-      title: `Compatible avec tes sites d'emploi préférés`,
+      title: "Compatible avec tes sites d'emploi préférés",
     },
     features: {
-      title: `Tout ce qu'il te faut, rien de superflu`,
-      subtitle: `Des outils pensés pour les chercheurs d'emploi qui veulent rester organisés.`,
+      badge: "Tes outils",
+      title: "Tout ce qu'il te faut, rien de superflu",
+      subtitle:
+        "Des outils pensés pour les chercheurs d'emploi qui veulent rester organisés.",
       kanban: {
         title: "Tableau Kanban",
-        description: `Visualise tes candidatures par statut : à postuler, postulé, entretien, offre... Déplace-les d'un simple glisser-déposer.`,
+        description: "Visualise par statut. Glisse-dépose pour faire avancer.",
       },
       extension: {
         title: "Extension Chrome",
         description:
-          "Sauvegarde une offre depuis LinkedIn ou Indeed en un clic. Plus besoin de copier-coller.",
+          "Sauvegarde une offre en 1 clic depuis LinkedIn ou Indeed.",
       },
       timeline: {
         title: "Timeline intelligente",
-        description: `Retrouve l'historique complet de chaque candidature : relances, entretiens, changements de statut.`,
+        description: "Historique complet : relances, entretiens, statuts.",
       },
       stats: {
         title: "Statistiques claires",
-        description: `Taux de réponse, répartition par source, par statut… Comprends ta recherche en un coup d'œil.`,
+        description: "Taux de réponse, sources, statuts. En un coup d'œil.",
       },
     },
     howItWorks: {
+      badge: "Démarrage rapide",
       title: "Prêt en 3 étapes",
       subtitle: "Commence à suivre tes candidatures en moins de 2 minutes.",
       step1: {
         title: "Crée ton compte",
-        description: `Inscription gratuite, sans carte bancaire. C'est parti !`,
+        description:
+          "Inscription gratuite, sans carte bancaire. 30 secondes chrono.",
       },
       step2: {
         title: "Ajoute tes candidatures",
-        description: `Manuellement ou via l'extension Chrome directement depuis les sites d'emploi.`,
+        description:
+          "1 clic depuis LinkedIn / Indeed via l'extension, ou manuellement.",
       },
       step3: {
         title: "Suis et organise",
         description:
-          "Déplace tes candidatures sur le Kanban, ajoute des notes et ne rate plus aucune relance.",
+          "Glisse-dépose sur le Kanban, ajoute des notes, ne rate plus aucune relance.",
       },
     },
-    screenshot: {
-      title: "Un dashboard pensé pour toi",
-      subtitle:
-        "Interface épurée, rapide et intuitive. Tout est à portée de clic.",
-    },
     faq: {
-      title: "Questions fréquentes",
+      badge: "Questions fréquentes",
+      title: "On répond avant que tu demandes",
       items: [
         {
           question: "Est-ce que JobTracker est gratuit ?",
           answer:
-            "Oui ! JobTracker est entièrement gratuit. Pas de freemium caché, pas de limite sur le nombre de candidatures.",
+            "Oui ! 100% gratuit. Pas de freemium caché, pas de limite sur le nombre de candidatures.",
         },
         {
           question: "Mes données sont-elles en sécurité ?",
           answer:
-            "Absolument. Tes données sont chiffrées, hébergées en Europe et ne sont jamais partagées avec des tiers. Tu peux les exporter ou supprimer ton compte à tout moment.",
+            "Tes données sont chiffrées, hébergées en Europe et ne sont jamais partagées. Tu peux les exporter ou tout supprimer à tout moment.",
         },
         {
-          question: `L'extension Chrome fonctionne avec quels sites ?`,
-          answer: `LinkedIn et Indeed pour le moment. D'autres sites seront ajoutés prochainement.`,
+          question: "L'extension Chrome fonctionne avec quels sites ?",
+          answer:
+            "LinkedIn et Indeed pour le moment. HelloWork et d'autres sites arrivent.",
         },
         {
           question: "Puis-je utiliser JobTracker sur mobile ?",
-          answer: `JobTracker est conçu pour une utilisation sur desktop. L'extension Chrome est également disponible uniquement sur ordinateur.`,
+          answer:
+            "JobTracker est optimisé pour le desktop. L'extension Chrome est uniquement disponible sur ordinateur.",
+        },
+        {
+          question: "Faut-il installer l'extension pour utiliser l'app ?",
+          answer:
+            "Non, c'est totalement optionnel. Tu peux ajouter tes candidatures manuellement si tu préfères.",
         },
       ],
     },
     finalCta: {
-      title: "Prêt à organiser ta recherche ?",
-      subtitle: `Rejoins des centaines de candidats qui ont repris le contrôle de leur recherche d'emploi.`,
-      ctaDashboard: "Créer mon compte gratuitement",
-      ctaExtension: `Installer l'extension`,
+      title: "Prêt\u00b7e à reprendre le contrôle ?",
+      subtitle:
+        "Rejoins des centaines de candidat\u00b7e\u00b7s qui ne ratent plus aucune opportunité.",
+      ctaRegister: "Créer mon compte gratuitement",
+      ctaExtension: "Installer l'extension",
+      caption: "Sans carte bancaire \u00b7 30 secondes \u00b7 100% gratuit",
+    },
+    onboarding: {
+      step1: {
+        title: "Comment tu suis tes candidatures ?",
+        description: "Pas de mauvaise réponse \u2014 on a tous commencé là.",
+        optSpreadsheet: "Excel / Sheets",
+        optNotes: "Notes mobile",
+        optEmail: "Boîte mail",
+        optMemory: "De tête",
+        painSpreadsheet: "Tu copies-colles tout à la main.",
+        painNotes: "Tu oublies de mettre à jour.",
+        painEmail: "Tu fouilles pour retrouver une offre.",
+        painMemory: "Tu as déjà oublié 2 candidatures.",
+        painSuffix:
+          " JobTracker remplace ça par un seul tableau, mis à jour automatiquement.",
+        cta: "Continuer",
+      },
+      step2: {
+        title: "Ajoute ta première candidature",
+        description: "Deux façons de faire \u2014 choisis la tienne.",
+        methodExtension: "Avec l'extension Chrome",
+        methodExtensionDesc: "1 clic depuis LinkedIn / Indeed.",
+        methodExtensionBadge: "Recommandé",
+        methodManual: "Manuellement",
+        methodManualDesc: "Remplis les champs toi-même \u2014 30 s.",
+        extensionTitle: "Imagine que tu es sur une offre\u2026",
+        extensionDesc:
+          "Clique sur le bouton bleu pour la sauvegarder dans JobTracker.",
+        extensionHint:
+          '\ud83d\udc46 Clique sur le bouton "Sauvegarder dans JobTracker"',
+        extensionSaved: "Sauvegardé",
+        extensionSaveBtn: "Sauvegarder dans JobTracker",
+        extensionImporting: "Import\u2026",
+        extensionNext: "Voir ce qui se passe ensuite",
+        manualTitle: "Remplis l'essentiel",
+        manualDesc: "3 champs, c'est tout. Tu peux compléter plus tard.",
+        fieldTitle: "Titre du poste",
+        fieldCompany: "Entreprise",
+        fieldLocation: "Localisation",
+        manualAdd: "Ajouter",
+        manualPrefill: "Pré-remplir avec un exemple",
+      },
+      step3: {
+        titles: [
+          "Regarde-la avancer",
+          "Convoqué pour entretien",
+          "\ud83c\udf89 Décrochée !",
+        ],
+        subtitles: [
+          "Ta candidature est en ligne.",
+          "JobTracker te rappellera la relance.",
+          "Voilà comment ça marchera pour les tiennes.",
+        ],
+        notes: [
+          "Candidature postée chez ",
+          "Statut \u2192 Entretien \u00b7 relance dans 3 jours",
+          "Statut \u2192 Offre reçue \ud83c\udf89",
+        ],
+        ctaFinish: "Créer mon compte gratuitement",
+        ctaFinishCaption:
+          "Sans carte bancaire \u00b7 1 minute \u00b7 100% gratuit",
+        ctaSkip: "Passer à la fin \u2192",
+      },
+      reset: "Recommencer la démo",
+      colToApply: "À postuler",
+      colApplied: "Postulé",
+      colInterview: "Entretien",
+      colOffer: "Offre",
+      sampleTitle: "Développeur Full Stack",
+      sampleCompany: "Stripe",
+      sampleLocation: "Paris, France",
     },
   },
 

@@ -2,18 +2,21 @@ import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
+import { OnboardingDemo } from "@/components/landing/OnboardingDemo";
 import { ChromeIcon } from "@/components/icons/ChromeIcon";
 import { ExtensionComingSoonModal } from "@/components/ExtensionComingSoonModal";
-import { Footer } from "@/components/layout/Footer";
+import { useAuthStore } from "@/stores/authStore";
 import { t } from "@/lib/i18n";
 import {
+  Sparkles,
+  Zap,
   Columns3,
   Clock,
   BarChart3,
-  UserPlus,
-  PlusCircle,
-  GripVertical,
+  Check,
   ChevronDown,
+  ArrowRight,
+  Heart,
   Menu,
   X,
 } from "lucide-react";
@@ -47,7 +50,7 @@ function useReveal(): [(el: HTMLElement | null) => void, string] {
 // ---------------------------------------------------------------------------
 // Navbar
 // ---------------------------------------------------------------------------
-function LandingNavbar() {
+function LandingNavbar({ onAuth }: { onAuth: () => void }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -58,8 +61,9 @@ function LandingNavbar() {
   }, []);
 
   const navLinks = [
+    { href: "#demo", label: t.landing.nav.tryIt },
     { href: "#features", label: t.landing.nav.features },
-    { href: "#how-it-works", label: t.landing.nav.howItWorks },
+    { href: "#how", label: t.landing.nav.howItWorks },
     { href: "#faq", label: t.landing.nav.faq },
   ];
 
@@ -67,14 +71,20 @@ function LandingNavbar() {
     <nav
       className={`fixed top-0 right-0 left-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-background/80 shadow-sm backdrop-blur-md"
+          ? "bg-background/80 shadow-[0_1px_0_var(--border)] backdrop-blur-xl"
           : "bg-transparent"
       }`}
     >
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link to="/">
-          <img src="/logo-full.png" alt="JobTracker" className="h-8" />
-        </Link>
+      <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-6">
+        {/* Logo */}
+        <div className="flex items-center gap-2">
+          <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-[14px] font-extrabold tracking-tighter text-primary-foreground">
+            JT
+          </div>
+          <span className="text-[16px] font-bold tracking-tight">
+            JobTracker
+          </span>
+        </div>
 
         {/* Desktop links */}
         <div className="hidden items-center gap-6 md:flex">
@@ -87,9 +97,9 @@ function LandingNavbar() {
               {l.label}
             </a>
           ))}
-          <Link to="/dashboard">
-            <Button size="sm">{t.landing.nav.cta}</Button>
-          </Link>
+          <Button size="sm" onClick={onAuth}>
+            {t.landing.nav.cta}
+          </Button>
         </div>
 
         {/* Mobile toggle */}
@@ -103,7 +113,7 @@ function LandingNavbar() {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="border-b bg-background px-4 pb-4 md:hidden">
+        <div className="border-b bg-background px-6 pb-4 md:hidden">
           {navLinks.map((l) => (
             <a
               key={l.href}
@@ -114,11 +124,9 @@ function LandingNavbar() {
               {l.label}
             </a>
           ))}
-          <Link to="/dashboard" className="mt-2 block">
-            <Button className="w-full" size="sm">
-              {t.landing.nav.cta}
-            </Button>
-          </Link>
+          <Button className="mt-2 w-full" size="sm" onClick={onAuth}>
+            {t.landing.nav.cta}
+          </Button>
         </div>
       )}
     </nav>
@@ -128,37 +136,100 @@ function LandingNavbar() {
 // ---------------------------------------------------------------------------
 // Hero
 // ---------------------------------------------------------------------------
-function Hero({ onExtensionClick }: { onExtensionClick: () => void }) {
+function Hero({ onAuth }: { onAuth: () => void }) {
   return (
-    <section className="relative flex min-h-[90vh] items-center justify-center overflow-hidden pt-16">
-      {/* Background gradient blobs */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -top-24 -left-24 h-96 w-96 rounded-full bg-primary/5 blur-3xl" />
-        <div className="absolute -right-24 -bottom-24 h-96 w-96 rounded-full bg-primary/5 blur-3xl" />
-      </div>
+    <section className="relative overflow-hidden pt-[120px] pb-[60px]">
+      {/* Dotted background */}
+      <div
+        className="dotted-bg pointer-events-none absolute inset-0 opacity-40"
+        style={{
+          maskImage:
+            "radial-gradient(ellipse at top, black 30%, transparent 70%)",
+          WebkitMaskImage:
+            "radial-gradient(ellipse at top, black 30%, transparent 70%)",
+        }}
+      />
 
-      <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6">
-        <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
-          {t.landing.hero.title}
-        </h1>
-        <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl">
-          {t.landing.hero.subtitle}
-        </p>
-        <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-          <Link to="/dashboard">
-            <Button size="lg" className="h-12 px-6 text-base">
-              {t.landing.hero.ctaDashboard}
-            </Button>
-          </Link>
-          <Button
-            variant="outline"
-            size="lg"
-            className="h-12 px-6 text-base"
-            onClick={onExtensionClick}
+      <div className="hero-grid relative mx-auto grid max-w-[1200px] items-center gap-14 px-6 max-[960px]:grid-cols-1 min-[961px]:grid-cols-2">
+        {/* Left: Copy */}
+        <div>
+          {/* Eyebrow badge */}
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border bg-secondary px-3 py-[5px] text-xs font-medium text-muted-foreground">
+            <span className="size-1.5 rounded-full bg-success" />
+            {t.landing.hero.eyebrow}
+          </div>
+
+          {/* H1 */}
+          <h1
+            className="text-[clamp(36px,5vw,56px)] font-extrabold leading-[1.05]"
+            style={{ letterSpacing: "-0.035em" }}
           >
-            <ChromeIcon className="mr-2 size-5" />
-            {t.landing.hero.ctaExtension}
-          </Button>
+            {t.landing.hero.title}
+            <span className="relative whitespace-nowrap">
+              {t.landing.hero.titleHighlight}
+              <svg
+                viewBox="0 0 200 12"
+                preserveAspectRatio="none"
+                className="absolute bottom-[-6px] left-0 h-[10px] w-full"
+              >
+                <path
+                  d="M2 8 Q 50 2, 100 6 T 198 5"
+                  fill="none"
+                  stroke="oklch(0.769 0.188 70.08)"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </span>
+            .
+          </h1>
+
+          {/* Subtitle */}
+          <p className="mt-6 max-w-[480px] text-lg leading-relaxed text-muted-foreground">
+            {t.landing.hero.subtitle}{" "}
+            <b className="text-foreground">{t.landing.hero.subtitleBold}</b>
+            {t.landing.hero.subtitleEnd}
+          </p>
+
+          {/* CTAs */}
+          <div className="mt-8 flex flex-wrap gap-3">
+            <a href="#demo" className="no-underline">
+              <Button size="lg" className="h-11 px-5">
+                <Sparkles className="size-[18px]" fill="currentColor" />
+                {t.landing.hero.ctaTry}
+              </Button>
+            </a>
+            <Button
+              size="lg"
+              variant="outline"
+              className="h-11 px-5"
+              onClick={onAuth}
+            >
+              {t.landing.hero.ctaRegister}
+            </Button>
+          </div>
+
+          {/* Trust signals */}
+          <div className="mt-7 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+            {[
+              t.landing.hero.trustFree,
+              t.landing.hero.trustEncrypted,
+              t.landing.hero.trustRgpd,
+            ].map((text) => (
+              <div key={text} className="flex items-center gap-1.5">
+                <Check className="size-3.5 text-success" strokeWidth={3} />
+                {text}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right: Demo */}
+        <div id="demo">
+          <OnboardingDemo onAccount={onAuth} />
+          <p className="mt-3.5 text-center text-xs text-muted-foreground">
+            {t.landing.hero.demoCaption}
+          </p>
         </div>
       </div>
     </section>
@@ -166,31 +237,116 @@ function Hero({ onExtensionClick }: { onExtensionClick: () => void }) {
 }
 
 // ---------------------------------------------------------------------------
-// Logos banner
+// Sources Banner
 // ---------------------------------------------------------------------------
-function LogosBanner() {
+function SourcesBanner() {
   const [revealRef, revealClass] = useReveal();
 
-  const logos = [
-    { name: "LinkedIn", color: "#0A66C2" },
-    { name: "Indeed", color: "#2164F3" },
+  return (
+    <section ref={revealRef} className={`border-y py-10 ${revealClass}`}>
+      <div className="mx-auto max-w-[1200px] px-6 text-center">
+        <p className="font-mono-jb text-[11px] font-medium uppercase tracking-[0.15em] text-muted-foreground">
+          {t.landing.logos.title}
+        </p>
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-12 opacity-70">
+          <div className="flex items-center gap-2 text-lg font-bold">
+            <LinkedInLogo size={22} /> LinkedIn
+          </div>
+          <div className="flex items-center gap-2 text-lg font-bold text-[#2164F3]">
+            <IndeedLogo size={22} /> Indeed
+          </div>
+          <div className="flex items-center gap-2 text-lg font-bold text-[#FF6600]">
+            <span className="inline-flex size-[22px] items-center justify-center rounded-md bg-[#FF6600] text-xs font-extrabold text-white">
+              H
+            </span>
+            HelloWork
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// How It Works
+// ---------------------------------------------------------------------------
+function HowItWorks() {
+  const [revealRef, revealClass] = useReveal();
+
+  const steps = [
+    {
+      n: 1,
+      title: t.landing.howItWorks.step1.title,
+      desc: t.landing.howItWorks.step1.description,
+      icon: Sparkles,
+    },
+    {
+      n: 2,
+      title: t.landing.howItWorks.step2.title,
+      desc: t.landing.howItWorks.step2.description,
+      icon: Zap,
+    },
+    {
+      n: 3,
+      title: t.landing.howItWorks.step3.title,
+      desc: t.landing.howItWorks.step3.description,
+      icon: Columns3,
+    },
   ];
 
   return (
-    <section ref={revealRef} className={`py-12 ${revealClass}`}>
-      <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
-        <p className="text-sm font-medium tracking-wide text-muted-foreground uppercase">
-          {t.landing.logos.title}
-        </p>
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-8 sm:gap-12">
-          {logos.map((logo) => (
-            <span
-              key={logo.name}
-              className="text-lg font-bold tracking-tight text-muted-foreground/60 transition-colors hover:text-foreground"
-              style={{ color: undefined }}
-            >
-              {logo.name}
-            </span>
+    <section
+      id="how"
+      ref={revealRef}
+      className={`bg-muted py-24 ${revealClass}`}
+    >
+      <div className="mx-auto max-w-[1100px] px-6">
+        <div className="mx-auto max-w-[600px] text-center">
+          <SectionBadge>{t.landing.howItWorks.badge}</SectionBadge>
+          <h2
+            className="mt-4 text-[40px] font-extrabold tracking-tight"
+            style={{ letterSpacing: "-0.03em" }}
+          >
+            {t.landing.howItWorks.title}
+          </h2>
+          <p className="mt-3 text-muted-foreground">
+            {t.landing.howItWorks.subtitle}
+          </p>
+        </div>
+
+        <div className="how-grid relative mt-14 grid grid-cols-1 gap-6 sm:grid-cols-3">
+          {/* Connector line (desktop only) */}
+          <svg
+            className="pointer-events-none absolute top-9 left-[16%] hidden h-0.5 w-[68%] sm:block"
+            preserveAspectRatio="none"
+            viewBox="0 0 100 2"
+          >
+            <line
+              x1="0"
+              y1="1"
+              x2="100"
+              y2="1"
+              stroke="var(--border)"
+              strokeWidth="2"
+              strokeDasharray="4 4"
+            />
+          </svg>
+
+          {steps.map((s) => (
+            <div key={s.n} className="relative z-[1] text-center">
+              <div className="relative mx-auto flex size-[72px] items-center justify-center rounded-full border-2 bg-card">
+                <s.icon className="size-[26px]" />
+                <div className="absolute -right-1 -top-1 flex size-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+                  {s.n}
+                </div>
+              </div>
+              <h3 className="mt-[18px] text-lg font-bold tracking-tight">
+                {s.title}
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                {s.desc}
+              </p>
+            </div>
           ))}
         </div>
       </div>
@@ -208,176 +364,66 @@ function Features() {
     {
       icon: Columns3,
       title: t.landing.features.kanban.title,
-      description: t.landing.features.kanban.description,
+      desc: t.landing.features.kanban.description,
+      tone: "#3b82f6",
     },
     {
       icon: ChromeIcon,
       title: t.landing.features.extension.title,
-      description: t.landing.features.extension.description,
+      desc: t.landing.features.extension.description,
+      tone: "#6366f1",
     },
     {
       icon: Clock,
       title: t.landing.features.timeline.title,
-      description: t.landing.features.timeline.description,
+      desc: t.landing.features.timeline.description,
+      tone: "#f59e0b",
     },
     {
       icon: BarChart3,
       title: t.landing.features.stats.title,
-      description: t.landing.features.stats.description,
+      desc: t.landing.features.stats.description,
+      tone: "#22c55e",
     },
   ];
 
   return (
     <section id="features" ref={revealRef} className={`py-24 ${revealClass}`}>
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+      <div className="mx-auto max-w-[1100px] px-6">
+        <div className="mx-auto max-w-[600px] text-center">
+          <SectionBadge>{t.landing.features.badge}</SectionBadge>
+          <h2
+            className="mt-4 text-[40px] font-extrabold tracking-tight"
+            style={{ letterSpacing: "-0.03em" }}
+          >
             {t.landing.features.title}
           </h2>
-          <p className="mt-4 text-muted-foreground">
+          <p className="mt-3 text-muted-foreground">
             {t.landing.features.subtitle}
           </p>
         </div>
 
-        <div className="mt-16 grid gap-8 sm:grid-cols-2">
+        <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2">
           {features.map((f, i) => (
             <div
               key={i}
-              className="group rounded-2xl border bg-card p-6 transition-shadow hover:shadow-lg"
+              className="cursor-default rounded-xl border bg-card p-7 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
             >
-              <div className="mb-4 inline-flex rounded-xl bg-primary/10 p-3">
-                <f.icon className="size-6 text-primary" />
+              <div
+                className="mb-4 flex size-11 items-center justify-center rounded-[10px]"
+                style={{
+                  background: `${f.tone}1a`,
+                  color: f.tone,
+                }}
+              >
+                <f.icon className="size-[22px]" />
               </div>
-              <h3 className="text-lg font-semibold">{f.title}</h3>
+              <h3 className="text-lg font-bold tracking-tight">{f.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                {f.description}
+                {f.desc}
               </p>
             </div>
           ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// How it works
-// ---------------------------------------------------------------------------
-function HowItWorks() {
-  const [revealRef, revealClass] = useReveal();
-
-  const steps = [
-    { icon: UserPlus, ...t.landing.howItWorks.step1 },
-    { icon: PlusCircle, ...t.landing.howItWorks.step2 },
-    { icon: GripVertical, ...t.landing.howItWorks.step3 },
-  ];
-
-  return (
-    <section
-      id="how-it-works"
-      ref={revealRef}
-      className={`bg-muted/40 py-24 ${revealClass}`}
-    >
-      <div className="mx-auto max-w-5xl px-4 sm:px-6">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            {t.landing.howItWorks.title}
-          </h2>
-          <p className="mt-4 text-muted-foreground">
-            {t.landing.howItWorks.subtitle}
-          </p>
-        </div>
-
-        <div className="mt-16 grid gap-10 sm:grid-cols-3">
-          {steps.map((step, i) => (
-            <div key={i} className="text-center">
-              <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground text-xl font-bold">
-                {i + 1}
-              </div>
-              <h3 className="text-lg font-semibold">{step.title}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                {step.description}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Screenshot / Demo
-// ---------------------------------------------------------------------------
-function Screenshot() {
-  const [revealRef, revealClass] = useReveal();
-
-  return (
-    <section ref={revealRef} className={`py-24 ${revealClass}`}>
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            {t.landing.screenshot.title}
-          </h2>
-          <p className="mt-4 text-muted-foreground">
-            {t.landing.screenshot.subtitle}
-          </p>
-        </div>
-
-        {/* Mockup frame */}
-        <div className="mt-12 overflow-hidden rounded-2xl border bg-card shadow-2xl">
-          {/* Browser chrome bar */}
-          <div className="flex items-center gap-2 border-b bg-muted/50 px-4 py-3">
-            <div className="size-3 rounded-full bg-destructive/40" />
-            <div className="size-3 rounded-full bg-warning/40" />
-            <div className="size-3 rounded-full bg-success/40" />
-            <div className="ml-4 h-6 flex-1 rounded-md bg-muted text-center text-xs leading-6 text-muted-foreground">
-              app.jobtracker.fr/dashboard/kanban
-            </div>
-          </div>
-          {/* Kanban mockup */}
-          <div className="grid grid-cols-2 gap-4 p-6 sm:grid-cols-4">
-            {[
-              {
-                label: t.status.to_apply,
-                count: 3,
-                color: "bg-blue-100 dark:bg-blue-900/30",
-              },
-              {
-                label: t.status.applied,
-                count: 5,
-                color: "bg-indigo-100 dark:bg-indigo-900/30",
-              },
-              {
-                label: t.status.interview,
-                count: 2,
-                color: "bg-amber-100 dark:bg-amber-900/30",
-              },
-              {
-                label: t.status.offer,
-                count: 1,
-                color: "bg-emerald-100 dark:bg-emerald-900/30",
-              },
-            ].map((col) => (
-              <div key={col.label} className={`rounded-xl ${col.color} p-3`}>
-                <div className="mb-3 flex items-center justify-between">
-                  <span className="text-xs font-semibold">{col.label}</span>
-                  <span className="rounded-full bg-background px-1.5 text-[10px] font-medium">
-                    {col.count}
-                  </span>
-                </div>
-                {Array.from({ length: col.count }).map((_, j) => (
-                  <div
-                    key={j}
-                    className="mb-2 rounded-lg bg-background p-2 shadow-sm last:mb-0"
-                  >
-                    <div className="h-2.5 w-3/4 rounded bg-muted" />
-                    <div className="mt-1.5 h-2 w-1/2 rounded bg-muted/60" />
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </section>
@@ -389,10 +435,11 @@ function Screenshot() {
 // ---------------------------------------------------------------------------
 function FaqItem({ question, answer }: { question: string; answer: string }) {
   const [open, setOpen] = useState(false);
+
   return (
-    <div className="border-b last:border-b-0">
+    <div className="border-b">
       <button
-        className="flex w-full items-center justify-between py-5 text-left text-sm font-medium transition-colors hover:text-primary"
+        className="flex w-full items-center justify-between py-5 text-left text-[15px] font-medium"
         onClick={() => setOpen((v) => !v)}
       >
         {question}
@@ -403,15 +450,12 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
         />
       </button>
       <div
-        className={`grid transition-all duration-200 ${
-          open ? "grid-rows-[1fr] pb-5" : "grid-rows-[0fr]"
-        }`}
+        className="overflow-hidden transition-all duration-200"
+        style={{ maxHeight: open ? 200 : 0 }}
       >
-        <div className="overflow-hidden">
-          <p className="text-sm leading-relaxed text-muted-foreground">
-            {answer}
-          </p>
-        </div>
+        <p className="pb-5 text-sm leading-relaxed text-muted-foreground">
+          {answer}
+        </p>
       </div>
     </div>
   );
@@ -424,13 +468,19 @@ function Faq() {
     <section
       id="faq"
       ref={revealRef}
-      className={`bg-muted/40 py-24 ${revealClass}`}
+      className={`bg-muted py-24 ${revealClass}`}
     >
-      <div className="mx-auto max-w-2xl px-4 sm:px-6">
-        <h2 className="text-center text-3xl font-bold tracking-tight sm:text-4xl">
-          {t.landing.faq.title}
-        </h2>
-        <div className="mt-12">
+      <div className="mx-auto max-w-[720px] px-6">
+        <div className="text-center">
+          <SectionBadge>{t.landing.faq.badge}</SectionBadge>
+          <h2
+            className="mt-4 text-[40px] font-extrabold tracking-tight"
+            style={{ letterSpacing: "-0.03em" }}
+          >
+            {t.landing.faq.title}
+          </h2>
+        </div>
+        <div className="mt-10">
           {t.landing.faq.items.map((item, i) => (
             <FaqItem key={i} question={item.question} answer={item.answer} />
           ))}
@@ -443,36 +493,131 @@ function Faq() {
 // ---------------------------------------------------------------------------
 // Final CTA
 // ---------------------------------------------------------------------------
-function FinalCta({ onExtensionClick }: { onExtensionClick: () => void }) {
+function FinalCta({
+  onAuth,
+  onExtensionClick,
+}: {
+  onAuth: () => void;
+  onExtensionClick: () => void;
+}) {
   const [revealRef, revealClass] = useReveal();
 
   return (
     <section ref={revealRef} className={`py-24 ${revealClass}`}>
-      <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
-        <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-          {t.landing.finalCta.title}
-        </h2>
-        <p className="mt-4 text-lg text-muted-foreground">
-          {t.landing.finalCta.subtitle}
-        </p>
-        <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-          <Link to="/dashboard">
-            <Button size="lg" className="h-12 px-6 text-base">
-              {t.landing.finalCta.ctaDashboard}
-            </Button>
-          </Link>
-          <Button
-            variant="outline"
-            size="lg"
-            className="h-12 px-6 text-base"
-            onClick={onExtensionClick}
-          >
-            <ChromeIcon className="mr-2 size-5" />
-            {t.landing.finalCta.ctaExtension}
-          </Button>
+      <div className="mx-auto max-w-[1100px] px-6">
+        <div
+          className="relative overflow-hidden rounded-2xl bg-primary px-8 py-16 text-center text-primary-foreground"
+          style={{ borderRadius: "var(--radius-2xl)" }}
+        >
+          {/* Decorative dotted bg */}
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              backgroundImage:
+                "radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px)",
+              backgroundSize: "20px 20px",
+              maskImage:
+                "radial-gradient(ellipse at center, black 30%, transparent 70%)",
+              WebkitMaskImage:
+                "radial-gradient(ellipse at center, black 30%, transparent 70%)",
+            }}
+          />
+
+          <div className="relative">
+            <h2
+              className="text-[40px] font-extrabold"
+              style={{ letterSpacing: "-0.03em" }}
+            >
+              {t.landing.finalCta.title}
+            </h2>
+            <p className="mx-auto mt-4 max-w-[520px] text-[17px] opacity-80">
+              {t.landing.finalCta.subtitle}
+            </p>
+            <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
+              <Button
+                size="lg"
+                onClick={onAuth}
+                className="h-11 border-background bg-background px-5 text-foreground hover:bg-background/90"
+              >
+                {t.landing.finalCta.ctaRegister}{" "}
+                <ArrowRight className="size-4" />
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={onExtensionClick}
+                className="h-11 border-primary-foreground/25 bg-transparent px-5 text-primary-foreground hover:bg-primary-foreground/10"
+              >
+                <ChromeIcon className="size-4" />
+                {t.landing.finalCta.ctaExtension}
+              </Button>
+            </div>
+            <p className="mt-5 text-xs opacity-60">
+              {t.landing.finalCta.caption}
+            </p>
+          </div>
         </div>
       </div>
     </section>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Landing Footer (custom for landing, wraps existing Footer)
+// ---------------------------------------------------------------------------
+function LandingFooter() {
+  return (
+    <footer className="border-t py-8 px-6">
+      <div className="mx-auto flex max-w-[1100px] flex-wrap items-center justify-between gap-4 text-[13px] text-muted-foreground">
+        <div>
+          &copy; {new Date().getFullYear()} JobTracker &middot; Fait avec{" "}
+          <Heart
+            className="inline size-[11px] align-middle text-[#ef4444]"
+            fill="currentColor"
+          />{" "}
+          en France
+        </div>
+        <div className="flex gap-5">
+          <Link
+            to="/privacy"
+            className="transition-colors hover:text-foreground"
+          >
+            {t.footer.privacy}
+          </Link>
+          <Link to="/legal" className="transition-colors hover:text-foreground">
+            {t.footer.legal}
+          </Link>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Shared components
+// ---------------------------------------------------------------------------
+function SectionBadge({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-slate-700">
+      {children}
+    </span>
+  );
+}
+
+function LinkedInLogo({ size = 22 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="#0A66C2">
+      <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zm1.78 13.02H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.55C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z" />
+    </svg>
+  );
+}
+
+function IndeedLogo({ size = 22 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="#2164F3">
+      <circle cx="12" cy="4" r="2.5" />
+      <path d="M9.5 8h5v14a2.5 2.5 0 0 1-5 0V8z" />
+    </svg>
   );
 }
 
@@ -481,6 +626,9 @@ function FinalCta({ onExtensionClick }: { onExtensionClick: () => void }) {
 // ---------------------------------------------------------------------------
 export default function LandingPage() {
   const [extensionModalOpen, setExtensionModalOpen] = useState(false);
+  const openAuthModal = useAuthStore((s) => s.openAuthModal);
+
+  const handleAuth = () => openAuthModal("register");
 
   const faqJsonLd = {
     "@context": "https://schema.org",
@@ -504,7 +652,7 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
       <Helmet>
         <title>{t.seo.landing.title}</title>
         <meta name="description" content={t.seo.landing.description} />
@@ -520,15 +668,18 @@ export default function LandingPage() {
         <script type="application/ld+json">{JSON.stringify(appJsonLd)}</script>
         <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
       </Helmet>
-      <LandingNavbar />
-      <Hero onExtensionClick={() => setExtensionModalOpen(true)} />
-      <LogosBanner />
-      <Features />
+
+      <LandingNavbar onAuth={handleAuth} />
+      <Hero onAuth={handleAuth} />
+      <SourcesBanner />
       <HowItWorks />
-      <Screenshot />
+      <Features />
       <Faq />
-      <FinalCta onExtensionClick={() => setExtensionModalOpen(true)} />
-      <Footer />
+      <FinalCta
+        onAuth={handleAuth}
+        onExtensionClick={() => setExtensionModalOpen(true)}
+      />
+      <LandingFooter />
 
       <ExtensionComingSoonModal
         open={extensionModalOpen}
