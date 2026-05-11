@@ -16,6 +16,7 @@ const AccountPage = lazy(() => import("@/pages/AccountPage"));
 const PrivacyPolicyPage = lazy(() => import("@/pages/PrivacyPolicyPage"));
 const LegalMentionsPage = lazy(() => import("@/pages/LegalMentionsPage"));
 const LandingPage = lazy(() => import("@/pages/LandingPage"));
+const NotFoundPage = lazy(() => import("@/pages/NotFoundPage"));
 
 function PageLoader() {
   return (
@@ -114,7 +115,14 @@ function App() {
               />
             </Route>
           </Route>
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route
+            path="*"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <NotFoundPage />
+              </Suspense>
+            }
+          />
         </Routes>
         <AuthModal />
         <Toaster richColors position="bottom-right" />
