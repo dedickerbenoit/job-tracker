@@ -41,9 +41,9 @@ class ApplicationController extends Controller
         if ($request->filled('search')) {
             $search = str_replace(['%', '_'], ['\\%', '\\_'], strtolower($request->input('search')));
             $query->where(function ($q) use ($search) {
-                $q->whereRaw('LOWER(title) LIKE ?', ["%{$search}%"])
-                    ->orWhereRaw('LOWER(company) LIKE ?', ["%{$search}%"])
-                    ->orWhereRaw('LOWER(location) LIKE ?', ["%{$search}%"]);
+                foreach (['title', 'company', 'location'] as $column) {
+                    $q->orWhereRaw("LOWER({$column}) LIKE ?", ["%{$search}%"]);
+                }
             });
         }
 
