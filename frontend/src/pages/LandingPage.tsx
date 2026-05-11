@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
 import { ChromeIcon } from "@/components/icons/ChromeIcon";
 import { ExtensionComingSoonModal } from "@/components/ExtensionComingSoonModal";
@@ -481,8 +482,44 @@ function FinalCta({ onExtensionClick }: { onExtensionClick: () => void }) {
 export default function LandingPage() {
   const [extensionModalOpen, setExtensionModalOpen] = useState(false);
 
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: t.landing.faq.items.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: { "@type": "Answer", text: item.answer },
+    })),
+  };
+
+  const appJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "JobTracker",
+    applicationCategory: "ProductivityApplication",
+    operatingSystem: "Web",
+    description: t.seo.landing.description,
+    offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
+    url: t.seo.siteUrl,
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <Helmet>
+        <title>{t.seo.landing.title}</title>
+        <meta name="description" content={t.seo.landing.description} />
+        <link rel="canonical" href={`${t.seo.siteUrl}/`} />
+        <meta property="og:title" content={t.seo.landing.title} />
+        <meta property="og:description" content={t.seo.landing.description} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`${t.seo.siteUrl}/`} />
+        <meta property="og:image" content={`${t.seo.siteUrl}/og-image.png`} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={t.seo.landing.title} />
+        <meta name="twitter:description" content={t.seo.landing.description} />
+        <script type="application/ld+json">{JSON.stringify(appJsonLd)}</script>
+        <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
+      </Helmet>
       <LandingNavbar />
       <Hero onExtensionClick={() => setExtensionModalOpen(true)} />
       <LogosBanner />
