@@ -147,6 +147,10 @@ export const accountApi = {
     return api.get("/account/data-export").then((r) => r.data.data ?? r.data);
   },
 
+  suspendAccount(): Promise<void> {
+    return api.post("/account/suspend").then(() => undefined);
+  },
+
   deleteAccount(): Promise<void> {
     return api.delete("/account").then(() => undefined);
   },

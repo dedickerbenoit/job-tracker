@@ -32,6 +32,34 @@ class AccountController extends Controller
     }
 
     /**
+     * RGPD — Droit à la limitation du traitement (art. 18).
+     * Suspend le compte : les données sont conservées mais plus traitées.
+     */
+    public function suspendAccount(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        Log::info('RGPD account suspension requested', [
+            'user_id' => $user->id,
+            'ip' => $request->ip(),
+        ]);
+
+        $user->suspended_at = now();
+        $user->save();
+
+        // Revoke all tokens and invalidate session
+        $user->tokens()->delete();
+
+        Auth::guard('web')->logout();
+        if ($request->hasSession()) {
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
+
+        return response()->json(null, 204);
+    }
+
+    /**
      * B04 — Droit à l'effacement RGPD.
      * Soft-delete le compte, révoque les tokens et invalide la session.
      */

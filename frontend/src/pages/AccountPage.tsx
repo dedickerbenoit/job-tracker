@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Download, Trash2 } from "lucide-react";
+import { Download, Pause, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +19,8 @@ export default function AccountPage() {
   const clearAuth = useAuthStore((s) => s.clearAuth);
   const navigate = useNavigate();
   const [exporting, setExporting] = useState(false);
+  const [suspending, setSuspending] = useState(false);
+  const [showSuspendDialog, setShowSuspendDialog] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
@@ -40,6 +42,21 @@ export default function AccountPage() {
       toast.error(t.rgpd.exportError);
     } finally {
       setExporting(false);
+    }
+  };
+
+  const handleSuspend = async () => {
+    setSuspending(true);
+    try {
+      await accountApi.suspendAccount();
+      toast.success(t.rgpd.suspendSuccess);
+      clearAuth();
+      navigate("/");
+    } catch {
+      toast.error(t.rgpd.suspendError);
+    } finally {
+      setSuspending(false);
+      setShowSuspendDialog(false);
     }
   };
 
@@ -97,6 +114,24 @@ export default function AccountPage() {
         </Button>
       </div>
 
+      {/* Suspend account (right to restriction) */}
+      <div className="rounded-lg border border-orange-500/30 bg-card p-6">
+        <h2 className="mb-2 text-lg font-semibold text-orange-600">
+          {t.rgpd.suspendAccount}
+        </h2>
+        <p className="mb-4 text-sm text-muted-foreground">
+          {t.rgpd.suspendDescription}
+        </p>
+        <Button
+          variant="outline"
+          className="border-orange-500/50 text-orange-600 hover:bg-orange-50"
+          onClick={() => setShowSuspendDialog(true)}
+        >
+          <Pause className="mr-2 h-4 w-4" />
+          {t.rgpd.suspendAccount}
+        </Button>
+      </div>
+
       {/* Delete account */}
       <div className="rounded-lg border border-destructive/30 bg-card p-6">
         <h2 className="mb-2 text-lg font-semibold text-destructive">
@@ -110,6 +145,33 @@ export default function AccountPage() {
           {t.rgpd.deleteAccount}
         </Button>
       </div>
+
+      {/* Suspend confirmation dialog */}
+      <Dialog open={showSuspendDialog} onOpenChange={setShowSuspendDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t.rgpd.suspendConfirmTitle}</DialogTitle>
+            <DialogDescription>
+              {t.rgpd.suspendConfirmDescription}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-3 pt-4">
+            <Button
+              variant="outline"
+              onClick={() => setShowSuspendDialog(false)}
+            >
+              {t.common.cancel}
+            </Button>
+            <Button
+              className="bg-orange-600 hover:bg-orange-700"
+              onClick={handleSuspend}
+              disabled={suspending}
+            >
+              {suspending ? t.rgpd.suspending : t.rgpd.suspendConfirm}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Delete confirmation dialog */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
