@@ -1,0 +1,7 @@
+# Security Policy for JobTracker
+# https://securitytxt.org/
+
+Contact: mailto:security@jobtracker.example.com
+Preferred-Languages: fr, en
+Canonical: https://jobtracker.example.com/.well-known/security.txt
+Expires: 2027-05-11T00:00:00.000Z
