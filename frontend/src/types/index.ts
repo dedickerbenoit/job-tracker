@@ -142,6 +142,13 @@ export type UpdateApplicationData = Partial<CreateApplicationData>;
 
 // ── RGPD ──
 
+export interface Consent {
+  id: number;
+  consent_type: "terms" | "privacy";
+  consented_at: string;
+  revoked_at: string | null;
+}
+
 export interface DataExport {
   profile: {
     id: number;

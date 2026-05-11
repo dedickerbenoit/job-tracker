@@ -6,6 +6,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 
 class AccountController extends Controller
 {
@@ -29,6 +30,54 @@ class AccountController extends Controller
                 'consents' => $user->consents,
             ],
         ], 200, [], JSON_UNESCAPED_UNICODE);
+    }
+
+    /**
+     * RGPD — Liste des consentements de l'utilisateur.
+     */
+    public function consents(Request $request): JsonResponse
+    {
+        $consents = $request->user()->consents()
+            ->select('id', 'consent_type', 'consented_at', 'revoked_at')
+            ->orderBy('consented_at', 'desc')
+            ->get();
+
+        return response()->json(['data' => $consents]);
+    }
+
+    /**
+     * RGPD — Révocation d'un consentement spécifique.
+     */
+    public function revokeConsent(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'consent_type' => ['required', Rule::in(['terms', 'privacy'])],
+        ]);
+
+        $user = $request->user();
+
+        $consent = $user->consents()
+            ->where('consent_type', $validated['consent_type'])
+            ->whereNull('revoked_at')
+            ->latest('consented_at')
+            ->first();
+
+        if (! $consent) {
+            return response()->json([
+                'message' => 'Aucun consentement actif trouvé pour ce type.',
+            ], 404);
+        }
+
+        Log::info('RGPD consent revoked', [
+            'user_id' => $user->id,
+            'consent_type' => $validated['consent_type'],
+            'ip' => $request->ip(),
+        ]);
+
+        $consent->revoked_at = now();
+        $consent->save();
+
+        return response()->json(null, 204);
     }
 
     /**

@@ -258,6 +258,21 @@ const fr = {
     lastName: "Nom",
     email: "Adresse e-mail",
     memberSince: "Membre depuis le",
+    consents: "Gestion des consentements",
+    consentsDescription:
+      "Vous pouvez révoquer vos consentements à tout moment. La révocation n'entraîne pas la suppression de votre compte.",
+    consentTerms: "Conditions générales d'utilisation",
+    consentPrivacy: "Politique de confidentialité",
+    consentActive: "Actif",
+    consentRevoked: "Révoqué",
+    revokeConsent: "Révoquer",
+    revokeConsentConfirmTitle: "Révoquer ce consentement ?",
+    revokeConsentConfirmDescription:
+      "La révocation de ce consentement sera enregistrée. Cela n'entraîne pas la suppression de votre compte.",
+    revokeConsentConfirm: "Oui, révoquer",
+    revoking: "Révocation...",
+    revokeSuccess: "Consentement révoqué.",
+    revokeError: "Erreur lors de la révocation.",
     exportData: "Exporter mes données",
     exportDescription:
       "Téléchargez une copie de toutes vos données personnelles (profil, candidatures, événements) au format JSON.",

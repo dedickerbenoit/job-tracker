@@ -5,6 +5,7 @@ import type {
   ApplicationEvent,
   ApplicationFilters,
   AuthResponse,
+  Consent,
   CreateApplicationData,
   CreateApplicationResponse,
   DataExport,
@@ -145,6 +146,16 @@ export async function getCsrfCookie(): Promise<void> {
 export const accountApi = {
   exportData(): Promise<DataExport> {
     return api.get("/account/data-export").then((r) => r.data.data ?? r.data);
+  },
+
+  consents(): Promise<Consent[]> {
+    return api.get("/account/consents").then((r) => r.data.data);
+  },
+
+  revokeConsent(consentType: "terms" | "privacy"): Promise<void> {
+    return api
+      .post("/account/consents/revoke", { consent_type: consentType })
+      .then(() => undefined);
   },
 
   suspendAccount(): Promise<void> {
