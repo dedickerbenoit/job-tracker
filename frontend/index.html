@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/favicon.png" />
@@ -16,31 +16,31 @@
           var token = null;
           if (window.location.hash) {
             var hash = new URLSearchParams(window.location.hash.slice(1));
-            token = hash.get('auth_token');
+            token = hash.get("auth_token");
             if (token) {
-              hash.delete('auth_token');
+              hash.delete("auth_token");
               var h = hash.toString();
               window.history.replaceState(
                 {},
-                '',
+                "",
                 window.location.pathname +
                   window.location.search +
-                  (h ? '#' + h : '')
+                  (h ? "#" + h : ""),
               );
             }
           }
           if (!token && window.location.search) {
             var qs = new URLSearchParams(window.location.search);
-            token = qs.get('auth_token');
+            token = qs.get("auth_token");
             if (token) {
-              qs.delete('auth_token');
+              qs.delete("auth_token");
               var q = qs.toString();
               window.history.replaceState(
                 {},
-                '',
+                "",
                 window.location.pathname +
-                  (q ? '?' + q : '') +
-                  window.location.hash
+                  (q ? "?" + q : "") +
+                  window.location.hash,
               );
             }
           }
