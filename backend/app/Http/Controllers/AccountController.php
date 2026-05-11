@@ -48,6 +48,7 @@ class AccountController extends Controller
 
     /**
      * RGPD — Révocation d'un consentement spécifique.
+     * La révocation suspend automatiquement le compte (art. 6 : pas de traitement sans base légale).
      */
     public function revokeConsent(Request $request): JsonResponse
     {
@@ -70,14 +71,103 @@ class AccountController extends Controller
             ], 404);
         }
 
+        $consent->revoked_at = now();
+        $consent->save();
+
+        // Suspend account automatically — no processing without active consent
+        if (! $user->suspended_at) {
+            $user->suspended_at = now();
+            $user->save();
+        }
+
         Log::info('RGPD consent revoked', [
+            'user_id' => $user->id,
+            'consent_type' => $validated['consent_type'],
+            'auto_suspended' => ! $user->wasChanged('suspended_at') ? false : true,
+            'ip' => $request->ip(),
+        ]);
+
+        return response()->json(null, 204);
+    }
+
+    /**
+     * RGPD — Re-souscription à un consentement révoqué.
+     * Crée un NOUVEAU enregistrement (traçabilité : l'ancien reste avec revoked_at).
+     */
+    public function grantConsent(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'consent_type' => ['required', Rule::in(['terms', 'privacy'])],
+        ]);
+
+        $user = $request->user();
+
+        $alreadyActive = UserConsent::query()
+            ->where('user_id', $user->id)
+            ->where('consent_type', $validated['consent_type'])
+            ->whereNull('revoked_at')
+            ->exists();
+
+        if ($alreadyActive) {
+            return response()->json([
+                'message' => 'Un consentement actif existe déjà pour ce type.',
+            ], 409);
+        }
+
+        UserConsent::create([
+            'user_id' => $user->id,
+            'consent_type' => $validated['consent_type'],
+            'consented_at' => now(),
+            'ip_address' => $request->ip(),
+            'user_agent' => mb_substr((string) $request->userAgent(), 0, 500),
+        ]);
+
+        Log::info('RGPD consent granted', [
             'user_id' => $user->id,
             'consent_type' => $validated['consent_type'],
             'ip' => $request->ip(),
         ]);
 
-        $consent->revoked_at = now();
-        $consent->save();
+        return response()->json(null, 201);
+    }
+
+    /**
+     * RGPD — Réactivation du compte par l'utilisateur.
+     * Requiert que les deux consentements (terms + privacy) soient actifs.
+     */
+    public function reactivateAccount(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        if (! $user->suspended_at) {
+            return response()->json([
+                'message' => 'Le compte n\'est pas suspendu.',
+            ], 409);
+        }
+
+        $activeConsentTypes = UserConsent::query()
+            ->where('user_id', $user->id)
+            ->whereNull('revoked_at')
+            ->pluck('consent_type')
+            ->unique()
+            ->toArray();
+
+        $missing = array_values(array_diff(['terms', 'privacy'], $activeConsentTypes));
+
+        if (! empty($missing)) {
+            return response()->json([
+                'message' => 'Consentements manquants.',
+                'missing_consents' => $missing,
+            ], 422);
+        }
+
+        $user->suspended_at = null;
+        $user->save();
+
+        Log::info('RGPD account reactivated', [
+            'user_id' => $user->id,
+            'ip' => $request->ip(),
+        ]);
 
         return response()->json(null, 204);
     }

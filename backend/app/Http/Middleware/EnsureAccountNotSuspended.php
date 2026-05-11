@@ -14,7 +14,8 @@ class EnsureAccountNotSuspended
 
         if ($user && $user->suspended_at) {
             return response()->json([
-                'message' => 'Votre compte est suspendu (droit à la limitation du traitement). Contactez dedickerbenoit@gmail.com pour lever la restriction.',
+                'message' => 'Votre compte est suspendu (droit à la limitation du traitement).',
+                'error_code' => 'ACCOUNT_SUSPENDED',
             ], 403);
         }
 
