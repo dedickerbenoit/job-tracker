@@ -20,6 +20,12 @@ class AuthController extends Controller
     {
         $validated = $request->validated();
 
+        // Purge any previously soft-deleted account with the same email
+        // so the DB unique constraint does not block re-registration.
+        User::onlyTrashed()
+            ->where('email', $validated['email'])
+            ->forceDelete();
+
         $user = User::create([
             'first_name' => $validated['first_name'],
             'last_name' => $validated['last_name'],

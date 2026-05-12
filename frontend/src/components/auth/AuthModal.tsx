@@ -93,6 +93,7 @@ function parseLaravelErrors(error: unknown): Record<string, string> | null {
 function LoginForm() {
   const [loading, setLoading] = useState(false);
   const login = useAuthStore((s) => s.login);
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -104,6 +105,7 @@ function LoginForm() {
     setLoading(true);
     try {
       await login(data);
+      navigate("/dashboard");
     } catch (error) {
       const fieldErrors = parseLaravelErrors(error);
       if (fieldErrors) {
@@ -160,6 +162,7 @@ function LoginForm() {
 function RegisterForm() {
   const [loading, setLoading] = useState(false);
   const registerUser = useAuthStore((s) => s.register);
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -175,6 +178,7 @@ function RegisterForm() {
     setLoading(true);
     try {
       await registerUser(data);
+      navigate("/dashboard");
     } catch (error) {
       const fieldErrors = parseLaravelErrors(error);
       if (fieldErrors) {

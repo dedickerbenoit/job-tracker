@@ -648,7 +648,7 @@ const fr = {
         methodManualDesc: "Remplis les champs toi-même \u2014 30 s.",
         extensionTitle: "Imagine que tu es sur une offre\u2026",
         extensionDesc:
-          "Clique sur le bouton bleu pour la sauvegarder dans JobTracker.",
+          "Clique sur le bouton pour la sauvegarder dans JobTracker.",
         extensionHint:
           '\ud83d\udc46 Clique sur le bouton "Sauvegarder dans JobTracker"',
         extensionSaved: "Sauvegardé",

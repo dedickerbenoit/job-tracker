@@ -23,6 +23,7 @@ const elements = {
   sectionSettings: document.getElementById("section-settings"),
 
   // Status
+  statusBar: document.getElementById("job-status"),
   statusIcon: document.getElementById("status-icon"),
   statusText: document.getElementById("status-text"),
 
@@ -261,6 +262,7 @@ function setStatus(type, text) {
   elements.statusIcon.textContent = icons[type] || "○";
   elements.statusIcon.className = `status-icon ${type}`;
   elements.statusText.textContent = text;
+  elements.statusBar.classList.toggle("detected", type === "detected");
 }
 
 function showScrapedData(data) {

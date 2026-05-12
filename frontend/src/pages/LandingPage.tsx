@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
 import { OnboardingDemo } from "@/components/landing/OnboardingDemo";
 import { ChromeIcon } from "@/components/icons/ChromeIcon";
+import { LinkedInIcon, IndeedIcon } from "@/components/icons/SourceIcons";
 import { ExtensionComingSoonModal } from "@/components/ExtensionComingSoonModal";
 import { useAuthStore } from "@/stores/authStore";
 import { t } from "@/lib/i18n";
@@ -97,7 +98,7 @@ function LandingNavbar({ onAuth }: { onAuth: () => void }) {
               {l.label}
             </a>
           ))}
-          <Button size="sm" onClick={onAuth}>
+          <Button size="lg" className="h-11 px-5" onClick={onAuth}>
             {t.landing.nav.cta}
           </Button>
         </div>
@@ -124,7 +125,7 @@ function LandingNavbar({ onAuth }: { onAuth: () => void }) {
               {l.label}
             </a>
           ))}
-          <Button className="mt-2 w-full" size="sm" onClick={onAuth}>
+          <Button className="mt-2 h-11 w-full" size="lg" onClick={onAuth}>
             {t.landing.nav.cta}
           </Button>
         </div>
@@ -250,10 +251,10 @@ function SourcesBanner() {
         </p>
         <div className="mt-5 flex flex-wrap items-center justify-center gap-12 opacity-70">
           <div className="flex items-center gap-2 text-lg font-bold">
-            <LinkedInLogo size={22} /> LinkedIn
+            <LinkedInIcon size={22} /> LinkedIn
           </div>
           <div className="flex items-center gap-2 text-lg font-bold text-[#2164F3]">
-            <IndeedLogo size={22} /> Indeed
+            <IndeedIcon size={22} /> Indeed
           </div>
           {/* <div className="flex items-center gap-2 text-lg font-bold text-[#FF6600]">
             <span className="inline-flex size-[22px] items-center justify-center rounded-md bg-[#FF6600] text-xs font-extrabold text-white">
@@ -601,23 +602,6 @@ function SectionBadge({ children }: { children: React.ReactNode }) {
     <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-slate-700">
       {children}
     </span>
-  );
-}
-
-function LinkedInLogo({ size = 22 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="#0A66C2">
-      <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zm1.78 13.02H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.55C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z" />
-    </svg>
-  );
-}
-
-function IndeedLogo({ size = 22 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="#2164F3">
-      <circle cx="12" cy="4" r="2.5" />
-      <path d="M9.5 8h5v14a2.5 2.5 0 0 1-5 0V8z" />
-    </svg>
   );
 }
 
