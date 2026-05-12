@@ -63,27 +63,22 @@ export const KANBAN_COLUMNS: ApplicationStatus[] = [
 
 export const SOURCE_CONFIG: Record<
   ApplicationSource,
-  { label: string; color: string; bgColor: string }
+  { label: string; brandColor?: string }
 > = {
   linkedin: {
     label: t.source.linkedin,
-    color: "text-blue-700",
-    bgColor: "bg-blue-100",
+    brandColor: "#0A66C2",
   },
   indeed: {
     label: t.source.indeed,
-    color: "text-indigo-700",
-    bgColor: "bg-indigo-100",
+    brandColor: "#2164F3",
   },
   hellowork: {
     label: t.source.hellowork,
-    color: "text-orange-700",
-    bgColor: "bg-orange-100",
+    brandColor: "#FF6600",
   },
   manual: {
     label: t.source.manual,
-    color: "text-gray-700",
-    bgColor: "bg-gray-100",
   },
 };
 

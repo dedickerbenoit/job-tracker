@@ -81,7 +81,7 @@ async function _handleTabUrlChangeInner(tabId, url) {
 
   await setIcon(tabId, "active");
   await chrome.action.setBadgeText({ tabId, text: "!" });
-  await chrome.action.setBadgeBackgroundColor({ tabId, color: "#0073B1" });
+  await chrome.action.setBadgeBackgroundColor({ tabId, color: "#1a1a1a" });
 
   // No auto-scrape — RGPD: scraping is triggered only by explicit user action
 }
