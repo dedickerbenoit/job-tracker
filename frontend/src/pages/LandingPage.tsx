@@ -255,12 +255,12 @@ function SourcesBanner() {
           <div className="flex items-center gap-2 text-lg font-bold text-[#2164F3]">
             <IndeedLogo size={22} /> Indeed
           </div>
-          <div className="flex items-center gap-2 text-lg font-bold text-[#FF6600]">
+          {/* <div className="flex items-center gap-2 text-lg font-bold text-[#FF6600]">
             <span className="inline-flex size-[22px] items-center justify-center rounded-md bg-[#FF6600] text-xs font-extrabold text-white">
               H
             </span>
             HelloWork
-          </div>
+          </div> */}
         </div>
       </div>
     </section>
