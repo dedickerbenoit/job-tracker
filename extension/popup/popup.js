@@ -376,6 +376,9 @@ async function handleSubmit(e) {
       });
     }
 
+    // Notify dashboard tab(s) to refresh their data
+    chrome.runtime.sendMessage({ type: "NOTIFY_DASHBOARD" });
+
     hasSubmitted = true;
     showToast(t.job.savedToast, "success");
     elements.btnSubmit.textContent = t.job.saved;
