@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { AlertTriangle } from "lucide-react";
 import { Header } from "@/components/layout/Header";
@@ -14,12 +14,31 @@ import { t } from "@/lib/i18n";
 export function DashboardLayout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
+  const fetchApplications = useApplicationStore((s) => s.fetchApplications);
   const selectedApplication = useApplicationStore((s) => s.selectedApplication);
   const setSelectedApplication = useApplicationStore(
     (s) => s.setSelectedApplication,
   );
   const user = useAuthStore((s) => s.user);
   const location = useLocation();
+
+  // Listen for extension notifications when a new application is saved
+  const handleExtensionSave = useCallback(() => {
+    fetchApplications();
+  }, [fetchApplications]);
+
+  useEffect(() => {
+    window.addEventListener(
+      "jobtracker:application-saved",
+      handleExtensionSave,
+    );
+    return () => {
+      window.removeEventListener(
+        "jobtracker:application-saved",
+        handleExtensionSave,
+      );
+    };
+  }, [handleExtensionSave]);
 
   const isSuspended = !!user?.suspended_at;
   const isAccountPage = location.pathname === "/dashboard/account";

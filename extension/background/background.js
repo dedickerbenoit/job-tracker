@@ -1,5 +1,6 @@
 import { detectJobSite } from "../utils/detector.js";
 import { isSiteEnabled } from "../utils/settings.js";
+import { getDashboardUrl } from "../utils/api.js";
 import { IS_PRODUCTION } from "../config.js";
 
 const currentTabStates = {};
@@ -145,6 +146,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       return true; // async sendResponse
     }
 
+    case "NOTIFY_DASHBOARD": {
+      notifyDashboardTabs();
+      sendResponse({ ok: true });
+      break;
+    }
+
     case "URL_CHANGED": {
       if (tabId && message.url) {
         handleTabUrlChange(tabId, message.url);
@@ -154,6 +161,29 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
   }
 });
+
+// --- Dashboard notification helper ---
+
+async function notifyDashboardTabs() {
+  try {
+    const dashboardUrl = await getDashboardUrl();
+    const tabs = await chrome.tabs.query({ url: `${dashboardUrl}/*` });
+    for (const tab of tabs) {
+      if (tab.id) {
+        chrome.scripting.executeScript({
+          target: { tabId: tab.id },
+          func: () => {
+            window.dispatchEvent(
+              new CustomEvent("jobtracker:application-saved"),
+            );
+          },
+        });
+      }
+    }
+  } catch (e) {
+    // Dashboard tab may not be open — silently ignore
+  }
+}
 
 // --- Icon helper ---
 

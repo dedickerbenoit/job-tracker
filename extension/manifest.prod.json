@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "JobTracker",
+  "name": "JobTracker BETA",
   "version": "0.1.0",
-  "description": "Save job offers from LinkedIn & Indeed in one click. Track your applications and never lose an opportunity.",
-  "permissions": ["storage", "activeTab", "tabs"],
+  "description": "THIS EXTENSION IS FOR BETA TESTING. Save job offers from LinkedIn, Indeed & HelloWork in one click.",
+  "permissions": ["storage", "activeTab", "tabs", "scripting"],
   "host_permissions": [
     "https://www.linkedin.com/*",
     "https://*.linkedin.com/*",
