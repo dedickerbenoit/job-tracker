@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Notifications\QueuedVerifyEmail;
 use Database\Factories\UserFactory;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -30,7 +32,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property-read Collection<int, ApplicationEvent> $applicationEvents
  * @property-read Collection<int, UserConsent> $consents
  */
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
@@ -46,6 +48,11 @@ class User extends Authenticatable
             'suspended_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function sendEmailVerificationNotification(): void
+    {
+        $this->notify(new QueuedVerifyEmail);
     }
 
     public function applications(): HasMany
