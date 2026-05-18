@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Notifications\QueuedVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Collection;
@@ -48,11 +47,6 @@ class User extends Authenticatable implements MustVerifyEmail
             'suspended_at' => 'datetime',
             'password' => 'hashed',
         ];
-    }
-
-    public function sendEmailVerificationNotification(): void
-    {
-        $this->notify(new QueuedVerifyEmail);
     }
 
     public function applications(): HasMany
