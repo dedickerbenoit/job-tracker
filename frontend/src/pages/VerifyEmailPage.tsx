@@ -78,11 +78,13 @@ export default function VerifyEmailPage() {
               : t.auth.emailVerification.resend}
         </Button>
 
-        <Button variant="ghost" asChild className="gap-2">
-          <Link to="/dashboard/account">
-            <Settings className="h-4 w-4" />
-            {t.rgpd.myAccount}
-          </Link>
+        <Button
+          variant="ghost"
+          className="gap-2"
+          render={<Link to="/dashboard/account" />}
+        >
+          <Settings className="h-4 w-4" />
+          {t.rgpd.myAccount}
         </Button>
 
         <Button variant="ghost" onClick={logout} className="gap-2">
