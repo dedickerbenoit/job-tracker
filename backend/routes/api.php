@@ -3,6 +3,7 @@
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\EmailVerificationController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -19,6 +20,9 @@ Route::prefix('v1')->group(function () {
         // route cannot rely on auth:sanctum (which would resolve stale session
         // cookies via TransientToken and bypass the ability check).
         Route::post('auth/token-login', [AuthController::class, 'tokenLogin']);
+
+        Route::get('auth/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
+            ->name('verification.verify');
     });
 
     Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
@@ -27,6 +31,8 @@ Route::prefix('v1')->group(function () {
         Route::post('auth/create-handoff-token', [AuthController::class, 'createHandoffToken'])
             ->middleware('throttle:10,1');
         Route::get('auth/me', [AuthController::class, 'me']);
+        Route::post('auth/email/resend', [EmailVerificationController::class, 'resend'])
+            ->middleware('throttle:3,1');
 
         // RGPD — Account management (accessible even when suspended)
         Route::prefix('account')->controller(AccountController::class)->group(function () {
@@ -41,8 +47,8 @@ Route::prefix('v1')->group(function () {
             Route::delete('/', 'deleteAccount');
         });
 
-        // All routes below require an active (non-suspended) account
-        Route::middleware('not-suspended')->group(function () {
+        // All routes below require a verified email and an active (non-suspended) account
+        Route::middleware(['verified', 'not-suspended'])->group(function () {
             // Custom routes BEFORE apiResource to avoid {application} param conflict
             Route::get('applications/timeline', [ApplicationController::class, 'timeline'])
                 ->name('applications.timeline');

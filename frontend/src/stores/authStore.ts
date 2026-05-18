@@ -103,7 +103,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     const { user } = response.data;
     // Session cookie is set automatically by Sanctum
     set({ user, isAuthenticated: true, showAuthModal: false });
-    toast.success(t.auth.accountCreated);
+    toast.success(t.auth.emailVerification.checkInbox);
   },
 
   logout: async () => {

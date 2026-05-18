@@ -7,6 +7,7 @@ export interface User {
   email: string;
   avatar_url: string | null;
   suspended_at: string | null;
+  email_verified_at: string | null;
 }
 
 export interface LoginData {

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureAccountNotSuspended;
+use App\Http\Middleware\EnsureEmailIsVerified;
 use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -20,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(SecurityHeaders::class);
 
         $middleware->alias([
+            'verified' => EnsureEmailIsVerified::class,
             'not-suspended' => EnsureAccountNotSuspended::class,
         ]);
 

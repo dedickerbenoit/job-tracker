@@ -213,4 +213,19 @@ export const authApi = {
       )
       .then((r) => r.data.data.user);
   },
+
+  verifyEmail(
+    id: number,
+    hash: string,
+    query: string,
+  ): Promise<{ message: string }> {
+    return api
+      .get(`/auth/email/verify/${id}/${hash}?${query}`)
+      .then((r) => r.data);
+  },
+
+  async resendVerification(): Promise<void> {
+    await getCsrfCookie();
+    return api.post("/auth/email/resend").then(() => undefined);
+  },
 };

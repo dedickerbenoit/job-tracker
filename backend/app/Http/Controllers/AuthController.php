@@ -45,6 +45,8 @@ class AuthController extends Controller
             ]);
         }
 
+        $user->sendEmailVerificationNotification();
+
         // Support both SPA mode (session cookies) and token mode (Chrome extension)
         // If request wants a token (X-Request-Token header), return a token
         // Otherwise, use session authentication (SPA mode)
@@ -57,7 +59,7 @@ class AuthController extends Controller
         ]);
 
         $data = [
-            'user' => $user->only('id', 'first_name', 'last_name', 'email', 'avatar_url'),
+            'user' => $user->only('id', 'first_name', 'last_name', 'email', 'avatar_url', 'email_verified_at'),
         ];
 
         if ($wantsToken) {
@@ -122,7 +124,7 @@ class AuthController extends Controller
         ]);
 
         $data = [
-            'user' => $user->only('id', 'first_name', 'last_name', 'email', 'avatar_url'),
+            'user' => $user->only('id', 'first_name', 'last_name', 'email', 'avatar_url', 'email_verified_at'),
         ];
 
         if ($wantsToken) {
@@ -258,7 +260,7 @@ class AuthController extends Controller
 
         return response()->json([
             'data' => [
-                'user' => $user->only('id', 'first_name', 'last_name', 'email', 'avatar_url'),
+                'user' => $user->only('id', 'first_name', 'last_name', 'email', 'avatar_url', 'email_verified_at'),
             ],
         ]);
     }
@@ -268,7 +270,7 @@ class AuthController extends Controller
         $user = $request->user();
 
         return response()->json([
-            'data' => $user->only('id', 'first_name', 'last_name', 'email', 'avatar_url', 'suspended_at'),
+            'data' => $user->only('id', 'first_name', 'last_name', 'email', 'avatar_url', 'suspended_at', 'email_verified_at'),
         ]);
     }
 }

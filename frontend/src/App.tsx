@@ -17,6 +17,9 @@ const PrivacyPolicyPage = lazy(() => import("@/pages/PrivacyPolicyPage"));
 const LegalMentionsPage = lazy(() => import("@/pages/LegalMentionsPage"));
 const LandingPage = lazy(() => import("@/pages/LandingPage"));
 const NotFoundPage = lazy(() => import("@/pages/NotFoundPage"));
+const VerifyEmailCallbackPage = lazy(
+  () => import("@/pages/VerifyEmailCallbackPage"),
+);
 
 function PageLoader() {
   return (
@@ -66,6 +69,16 @@ function App() {
               }
             />
           </Route>
+
+          {/* Email verification callback (public — user clicks from email) */}
+          <Route
+            path="/verify-email/:id/:hash"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <VerifyEmailCallbackPage />
+              </Suspense>
+            }
+          />
 
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<DashboardLayout />}>
