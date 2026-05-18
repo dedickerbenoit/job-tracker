@@ -249,6 +249,24 @@ const fr = {
       lowercase: "Une lettre minuscule",
       digit: "Un chiffre",
     },
+    emailVerification: {
+      title: "Vérifiez votre adresse e-mail",
+      description:
+        "Nous avons envoyé un lien de vérification à votre adresse e-mail.",
+      checkInbox:
+        "Consultez votre boîte de réception pour vérifier votre e-mail.",
+      checkSpam:
+        "Si vous ne trouvez pas l'e-mail, vérifiez votre dossier spam.",
+      resend: "Renvoyer l'e-mail",
+      resending: "Envoi en cours...",
+      resent: "E-mail de vérification renvoyé !",
+      resendCooldown: (seconds: number) => `Renvoyer dans ${seconds}s`,
+      verified: "Adresse e-mail vérifiée !",
+      alreadyVerified: "Adresse e-mail déjà vérifiée.",
+      invalidLink: "Le lien de vérification est invalide ou a expiré.",
+      verifying: "Vérification en cours...",
+      logout: "Se déconnecter",
+    },
   },
 
   rgpd: {
