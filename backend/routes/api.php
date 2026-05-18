@@ -32,7 +32,7 @@ Route::prefix('v1')->group(function () {
             ->middleware('throttle:10,1');
         Route::get('auth/me', [AuthController::class, 'me']);
         Route::post('auth/email/resend', [EmailVerificationController::class, 'resend'])
-            ->middleware('throttle:3,1');
+            ->middleware('throttle:resend');
 
         // RGPD — Account management (accessible even when suspended)
         Route::prefix('account')->controller(AccountController::class)->group(function () {
