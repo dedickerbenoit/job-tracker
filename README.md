@@ -21,33 +21,6 @@
 
 JobTracker est un outil de suivi de candidatures d'emploi avec une extension Chrome qui capture automatiquement les offres depuis LinkedIn, Indeed et HelloWork.
 
-<p align="center">
-  <img src="extension/screenshots/screenshot-1.png" alt="Landing page" width="700">
-</p>
-
-<details>
-<summary>Plus de captures</summary>
-
-**Extension Chrome - Detection automatique d'une offre LinkedIn**
-
-<p align="center">
-  <img src="extension/screenshots/screenshot-3.png" alt="Extension - detection" width="700">
-</p>
-
-**Extension Chrome - Formulaire pre-rempli apres scraping**
-
-<p align="center">
-  <img src="extension/screenshots/screenshot-2.png" alt="Extension - formulaire" width="700">
-</p>
-
-**Dashboard - Vue Kanban**
-
-<p align="center">
-  <img src="extension/screenshots/screenshot-4.png" alt="Dashboard Kanban" width="700">
-</p>
-
-</details>
-
 ## Fonctionnalites
 
 **Suivi de candidatures**
