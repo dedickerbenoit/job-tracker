@@ -58,16 +58,11 @@ export default function KanbanView() {
     }),
   );
 
-  // Group applications by kanban columns (merge follow_up into applied)
   const columns = useMemo(
     () =>
       KANBAN_COLUMNS.map((status) => ({
         status,
-        items: applications.filter((app) =>
-          status === "applied"
-            ? app.status === "applied" || app.status === "follow_up"
-            : app.status === status,
-        ),
+        items: applications.filter((app) => app.status === status),
       })),
     [applications],
   );
@@ -112,8 +107,6 @@ export default function KanbanView() {
         return;
 
       if (app.status === newStatus) return;
-      // If follow_up app dropped on "applied" column, no change needed
-      if (app.status === "follow_up" && newStatus === "applied") return;
 
       // Confirm if dropping to "rejected"
       if (newStatus === "rejected") {

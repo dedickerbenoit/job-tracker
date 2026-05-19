@@ -129,7 +129,6 @@ const fr = {
     confirmReject: "Confirmer le refus",
     showRejected: "Voir les refusés",
     hideRejected: "Masquer les refusés",
-    followUpBadge: "Relance",
     rejectedCount: (count: number) => `${count} refusée${count > 1 ? "s" : ""}`,
   },
 
@@ -264,6 +263,10 @@ const fr = {
       verified: "Adresse e-mail vérifiée !",
       alreadyVerified: "Adresse e-mail déjà vérifiée.",
       invalidLink: "Le lien de vérification est invalide ou a expiré.",
+      rateLimited: (seconds: number) =>
+        `Trop de tentatives. Nouvelle vérification dans ${seconds}s…`,
+      serverError: "Erreur de connexion. Réessayez.",
+      retry: "Réessayer",
       verifying: "Vérification en cours...",
       logout: "Se déconnecter",
     },
