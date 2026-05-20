@@ -18,7 +18,9 @@ export default function VerifyEmailCallbackPage() {
   const [status, setStatus] = useState<Status>("loading");
   const [errorType, setErrorType] = useState<ErrorType>("invalid");
   const [retryCountdown, setRetryCountdown] = useState(0);
-  const timerRef = useRef<ReturnType<typeof setInterval>>();
+  const timerRef = useRef<ReturnType<typeof setInterval> | undefined>(
+    undefined,
+  );
 
   const query = searchParams.toString();
 

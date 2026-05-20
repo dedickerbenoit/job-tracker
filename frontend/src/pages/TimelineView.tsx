@@ -82,6 +82,7 @@ export default function TimelineView() {
           status: "to_apply",
           status_label: "",
           applied_at: null,
+          status_changed_at: new Date().toISOString(),
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         };
