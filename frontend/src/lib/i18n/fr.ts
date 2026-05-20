@@ -717,15 +717,14 @@ const fr = {
 
   extension: {
     comingSoon: {
-      title: `L'extension arrive bientôt`,
-      description: `Ajoute tes candidatures en 1 clic depuis LinkedIn et Indeed.`,
-      status: "On met les derniers coups de polish avant le lancement.",
+      title: `L'extension est en beta fermée`,
+      description: `Sauvegarde une offre en 1 clic depuis LinkedIn ou Indeed.`,
+      status: "Entre ton email \u2014 on t'envoie l'accès au Chrome Web Store.",
       emailPlaceholder: "ton@email.com",
-      submit: "Me prévenir",
+      submit: "Rejoindre la beta",
       submitting: "Envoi...",
-      success: "On te tient au courant !",
+      success: "C'est noté \u2014 on t'envoie l'accès très vite !",
       error: "Une erreur est survenue, réessaie.",
-      close: "Fermer",
     },
   },
 
