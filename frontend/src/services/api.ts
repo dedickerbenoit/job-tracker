@@ -177,6 +177,15 @@ export const accountApi = {
   },
 };
 
+// ── Beta Signup API ──
+
+export const betaApi = {
+  async signup(email: string): Promise<void> {
+    await getCsrfCookie();
+    await api.post("/beta-signup", { email });
+  },
+};
+
 // ── Auth API ──
 
 export const authApi = {
