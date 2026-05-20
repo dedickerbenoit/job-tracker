@@ -150,7 +150,7 @@ function LoginForm() {
         )}
       </div>
 
-      <Button type="submit" className="w-full" disabled={loading}>
+      <Button type="submit" className="h-11 w-full px-5" disabled={loading}>
         {loading ? t.auth.loggingIn : t.auth.loginAction}
       </Button>
     </form>
@@ -347,7 +347,7 @@ function RegisterForm() {
         )}
       </div>
 
-      <Button type="submit" className="w-full" disabled={loading}>
+      <Button type="submit" className="h-11 w-full px-5" disabled={loading}>
         {loading ? t.auth.registering : t.auth.registerAction}
       </Button>
     </form>

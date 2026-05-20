@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -39,17 +39,15 @@ export function ExtensionComingSoonModal({
     }
   };
 
-  const handleClose = () => {
-    onClose();
-    // Reset state after dialog close animation
-    setTimeout(() => {
+  useEffect(() => {
+    if (open) {
       setEmail("");
       setStatus("idle");
-    }, 200);
-  };
+    }
+  }, [open]);
 
   return (
-    <Dialog open={open} onOpenChange={(v) => !v && handleClose()}>
+    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
           <div className="flex items-center gap-3">
@@ -64,6 +62,7 @@ export function ExtensionComingSoonModal({
             {t.extension.comingSoon.description}
           </DialogDescription>
         </DialogHeader>
+
         <p className="rounded-lg bg-muted/60 px-3 py-2 text-center text-xs text-muted-foreground italic">
           {t.extension.comingSoon.status}
         </p>
@@ -73,7 +72,7 @@ export function ExtensionComingSoonModal({
             {t.extension.comingSoon.success}
           </p>
         ) : (
-          <form onSubmit={handleSubmit} className="flex gap-2">
+          <form onSubmit={handleSubmit} className="space-y-3">
             <Input
               type="email"
               required
@@ -84,20 +83,22 @@ export function ExtensionComingSoonModal({
                 if (status === "error") setStatus("idle");
               }}
               disabled={status === "loading"}
-              className="flex-1"
             />
-            <Button type="submit" size="sm" disabled={status === "loading"}>
+            {status === "error" && (
+              <p className="text-center text-xs text-destructive">
+                {t.extension.comingSoon.error}
+              </p>
+            )}
+            <Button
+              type="submit"
+              disabled={status === "loading"}
+              className="h-11 w-full px-5"
+            >
               {status === "loading"
                 ? t.extension.comingSoon.submitting
                 : t.extension.comingSoon.submit}
             </Button>
           </form>
-        )}
-
-        {status === "error" && (
-          <p className="text-center text-xs text-destructive">
-            {t.extension.comingSoon.error}
-          </p>
         )}
       </DialogContent>
     </Dialog>
