@@ -137,7 +137,13 @@ function LandingNavbar({ onAuth }: { onAuth: () => void }) {
 // ---------------------------------------------------------------------------
 // Hero
 // ---------------------------------------------------------------------------
-function Hero({ onAuth }: { onAuth: () => void }) {
+function Hero({
+  onAuth,
+  onExtensionClick,
+}: {
+  onAuth: () => void;
+  onExtensionClick: () => void;
+}) {
   return (
     <section className="relative overflow-hidden pt-[120px] pb-[60px]">
       {/* Dotted background */}
@@ -207,6 +213,15 @@ function Hero({ onAuth }: { onAuth: () => void }) {
               onClick={onAuth}
             >
               {t.landing.hero.ctaRegister}
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="h-11 gap-2 px-5"
+              onClick={onExtensionClick}
+            >
+              <ChromeIcon className="size-4" />
+              {t.landing.finalCta.ctaExtension}
             </Button>
           </div>
 
@@ -654,7 +669,10 @@ export default function LandingPage() {
       </Helmet>
 
       <LandingNavbar onAuth={handleAuth} />
-      <Hero onAuth={handleAuth} />
+      <Hero
+        onAuth={handleAuth}
+        onExtensionClick={() => setExtensionModalOpen(true)}
+      />
       <SourcesBanner />
       <HowItWorks />
       <Features />

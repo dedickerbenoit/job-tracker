@@ -3,12 +3,17 @@
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BetaSignupController;
 use App\Http\Controllers\EmailVerificationController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
     // Health check (public, no auth)
     Route::get('/health', fn () => response()->json(['status' => 'ok']));
+
+    // Beta signup (public, rate-limited: 3 per minute per IP)
+    Route::post('beta-signup', [BetaSignupController::class, 'store'])
+        ->middleware('throttle:3,1');
 
     // Auth routes (public, rate-limited)
     Route::middleware('throttle:5,1')->group(function () {

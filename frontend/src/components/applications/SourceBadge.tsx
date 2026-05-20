@@ -28,7 +28,7 @@ export function SourceBadge({ source, className }: SourceBadgeProps) {
       )}
     >
       {Icon && <Icon size={12} />}
-      {config.label}
+      {config?.label ?? source}
     </Badge>
   );
 }
