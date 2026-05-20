@@ -20,10 +20,13 @@ Route::prefix('v1')->group(function () {
         // route cannot rely on auth:sanctum (which would resolve stale session
         // cookies via TransientToken and bypass the ability check).
         Route::post('auth/token-login', [AuthController::class, 'tokenLogin']);
-
-        Route::get('auth/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
-            ->name('verification.verify');
     });
+
+    // Email verification — separate, more lenient rate limiter to avoid
+    // legitimate clicks being throttled by register/login traffic.
+    Route::get('auth/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
+        ->middleware('throttle:10,1')
+        ->name('verification.verify');
 
     Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
         // Auth routes (protected) — accessible even when suspended

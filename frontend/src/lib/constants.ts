@@ -55,6 +55,7 @@ export const STATUS_ORDER: ApplicationStatus[] = [
 export const KANBAN_COLUMNS: ApplicationStatus[] = [
   "to_apply",
   "applied",
+  "follow_up",
   "interview",
   "offer",
 ];

@@ -1,8 +1,6 @@
 import { memo, useState, useCallback } from "react";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import { formatDistanceToNow } from "date-fns";
-import { fr } from "date-fns/locale";
 import {
   ArrowRightLeft,
   ExternalLink,
@@ -99,8 +97,6 @@ export const KanbanCard = memo(function KanbanCard({
     updateApplication,
   ]);
 
-  const isFollowUp = application.status === "follow_up";
-
   return (
     <div
       onMouseEnter={() => setIsHovered(true)}
@@ -131,26 +127,20 @@ export const KanbanCard = memo(function KanbanCard({
           {application.title}
         </div>
 
-        {/* Company + follow_up badge */}
-        <div className="flex items-center gap-1.5">
-          <span className="text-xs text-muted-foreground">
-            {application.company}
-          </span>
-          {isFollowUp && (
-            <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[0.6rem] font-medium text-amber-700">
-              {t.kanban.followUpBadge}
-            </span>
-          )}
+        {/* Company */}
+        <div className="text-xs text-muted-foreground">
+          {application.company}
         </div>
 
-        {/* Source + date (discreet) */}
+        {/* Source + days in current column */}
         <div className="flex items-center justify-between pt-0.5 opacity-70">
           <SourceBadge source={application.source} />
           <span className="text-[0.6rem] text-muted-foreground">
-            {formatDistanceToNow(new Date(application.created_at), {
-              addSuffix: true,
-              locale: fr,
-            })}
+            {Math.floor(
+              (Date.now() - new Date(application.status_changed_at).getTime()) /
+                86_400_000,
+            )}{" "}
+            j
           </span>
         </div>
 

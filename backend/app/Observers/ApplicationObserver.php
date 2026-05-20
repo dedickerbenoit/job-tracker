@@ -56,7 +56,7 @@ class ApplicationObserver
             $event->save();
         }
 
-        $excludeFields = ['updated_at'];
+        $excludeFields = ['updated_at', 'status_changed_at'];
         if ($application->isDirty('status')) {
             $excludeFields[] = 'status';
             $excludeFields[] = 'applied_at';

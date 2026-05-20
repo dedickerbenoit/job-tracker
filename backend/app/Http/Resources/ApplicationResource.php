@@ -23,6 +23,7 @@ class ApplicationResource extends JsonResource
             'status_label' => $this->status->label(),
             'notes' => $this->when($request->routeIs('applications.show'), $this->notes),
             'applied_at' => $this->applied_at?->toISOString(),
+            'status_changed_at' => $this->status_changed_at?->toISOString(),
             'created_at' => $this->created_at->toISOString(),
             'updated_at' => $this->updated_at->toISOString(),
         ];

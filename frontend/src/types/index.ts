@@ -61,6 +61,7 @@ export interface Application {
   status_label: string;
   notes?: string | null;
   applied_at: string | null;
+  status_changed_at: string;
   created_at: string;
   updated_at: string;
 }

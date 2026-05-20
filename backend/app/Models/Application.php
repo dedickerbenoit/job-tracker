@@ -26,6 +26,7 @@ use Illuminate\Support\Carbon;
  * @property ApplicationStatus $status
  * @property string|null $notes
  * @property Carbon|null $applied_at
+ * @property Carbon|null $status_changed_at
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property-read User $user
@@ -45,7 +46,17 @@ class Application extends Model
             'source' => ApplicationSource::class,
             'status' => ApplicationStatus::class,
             'applied_at' => 'datetime',
+            'status_changed_at' => 'datetime',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::saving(function (Application $app) {
+            if (! $app->exists || $app->isDirty('status')) {
+                $app->status_changed_at = now();
+            }
+        });
     }
 
     public function user(): BelongsTo
