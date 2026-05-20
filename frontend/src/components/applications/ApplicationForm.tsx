@@ -15,7 +15,6 @@ import { STATUS_CONFIG, SOURCE_CONFIG } from "@/lib/constants";
 import { t } from "@/lib/i18n";
 import type {
   Application,
-  ApplicationSource,
   ApplicationStatus,
   CreateApplicationData,
 } from "@/types";
@@ -30,7 +29,7 @@ const schema = z.object({
     .url(t.form.validation.urlInvalid)
     .max(2048),
   description: z.string().optional(),
-  source: z.enum(["linkedin", "indeed", "hellowork", "manual"] as const),
+  source: z.enum(["linkedin", "indeed", "manual"] as const),
   status: z
     .enum([
       "to_apply",
@@ -61,6 +60,12 @@ export function ApplicationForm({
 }: ApplicationFormProps) {
   const isEdit = !!application;
 
+  const validSources: FormValues["source"][] = ["linkedin", "indeed", "manual"];
+  const safeSource = (s?: string): FormValues["source"] =>
+    validSources.includes(s as FormValues["source"])
+      ? (s as FormValues["source"])
+      : "manual";
+
   const {
     register,
     handleSubmit,
@@ -75,7 +80,7 @@ export function ApplicationForm({
       location: application?.location ?? "",
       url: application?.url ?? "",
       description: application?.description ?? "",
-      source: application?.source ?? "manual",
+      source: safeSource(application?.source),
       status: application?.status ?? "to_apply",
       notes: application?.notes ?? "",
     },
@@ -146,11 +151,11 @@ export function ApplicationForm({
           <Label>{t.list.columns.source}</Label>
           <Select
             value={sourceValue}
-            onValueChange={(v) => setValue("source", v as ApplicationSource)}
+            onValueChange={(v) => setValue("source", v as FormValues["source"])}
           >
             <SelectTrigger>
               <span className="flex flex-1 text-left" data-slot="select-value">
-                {SOURCE_CONFIG[sourceValue].label}
+                {SOURCE_CONFIG[sourceValue]?.label ?? sourceValue}
               </span>
             </SelectTrigger>
             <SelectContent>

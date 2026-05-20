@@ -62,9 +62,8 @@ export const KANBAN_COLUMNS: ApplicationStatus[] = [
 
 // ── Source configuration ──
 
-export const SOURCE_CONFIG: Record<
-  ApplicationSource,
-  { label: string; brandColor?: string }
+export const SOURCE_CONFIG: Partial<
+  Record<ApplicationSource, { label: string; brandColor?: string }>
 > = {
   linkedin: {
     label: t.source.linkedin,
@@ -73,10 +72,6 @@ export const SOURCE_CONFIG: Record<
   indeed: {
     label: t.source.indeed,
     brandColor: "#2164F3",
-  },
-  hellowork: {
-    label: t.source.hellowork,
-    brandColor: "#FF6600",
   },
   manual: {
     label: t.source.manual,
@@ -113,7 +108,6 @@ export const CHART_COLORS = {
   source: {
     linkedin: "#0a66c2",
     indeed: "#2557a7",
-    hellowork: "#ff6600",
     manual: "#6b7280",
   },
 } as const;

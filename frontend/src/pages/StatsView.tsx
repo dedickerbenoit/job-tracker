@@ -17,7 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useApplicationStore } from "@/stores/applicationStore";
 import { STATUS_CONFIG, CHART_COLORS } from "@/lib/constants";
 import { t } from "@/lib/i18n";
-import type { ApplicationStatus, ApplicationSource } from "@/types";
+import type { ApplicationStatus } from "@/types";
 
 export default function StatsView() {
   const stats = useApplicationStore((s) => s.stats);
@@ -73,7 +73,9 @@ export default function StatsView() {
     .map(([source, count]) => ({
       name: source.charAt(0).toUpperCase() + source.slice(1),
       value: count,
-      color: CHART_COLORS.source[source as ApplicationSource],
+      color:
+        CHART_COLORS.source[source as keyof typeof CHART_COLORS.source] ??
+        "#6b7280",
     }));
 
   // Metric calculations
