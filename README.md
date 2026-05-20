@@ -21,6 +21,14 @@
 
 JobTracker est un outil de suivi de candidatures d'emploi avec une extension Chrome qui capture automatiquement les offres depuis LinkedIn et Indeed.
 
+<p align="center">
+  <img src="extension/screenshots/landing-page.png" alt="Landing page" width="80%">
+</p>
+
+|                              Dashboard Kanban                              |                                Statistiques                                 |                                  Extension Chrome                                   |
+| :------------------------------------------------------------------------: | :-------------------------------------------------------------------------: | :---------------------------------------------------------------------------------: |
+| <img src="extension/screenshots/Kanban.png" alt="Vue Kanban" width="100%"> | <img src="extension/screenshots/Stats.png" alt="Statistiques" width="100%"> | <img src="extension/screenshots/Extension.png" alt="Extension Chrome" width="100%"> |
+
 ## Fonctionnalites
 
 **Suivi de candidatures**
@@ -32,7 +40,7 @@ JobTracker est un outil de suivi de candidatures d'emploi avec une extension Chr
 **Extension Chrome (Manifest V3)**
 
 - Detection automatique des offres sur LinkedIn et Indeed
-- Scraping du titre, entreprise, localisation, description, URL
+- Capture du titre, entreprise, localisation, description et URL depuis la page visitee
 - Sauvegarde en un clic vers le dashboard
 - Authentification par handoff token (pas de mot de passe stocke dans l'extension)
 
@@ -53,6 +61,24 @@ JobTracker est un outil de suivi de candidatures d'emploi avec une extension Chr
 
 ## Architecture
 
+```
+                  ┌─────────────────────┐
+                  │   Extension Chrome  │
+                  │   (Manifest V3)     │
+                  └────────┬────────────┘
+                           │ Content scripts
+                           │ LinkedIn / Indeed
+                           ▼
+┌──────────────┐    ┌─────────────────┐    ┌──────────────┐
+│  SPA React   │◄──►│   API Laravel   │◄──►│  PostgreSQL  │
+│  (Vite)      │    │   (Sanctum)     │    │              │
+└──────────────┘    └─────────────────┘    └──────────────┘
+       │                    │
+       │    Build copie     │
+       └───────────────────►│
+            dans public/
+```
+
 Monorepo avec 3 sous-projets :
 
 ```
@@ -66,6 +92,19 @@ job-tracker/
 ```
 
 L'API backend sert aussi le frontend en production : le build React est copie dans le dossier `public/` Laravel et servi via une route catch-all Blade.
+
+## Choix techniques
+
+| Decision             | Choix                 | Pourquoi                                                                                                                         |
+| -------------------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| **State management** | Zustand               | Leger, peu de boilerplate vs Redux, suffisant pour un scope mono-utilisateur                                                     |
+| **Auth API**         | Laravel Sanctum       | Tokens SPA + tokens API dans un seul package, natif Laravel                                                                      |
+| **Auth extension**   | Handoff token         | Evite de stocker un mot de passe dans l'extension : un token temporaire est genere depuis le dashboard et transmis a l'extension |
+| **Monorepo**         | Dossiers simples      | Pas besoin de Turborepo/Nx pour 3 sous-projets avec des stacks differentes (PHP + Node + JS pur)                                 |
+| **Base de donnees**  | PostgreSQL            | Types riches (JSONB, timestamps), fiable, supporte nativement par Fly.io                                                         |
+| **Hosting**          | Fly.io                | Scale-to-zero (cout nul au repos), region Paris, deploiement Docker simple                                                       |
+| **Drag & drop**      | dnd-kit               | Accessible, performant, bien maintenu, pensé pour React                                                                          |
+| **Validation**       | Zod + React Hook Form | Schema-first cote front, validation Laravel cote back, coherence des regles                                                      |
 
 ## Installation
 
@@ -133,6 +172,14 @@ fly deploy
 ```
 
 La machine scale a zero quand il n'y a pas de trafic et redemarre automatiquement a la premiere requete.
+
+## Roadmap
+
+- [ ] Support HelloWork dans l'extension
+- [ ] Notifications de relance automatiques
+- [ ] Import/export CSV des candidatures
+- [ ] Suggestions IA pour ameliorer les candidatures
+- [ ] Synchronisation avec Google Calendar pour les entretiens
 
 ## Licence
 
