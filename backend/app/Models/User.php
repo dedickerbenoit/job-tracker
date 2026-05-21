@@ -20,6 +20,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property string $email
  * @property string|null $password
  * @property Carbon|null $email_verified_at
+ * @property bool $is_admin
  * @property string|null $remember_token
  * @property Carbon|null $suspended_at
  * @property string|null $google_id
@@ -44,6 +45,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return [
             'email_verified_at' => 'datetime',
+            'is_admin' => 'boolean',
             'suspended_at' => 'datetime',
             'password' => 'hashed',
         ];

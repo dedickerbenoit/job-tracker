@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\Admin\BetaInviteController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BetaSignupController;
@@ -66,6 +67,14 @@ Route::prefix('v1')->group(function () {
                 ->name('applications.update-status');
 
             Route::apiResource('applications', ApplicationController::class);
+        });
+
+        // Admin routes — require verified, non-suspended, admin user
+        Route::middleware(['verified', 'not-suspended', 'admin'])->prefix('admin')->group(function () {
+            Route::controller(BetaInviteController::class)->prefix('beta-invites')->group(function () {
+                Route::get('/', 'index');
+                Route::post('/', 'store');
+            });
         });
     });
 });
