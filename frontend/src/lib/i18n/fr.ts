@@ -715,6 +715,27 @@ const fr = {
     },
   },
 
+  admin: {
+    betaInvite: {
+      title: "Invitation beta",
+      description:
+        "Envoyer un e-mail d'invitation avec le lien de téléchargement de l'extension Chrome.",
+      emailPlaceholder: "testeur@exemple.com",
+      send: "Envoyer l'invitation",
+      sending: "Envoi...",
+      success: "Invitation envoyée avec succès.",
+      error: "Erreur lors de l'envoi de l'invitation.",
+      listTitle: "Invitations envoyées",
+      columnEmail: "E-mail",
+      columnSentAt: "Envoyée le",
+      columnStatus: "Statut",
+      statusActive: "Actif",
+      statusInactive: "Inactif",
+      empty: "Aucune invitation envoyée.",
+      loadError: "Erreur lors du chargement des invitations.",
+    },
+  },
+
   extension: {
     comingSoon: {
       title: `L'extension est en beta fermée`,

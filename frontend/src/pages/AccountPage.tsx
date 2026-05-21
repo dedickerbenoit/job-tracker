@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   AlertTriangle,
   Download,
+  Mail,
   Pause,
   RefreshCw,
   ShieldCheck,
@@ -11,6 +12,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -19,9 +21,9 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { useAuthStore } from "@/stores/authStore";
-import { accountApi } from "@/services/api";
+import { accountApi, adminApi } from "@/services/api";
 import { t } from "@/lib/i18n";
-import type { Consent } from "@/types";
+import type { BetaInvite, Consent } from "@/types";
 
 export default function AccountPage() {
   const user = useAuthStore((s) => s.user);
@@ -44,6 +46,9 @@ export default function AccountPage() {
   const [showSuspendDialog, setShowSuspendDialog] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [betaEmail, setBetaEmail] = useState("");
+  const [sendingInvite, setSendingInvite] = useState(false);
+  const [betaInvites, setBetaInvites] = useState<BetaInvite[]>([]);
 
   const isSuspended = !!user?.suspended_at;
 
@@ -62,9 +67,19 @@ export default function AccountPage() {
     }
   }, []);
 
+  const loadBetaInvites = useCallback(async () => {
+    try {
+      const data = await adminApi.listBetaInvites();
+      setBetaInvites(data);
+    } catch {
+      toast.error(t.admin.betaInvite.loadError);
+    }
+  }, []);
+
   useEffect(() => {
     loadConsents();
-  }, [loadConsents]);
+    if (user?.is_admin) loadBetaInvites();
+  }, [loadConsents, loadBetaInvites, user?.is_admin]);
 
   const handleRevoke = async (consentType: "terms" | "privacy") => {
     setRevoking(consentType);
@@ -180,11 +195,112 @@ export default function AccountPage() {
     }
   };
 
+  const handleSendBetaInvite = async () => {
+    if (!betaEmail.trim()) return;
+    setSendingInvite(true);
+    try {
+      await adminApi.sendBetaInvite(betaEmail.trim());
+      toast.success(t.admin.betaInvite.success);
+      setBetaEmail("");
+      loadBetaInvites();
+    } catch {
+      toast.error(t.admin.betaInvite.error);
+    } finally {
+      setSendingInvite(false);
+    }
+  };
+
   if (!user) return null;
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <h1 className="text-2xl font-bold">{t.rgpd.myAccount}</h1>
+
+      {/* Admin — Beta invite */}
+      {user.is_admin && (
+        <div className="rounded-lg border border-blue-500/30 bg-card p-6">
+          <h2 className="mb-2 text-lg font-semibold">
+            {t.admin.betaInvite.title}
+          </h2>
+          <p className="mb-4 text-sm text-muted-foreground">
+            {t.admin.betaInvite.description}
+          </p>
+          <div className="flex gap-2">
+            <Input
+              type="email"
+              placeholder={t.admin.betaInvite.emailPlaceholder}
+              value={betaEmail}
+              onChange={(e) => setBetaEmail(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSendBetaInvite();
+              }}
+              className="max-w-sm"
+            />
+            <Button
+              onClick={handleSendBetaInvite}
+              disabled={sendingInvite || !betaEmail.trim()}
+            >
+              <Mail className="mr-2 h-4 w-4" />
+              {sendingInvite
+                ? t.admin.betaInvite.sending
+                : t.admin.betaInvite.send}
+            </Button>
+          </div>
+
+          {/* Beta invites list */}
+          <div className="mt-6">
+            <h3 className="mb-3 text-sm font-semibold">
+              {t.admin.betaInvite.listTitle}
+            </h3>
+            {betaInvites.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                {t.admin.betaInvite.empty}
+              </p>
+            ) : (
+              <div className="overflow-x-auto rounded border">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b bg-muted/50">
+                      <th className="px-3 py-2 text-left font-medium">
+                        {t.admin.betaInvite.columnEmail}
+                      </th>
+                      <th className="px-3 py-2 text-left font-medium">
+                        {t.admin.betaInvite.columnSentAt}
+                      </th>
+                      <th className="px-3 py-2 text-left font-medium">
+                        {t.admin.betaInvite.columnStatus}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {betaInvites.map((invite) => (
+                      <tr key={invite.id} className="border-b last:border-0">
+                        <td className="px-3 py-2">{invite.email}</td>
+                        <td className="px-3 py-2 text-muted-foreground">
+                          {new Date(invite.sent_at).toLocaleDateString("fr-FR")}
+                        </td>
+                        <td className="px-3 py-2">
+                          <span
+                            className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
+                              invite.is_active
+                                ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                                : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                            }`}
+                          >
+                            {invite.is_active
+                              ? t.admin.betaInvite.statusActive
+                              : t.admin.betaInvite.statusInactive}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Suspended account banner + reactivation */}
       {isSuspended && (

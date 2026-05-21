@@ -5,6 +5,7 @@ import type {
   ApplicationEvent,
   ApplicationFilters,
   AuthResponse,
+  BetaInvite,
   Consent,
   CreateApplicationData,
   CreateApplicationResponse,
@@ -183,6 +184,18 @@ export const betaApi = {
   async signup(email: string): Promise<void> {
     await getCsrfCookie();
     await api.post("/beta-signup", { email });
+  },
+};
+
+// ── Admin API ──
+
+export const adminApi = {
+  sendBetaInvite(email: string): Promise<{ message: string }> {
+    return api.post("/admin/beta-invites", { email }).then((r) => r.data);
+  },
+
+  listBetaInvites(): Promise<BetaInvite[]> {
+    return api.get("/admin/beta-invites").then((r) => r.data.data);
   },
 };
 
