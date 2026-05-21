@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'chrome_store' => [
+        'url' => env('CHROME_STORE_URL', 'https://chromewebstore.google.com'),
+    ],
+
 ];

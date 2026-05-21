@@ -8,6 +8,7 @@ export interface User {
   avatar_url: string | null;
   suspended_at: string | null;
   email_verified_at: string | null;
+  is_admin: boolean;
 }
 
 export interface LoginData {
@@ -79,6 +80,16 @@ export interface StatsData {
   total: number;
   by_status: Record<ApplicationStatus, number>;
   by_source: Record<ApplicationSource, number>;
+}
+
+// ── Admin ──
+
+export interface BetaInvite {
+  id: number;
+  email: string;
+  sent_at: string;
+  is_active: boolean;
+  created_at: string;
 }
 
 // ── API Types ──
