@@ -15,7 +15,7 @@ final readonly class AuthResult
     public function toResponseArray(): array
     {
         $data = [
-            'user' => $this->user->only('id', 'first_name', 'last_name', 'email', 'avatar_url', 'email_verified_at', 'is_admin'),
+            'user' => $this->user->only(User::API_VISIBLE_FIELDS),
         ];
 
         if ($this->token !== null) {

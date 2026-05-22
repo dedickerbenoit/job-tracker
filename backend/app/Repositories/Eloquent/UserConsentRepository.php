@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Eloquent;
 
+use App\Enums\ConsentType;
 use App\Models\User;
 use App\Models\UserConsent;
 use App\Repositories\Contracts\UserConsentRepositoryInterface;
@@ -27,6 +28,7 @@ class UserConsentRepository implements UserConsentRepositoryInterface
             ->where('user_id', $user->id)
             ->whereNull('revoked_at')
             ->pluck('consent_type')
+            ->map(fn (ConsentType $ct) => $ct->value)
             ->unique()
             ->values()
             ->all();

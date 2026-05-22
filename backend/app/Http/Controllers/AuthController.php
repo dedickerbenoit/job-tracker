@@ -6,6 +6,7 @@ use App\DTOs\Auth\LoginData;
 use App\DTOs\Auth\RegisterData;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Models\User;
 use App\Services\Auth\AuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -55,7 +56,7 @@ class AuthController extends Controller
 
         return response()->json([
             'data' => [
-                'user' => $user->only('id', 'first_name', 'last_name', 'email', 'avatar_url', 'email_verified_at', 'is_admin'),
+                'user' => $user->only(User::API_VISIBLE_FIELDS),
             ],
         ]);
     }
@@ -63,7 +64,7 @@ class AuthController extends Controller
     public function me(Request $request): JsonResponse
     {
         return response()->json([
-            'data' => $request->user()->only('id', 'first_name', 'last_name', 'email', 'avatar_url', 'suspended_at', 'email_verified_at', 'is_admin'),
+            'data' => $request->user()->only(User::API_VISIBLE_FIELDS),
         ]);
     }
 }
