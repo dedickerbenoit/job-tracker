@@ -3,7 +3,7 @@
 namespace App\Repositories\Eloquent;
 
 use App\DTOs\Application\ApplicationFilterData;
-use App\Models\Model;
+use App\Models\Application;
 use App\Models\User;
 use App\Repositories\Contracts\ApplicationRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -67,10 +67,11 @@ class ApplicationRepository implements ApplicationRepositoryInterface
     }
 
     /**
-     * @return Collection<int, Model>
+     * @return Collection<int, Application>
      */
     public function findDuplicatesByUrl(User $user, string $url, int $excludeId): Collection
     {
+        /** @phpstan-ignore return.type */
         return $user->applications()
             ->where('id', '!=', $excludeId)
             ->where('url', $url)

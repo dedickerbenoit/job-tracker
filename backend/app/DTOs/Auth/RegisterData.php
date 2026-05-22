@@ -9,8 +9,8 @@ final readonly class RegisterData
     public function __construct(
         public string $email,
         public string $password,
-        public string $firstname,
-        public string $lastname,
+        public string $firstName,
+        public string $lastName,
         public string $ipAddress,
         public string $userAgent,
         public bool $wantsToken
@@ -23,8 +23,8 @@ final readonly class RegisterData
         return new self(
             email: $validated['email'],
             password: $validated['password'],
-            firstname: $validated['firstname'],
-            lastname: $validated['lastname'],
+            firstName: $validated['firstName'],
+            lastName: $validated['lastName'],
             ipAddress: (string) $request->ip(),
             userAgent: mb_substr((string) $request->userAgent(), 0, 500),
             wantsToken: $request->header('X-Request-Token') === 'true',
