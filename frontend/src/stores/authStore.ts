@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { toast } from "sonner";
 import { authApi, setOnUnauthorized } from "@/services/api";
 import { t } from "@/lib/i18n";
+import { markExtensionDetected } from "@/hooks/useExtensionDetected";
 import type { User, LoginData, RegisterData } from "@/types";
 
 type AuthModalTab = "login" | "register";
@@ -57,6 +58,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
       if (authToken) {
         // Exchange the token for a session cookie
+        markExtensionDetected();
         try {
           const user = await authApi.tokenLogin(authToken);
           set({ user, isAuthenticated: true, loading: false });

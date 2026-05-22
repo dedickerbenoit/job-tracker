@@ -1,7 +1,12 @@
 import { NavLink } from "react-router-dom";
-import { Kanban, List, Clock, BarChart3 } from "lucide-react";
+import { Kanban, List, Clock, BarChart3, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
+import { ChromeIcon } from "@/components/icons/ChromeIcon";
+import { useExtensionDetected } from "@/hooks/useExtensionDetected";
+
+const CHROME_STORE_URL =
+  "https://chromewebstore.google.com/detail/jobtracker-beta/bcnfmhkdkhegkobfomeipijlcldjaiad";
 
 const navItems = [
   { to: "/dashboard/kanban", label: t.sidebar.kanban, icon: Kanban },
@@ -15,6 +20,8 @@ interface SidebarProps {
 }
 
 export function Sidebar({ collapsed = false }: SidebarProps) {
+  const extensionDetected = useExtensionDetected();
+
   return (
     <aside
       className={cn(
@@ -46,6 +53,34 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
           </NavLink>
         ))}
       </nav>
+
+      <div className="border-t p-3">
+        {extensionDetected ? (
+          <div
+            className={cn(
+              "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-green-600",
+              collapsed && "justify-center px-2",
+            )}
+          >
+            <Check className="h-5 w-5 shrink-0" />
+            {!collapsed && <span>{t.sidebar.extensionInstalled}</span>}
+          </div>
+        ) : (
+          <a
+            href={CHROME_STORE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn(
+              "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+              "text-primary hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+              collapsed && "justify-center px-2",
+            )}
+          >
+            <ChromeIcon className="h-5 w-5 shrink-0" />
+            {!collapsed && <span>{t.sidebar.extensionCta}</span>}
+          </a>
+        )}
+      </div>
     </aside>
   );
 }

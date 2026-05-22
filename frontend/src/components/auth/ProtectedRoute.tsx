@@ -45,7 +45,7 @@ export function ProtectedRoute() {
   // Allow account page through even without email verification (RGPD rights)
   const isAccountPage = location.pathname === "/dashboard/account";
 
-  if (!user?.email_verified_at && !isAccountPage) {
+  if (!user?.email_verified_at && !isAccountPage && !user?.suspended_at) {
     return (
       <Suspense
         fallback={
