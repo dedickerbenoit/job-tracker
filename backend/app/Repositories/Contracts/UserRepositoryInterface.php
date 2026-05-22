@@ -1,0 +1,15 @@
+<?php
+
+namespace App\Repositories\Contracts;
+
+use App\Models\User;
+
+interface UserRepositoryInterface
+{
+    public function findbyEmail(string $email): ?User;
+
+    /** @param array<string, mixed> $data */
+    public function create(array $data): User;
+
+    public function forceDeleteTrashedByEmail(string $email): void;
+}
