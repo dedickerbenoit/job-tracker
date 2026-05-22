@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ApplicationStatus;
+use App\Http\Requests\Application\IndexApplicationRequest;
+use App\Http\Requests\Application\TimelineRequest;
 use App\Http\Requests\StoreApplicationRequest;
 use App\Http\Requests\UpdateApplicationRequest;
 use App\Http\Requests\UpdateApplicationStatusRequest;
@@ -15,18 +17,9 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class ApplicationController extends Controller
 {
-    public function index(Request $request): AnonymousResourceCollection
+    public function index(IndexApplicationRequest $request): AnonymousResourceCollection
     {
         $this->authorize('viewAny', Application::class);
-
-        $dateRules = [
-            'from_date' => ['nullable', 'date', 'date_format:Y-m-d'],
-            'to_date' => ['nullable', 'date', 'date_format:Y-m-d'],
-        ];
-        if ($request->filled('from_date')) {
-            $dateRules['to_date'][] = 'after_or_equal:from_date';
-        }
-        $request->validate($dateRules);
 
         $query = $request->user()->applications();
 
@@ -185,19 +178,8 @@ class ApplicationController extends Controller
         return new ApplicationResource($application);
     }
 
-    public function timeline(Request $request): AnonymousResourceCollection
+    public function timeline(TimelineRequest $request): AnonymousResourceCollection
     {
-        $this->authorize('viewAny', Application::class);
-
-        $dateRules = [
-            'from_date' => ['nullable', 'date', 'date_format:Y-m-d'],
-            'to_date' => ['nullable', 'date', 'date_format:Y-m-d'],
-        ];
-        if ($request->filled('from_date')) {
-            $dateRules['to_date'][] = 'after_or_equal:from_date';
-        }
-        $request->validate($dateRules);
-
         $query = $request->user()->applicationEvents();
 
         if ($request->filled('application_id')) {

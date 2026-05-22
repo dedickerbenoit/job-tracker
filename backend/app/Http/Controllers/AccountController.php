@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Account\ConsentRequest;
 use App\Models\UserConsent;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\Rule;
 
 class AccountController extends Controller
 {
@@ -50,17 +50,14 @@ class AccountController extends Controller
      * RGPD — Révocation d'un consentement spécifique.
      * La révocation suspend automatiquement le compte (art. 6 : pas de traitement sans base légale).
      */
-    public function revokeConsent(Request $request): JsonResponse
+    public function revokeConsent(ConsentRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'consent_type' => ['required', Rule::in(['terms', 'privacy'])],
-        ]);
 
         $user = $request->user();
 
         $consent = UserConsent::query()
             ->where('user_id', $user->id)
-            ->where('consent_type', $validated['consent_type'])
+            ->where('consent_type')
             ->whereNull('revoked_at')
             ->latest('consented_at')
             ->first();
@@ -82,7 +79,7 @@ class AccountController extends Controller
 
         Log::info('RGPD consent revoked', [
             'user_id' => $user->id,
-            'consent_type' => $validated['consent_type'],
+            'consent_type',
             'auto_suspended' => ! $user->wasChanged('suspended_at') ? false : true,
             'ip' => $request->ip(),
         ]);
@@ -94,17 +91,14 @@ class AccountController extends Controller
      * RGPD — Re-souscription à un consentement révoqué.
      * Crée un NOUVEAU enregistrement (traçabilité : l'ancien reste avec revoked_at).
      */
-    public function grantConsent(Request $request): JsonResponse
+    public function grantConsent(ConsentRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'consent_type' => ['required', Rule::in(['terms', 'privacy'])],
-        ]);
 
         $user = $request->user();
 
         $alreadyActive = UserConsent::query()
             ->where('user_id', $user->id)
-            ->where('consent_type', $validated['consent_type'])
+            ->where('consent_type')
             ->whereNull('revoked_at')
             ->exists();
 
@@ -116,7 +110,7 @@ class AccountController extends Controller
 
         UserConsent::create([
             'user_id' => $user->id,
-            'consent_type' => $validated['consent_type'],
+            'consent_type' => $request['consent_type'],
             'consented_at' => now(),
             'ip_address' => $request->ip(),
             'user_agent' => mb_substr((string) $request->userAgent(), 0, 500),
@@ -124,7 +118,7 @@ class AccountController extends Controller
 
         Log::info('RGPD consent granted', [
             'user_id' => $user->id,
-            'consent_type' => $validated['consent_type'],
+            'consent_type' => $request['consent_type'],
             'ip' => $request->ip(),
         ]);
 
