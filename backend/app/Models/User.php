@@ -34,6 +34,9 @@ use Laravel\Sanctum\HasApiTokens;
  */
 class User extends Authenticatable implements MustVerifyEmail
 {
+    /** @var list<string> */
+    public const API_VISIBLE_FIELDS = ['id', 'first_name', 'last_name', 'email', 'avatar_url', 'suspended_at', 'email_verified_at', 'is_admin'];
+
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
