@@ -3,6 +3,7 @@
 namespace App\Services\Account;
 
 use App\DTOs\Account\ConsentData;
+use App\Enums\ConsentType;
 use App\Exceptions\Account\AccountNotSuspendedException;
 use App\Exceptions\Account\ConsentAlreadyActiveException;
 use App\Exceptions\Account\ConsentNotFoundException;
@@ -103,7 +104,8 @@ class AccountService
         }
 
         $activeTypes = $this->consentRepository->getActiveConsentTypes($user);
-        $missing = array_values(array_diff(['terms', 'privacy'], $activeTypes));
+        $requiredTypes = array_map(fn (ConsentType $t) => $t->value, ConsentType::requiredForActivation());
+        $missing = array_values(array_diff($requiredTypes, $activeTypes));
 
         if (! empty($missing)) {
             throw new MissingConsentsException($missing);

@@ -23,11 +23,11 @@ final readonly class ApplicationFilterData
             status: $request->validated('status'),
             source: $request->validated('source'),
             search: $request->validated('search'),
-            fromDate: $request->validated('fromDate'),
-            toDate: $request->validated('toDate'),
-            sort: $request->validated('sort'),
-            direction: $request->validated('direction'),
-            perPage: $request->validated('perPage'),
+            fromDate: $request->validated('from_date'),
+            toDate: $request->validated('to_date'),
+            sort: $request->validated('sort') ?? 'created_at',
+            direction: $request->validated('direction') ?? 'desc',
+            perPage: (int) ($request->validated('per_page') ?? 15),
         );
     }
 }

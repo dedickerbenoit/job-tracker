@@ -7,7 +7,7 @@ use App\Repositories\Contracts\UserRepositoryInterface;
 
 class UserRepository implements UserRepositoryInterface
 {
-    public function findbyEmail(string $email): ?User
+    public function findByEmail(string $email): ?User
     {
         return User::where('email', $email)->first();
     }

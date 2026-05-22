@@ -15,5 +15,5 @@ interface UserConsentRepositoryInterface
     /** @param array<string, mixed> $data */
     public function createConsent(array $data): UserConsent;
 
-    public function createInitialConsents(User $user, string $idAddress, string $userAgent): void;
+    public function createInitialConsents(User $user, string $ipAddress, string $userAgent): void;
 }

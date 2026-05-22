@@ -6,7 +6,7 @@ use App\Models\User;
 
 interface UserRepositoryInterface
 {
-    public function findbyEmail(string $email): ?User;
+    public function findByEmail(string $email): ?User;
 
     /** @param array<string, mixed> $data */
     public function create(array $data): User;

@@ -15,7 +15,6 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -61,10 +60,6 @@ return Application::configure(basePath: dirname(__DIR__))
 
                 if ($e instanceof MissingConsentsException) {
                     $data['missing_consents'] = $e->missingConsents;
-                }
-
-                if ($e instanceof ValidationException) {
-                    $data['errors'] = $e->errors();
                 }
 
                 return response()->json($data, $e->getStatusCode(), $e->getHeaders());
