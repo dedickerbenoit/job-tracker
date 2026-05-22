@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\ApplicationStatus;
+use App\DTOs\Application\ApplicationFilterData;
+use App\DTOs\Application\StoreApplicationData;
+use App\DTOs\Application\UpdateApplicationData;
+use App\DTOs\Timeline\TimelineFilterData;
 use App\Http\Requests\Application\IndexApplicationRequest;
 use App\Http\Requests\Application\TimelineRequest;
 use App\Http\Requests\StoreApplicationRequest;
@@ -11,92 +14,41 @@ use App\Http\Requests\UpdateApplicationStatusRequest;
 use App\Http\Resources\ApplicationEventResource;
 use App\Http\Resources\ApplicationResource;
 use App\Models\Application;
+use App\Services\Application\ApplicationService;
+use App\Services\Application\TimelineService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class ApplicationController extends Controller
 {
+    public function __construct(
+        private readonly ApplicationService $applicationService,
+        private readonly TimelineService $timelineService,
+    ) {}
+
     public function index(IndexApplicationRequest $request): AnonymousResourceCollection
     {
         $this->authorize('viewAny', Application::class);
 
-        $query = $request->user()->applications();
+        $filters = ApplicationFilterData::fromRequest($request);
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->input('status'));
-        }
-
-        if ($request->filled('source')) {
-            $query->where('source', $request->input('source'));
-        }
-
-        if ($request->filled('search')) {
-            $search = str_replace(['%', '_'], ['\\%', '\\_'], strtolower($request->input('search')));
-            $query->where(function ($q) use ($search) {
-                foreach (['title', 'company', 'location'] as $column) {
-                    $q->orWhere($column, 'LIKE', "%{$search}%");
-                }
-            });
-        }
-
-        if ($request->filled('from_date')) {
-            $query->where('created_at', '>=', $request->input('from_date'));
-        }
-
-        if ($request->filled('to_date')) {
-            $query->where('created_at', '<=', $request->input('to_date'));
-        }
-
-        $sortField = $request->input('sort', 'created_at');
-        $sortDirection = $request->input('direction', 'desc');
-        $allowedSorts = ['created_at', 'updated_at', 'company', 'status', 'title'];
-
-        if (in_array($sortField, $allowedSorts)) {
-            $query->orderBy($sortField, $sortDirection === 'asc' ? 'asc' : 'desc');
-        }
-
-        $perPage = min((int) $request->input('per_page', 50), 100);
-
-        return ApplicationResource::collection($query->paginate($perPage));
+        return ApplicationResource::collection($this->applicationService->list($request->user(), $filters));
     }
 
     public function store(StoreApplicationRequest $request): JsonResponse
     {
         $this->authorize('create', Application::class);
 
-        $validated = $request->validated();
+        $result = $this->applicationService->create($request->user(), StoreApplicationData::fromRequest($request));
 
-        $application = new Application;
-        $application->user_id = $request->user()->id;
-        $application->title = $validated['title'];
-        $application->company = $validated['company'];
-        $application->location = $validated['location'];
-        $application->url = $validated['url'];
-        $application->description = $validated['description'] ?? null;
-        $application->source = $validated['source'];
-        $application->status = $validated['status'] ?? 'to_apply';
-        $application->notes = $validated['notes'] ?? null;
-        $application->applied_at = $validated['applied_at'] ?? null;
+        $response = ['data' => new ApplicationResource($result['application'])];
 
-        if ($application->status === ApplicationStatus::Applied && $application->applied_at === null) {
-            $application->applied_at = now();
-        }
-
-        $application->save();
-
-        $response = ['data' => new ApplicationResource($application)];
-
-        $duplicates = $request->user()->applications()
-            ->where('id', '!=', $application->id)
-            ->where('url', $validated['url'])
-            ->get();
-
-        if ($duplicates->isNotEmpty()) {
+        if ($result['duplicates']->isNotEmpty()) {
             $response['warning'] = [
                 'type' => 'duplicate_url',
                 'message' => 'Cette URL existe deja dans vos candidatures',
-                'duplicates' => ApplicationResource::collection($duplicates),
+                'duplicates' => ApplicationResource::collection($result['duplicates']),
             ];
         }
 
@@ -114,41 +66,7 @@ class ApplicationController extends Controller
     {
         $this->authorize('update', $application);
 
-        $validated = $request->validated();
-
-        if (isset($validated['title'])) {
-            $application->title = $validated['title'];
-        }
-        if (isset($validated['company'])) {
-            $application->company = $validated['company'];
-        }
-        if (isset($validated['location'])) {
-            $application->location = $validated['location'];
-        }
-        if (isset($validated['url'])) {
-            $application->url = $validated['url'];
-        }
-        if (array_key_exists('description', $validated)) {
-            $application->description = $validated['description'];
-        }
-        if (isset($validated['source'])) {
-            $application->source = $validated['source'];
-        }
-        if (isset($validated['status'])) {
-            $application->status = $validated['status'];
-        }
-        if (array_key_exists('notes', $validated)) {
-            $application->notes = $validated['notes'];
-        }
-        if (array_key_exists('applied_at', $validated)) {
-            $application->applied_at = $validated['applied_at'];
-        }
-
-        if ($application->status === ApplicationStatus::Applied && $application->applied_at === null) {
-            $application->applied_at = now();
-        }
-
-        $application->save();
+        $application = $this->applicationService->update($application, UpdateApplicationData::fromRequest($request));
 
         return new ApplicationResource($application);
     }
@@ -157,7 +75,7 @@ class ApplicationController extends Controller
     {
         $this->authorize('delete', $application);
 
-        $application->delete();
+        $this->applicationService->delete($application);
 
         return response()->json(null, 204);
     }
@@ -166,68 +84,24 @@ class ApplicationController extends Controller
     {
         $this->authorize('update', $application);
 
-        $newStatus = $request->validated()['status'];
-
-        if ($newStatus === ApplicationStatus::Applied->value && $application->applied_at === null) {
-            $application->applied_at = now();
-        }
-
-        $application->status = $newStatus;
-        $application->save();
+        $application = $this->applicationService->updateStatus($application, $request->validated('status'));
 
         return new ApplicationResource($application);
     }
 
     public function timeline(TimelineRequest $request): AnonymousResourceCollection
     {
-        $query = $request->user()->applicationEvents();
+        $this->authorize('viewAny', Application::class);
 
-        if ($request->filled('application_id')) {
-            $query->where('application_id', $request->input('application_id'));
-        }
+        $filters = TimelineFilterData::fromRequest($request);
 
-        if ($request->filled('type')) {
-            $query->where('type', $request->input('type'));
-        }
-
-        if ($request->filled('from_date')) {
-            $query->where('created_at', '>=', $request->input('from_date'));
-        }
-
-        if ($request->filled('to_date')) {
-            $query->where('created_at', '<=', $request->input('to_date'));
-        }
-
-        $query->orderByDesc('created_at');
-        $perPage = min((int) $request->input('per_page', 50), 100);
-
-        return ApplicationEventResource::collection($query->paginate($perPage));
+        return ApplicationEventResource::collection($this->timelineService->list($request->user(), $filters));
     }
 
     public function stats(Request $request): JsonResponse
     {
         $this->authorize('viewAny', Application::class);
 
-        $user = $request->user();
-
-        $statusCounts = $user->applications()
-            ->selectRaw('status, count(*) as count')
-            ->groupBy('status')
-            ->pluck('count', 'status');
-
-        $sourceCounts = $user->applications()
-            ->selectRaw('source, count(*) as count')
-            ->groupBy('source')
-            ->pluck('count', 'source');
-
-        $total = $user->applications()->count();
-
-        return response()->json([
-            'data' => [
-                'total' => $total,
-                'by_status' => $statusCounts,
-                'by_source' => $sourceCounts,
-            ],
-        ]);
+        return response()->json(['data' => $this->applicationService->getStats($request->user())]);
     }
 }
