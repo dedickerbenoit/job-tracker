@@ -23,8 +23,8 @@ final readonly class RegisterData
         return new self(
             email: $validated['email'],
             password: $validated['password'],
-            firstName: $validated['firstName'],
-            lastName: $validated['lastName'],
+            firstName: $validated['first_name'],
+            lastName: $validated['last_name'],
             ipAddress: (string) $request->ip(),
             userAgent: mb_substr((string) $request->userAgent(), 0, 500),
             wantsToken: $request->header('X-Request-Token') === 'true',
