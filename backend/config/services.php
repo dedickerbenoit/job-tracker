@@ -36,7 +36,11 @@ return [
     ],
 
     'chrome_store' => [
-        'url' => env('CHROME_STORE_URL', 'https://chromewebstore.google.com'),
+        'url' => env('CHROME_STORE_URL', 'https://chromewebstore.google.com/detail/jobtracker-beta/bcnfmhkdkhegkobfomeipijlcldjaiad'),
+    ],
+
+    'beta' => [
+        'notification_email' => env('BETA_NOTIFICATION_EMAIL', 'dedickerbenoit@gmail.com'),
     ],
 
 ];

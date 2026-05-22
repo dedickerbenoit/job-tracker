@@ -2,6 +2,16 @@
 
 namespace App\Providers;
 
+use App\Repositories\Contracts\ApplicationEventRepositoryInterface;
+use App\Repositories\Contracts\ApplicationRepositoryInterface;
+use App\Repositories\Contracts\BetaInviteRepositoryInterface;
+use App\Repositories\Contracts\UserConsentRepositoryInterface;
+use App\Repositories\Contracts\UserRepositoryInterface;
+use App\Repositories\Eloquent\ApplicationEventRepository;
+use App\Repositories\Eloquent\ApplicationRepository;
+use App\Repositories\Eloquent\BetaInviteRepository;
+use App\Repositories\Eloquent\UserConsentRepository;
+use App\Repositories\Eloquent\UserRepository;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -19,7 +29,26 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(
+            UserRepositoryInterface::class,
+            UserRepository::class,
+        );
+        $this->app->bind(
+            ApplicationRepositoryInterface::class,
+            ApplicationRepository::class,
+        );
+        $this->app->bind(
+            ApplicationEventRepositoryInterface::class,
+            ApplicationEventRepository::class,
+        );
+        $this->app->bind(
+            UserConsentRepositoryInterface::class,
+            UserConsentRepository::class,
+        );
+        $this->app->bind(
+            BetaInviteRepositoryInterface::class,
+            BetaInviteRepository::class,
+        );
     }
 
     /**

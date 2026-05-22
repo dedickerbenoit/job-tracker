@@ -168,6 +168,8 @@ const fr = {
     list: "Liste",
     timeline: "Timeline",
     stats: "Stats",
+    extensionCta: "Installer l'extension",
+    extensionInstalled: "Extension installée",
   },
 
   list: {

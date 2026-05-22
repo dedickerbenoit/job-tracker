@@ -66,7 +66,12 @@ export function Header({ sidebarCollapsed, onToggleSidebar }: HeaderProps) {
             {t.header.profile}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={logout}>
+          <DropdownMenuItem
+            onClick={async () => {
+              await logout();
+              navigate("/");
+            }}
+          >
             <LogOut className="mr-2 h-4 w-4" />
             {t.header.logout}
           </DropdownMenuItem>

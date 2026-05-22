@@ -114,4 +114,21 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Login Rate Limiting
+    |--------------------------------------------------------------------------
+    */
+
+    'login_rate_limit' => (int) env('LOGIN_RATE_LIMIT', 5),
+    'login_lockout_seconds' => (int) env('LOGIN_LOCKOUT_SECONDS', 60),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Handoff Token TTL
+    |--------------------------------------------------------------------------
+    */
+
+    'handoff_token_ttl_seconds' => (int) env('HANDOFF_TOKEN_TTL_SECONDS', 60),
+
 ];
