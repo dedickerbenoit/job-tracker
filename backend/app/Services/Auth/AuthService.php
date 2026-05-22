@@ -71,7 +71,7 @@ class AuthService
     {
         $throttleKey = 'login:'.Str::lower($data->email);
 
-        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+        if (RateLimiter::tooManyAttempts($throttleKey, config('auth.login_rate_limit'))) {
             $seconds = RateLimiter::availableIn($throttleKey);
             Log::warning('Login locked out by email', ['email' => $data->email, 'ip' => $data->ipAddress]);
             throw new TooManyAttempsException($seconds);
@@ -84,7 +84,7 @@ class AuthService
             : Auth::attempt($credentials);
 
         if (! $authenticated) {
-            RateLimiter::hit($throttleKey, 60);
+            RateLimiter::hit($throttleKey, config('auth.login_lockout_seconds'));
             Log::warning('Failed login attempt', ['email' => $data->email, 'ip' => $data->ipAddress]);
             throw new InvalidCredentialsException;
         }
@@ -119,17 +119,19 @@ class AuthService
 
     public function createHandoffToken(User $user, string $ipAddress): string
     {
+        $ttl = config('auth.handoff_token_ttl_seconds');
+
         $token = $user->createToken(
             'handoff',
             ['handoff'],
-            now()->addMinute(),
+            now()->addSeconds($ttl),
         )->plainTextToken;
 
         Log::info('Handoff token created', [
             'user_id' => $user->id,
             'ip' => $ipAddress,
             'token_abilities' => ['handoff'],
-            'expires_in_seconds' => 60,
+            'expires_in_seconds' => $ttl,
         ]);
 
         return $token;

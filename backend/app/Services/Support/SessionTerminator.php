@@ -14,7 +14,7 @@ class SessionTerminator
         $this->invalidateSession($request);
     }
 
-    public function invalidateSession(Request $request)
+    public function invalidateSession(Request $request): void
     {
         Auth::guard('web')->logout();
         if ($request->hasSession()) {

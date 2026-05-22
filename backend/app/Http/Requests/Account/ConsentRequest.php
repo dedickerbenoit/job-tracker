@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Account;
 
+use App\Enums\ConsentType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -16,7 +17,7 @@ class ConsentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'consent_type' => ['required', Rule::in(['terms', 'privacy'])],
+            'consent_type' => ['required', Rule::enum(ConsentType::class)],
         ];
     }
 }
