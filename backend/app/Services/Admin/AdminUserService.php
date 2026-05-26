@@ -3,7 +3,7 @@
 namespace App\Services\Admin;
 
 use App\Repositories\Contracts\UserRepositoryInterface;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class AdminUserService
 {
@@ -11,7 +11,7 @@ class AdminUserService
         private readonly UserRepositoryInterface $userRepository,
     ) {}
 
-    public function list(): Collection
+    public function list(): LengthAwarePaginator
     {
         return $this->userRepository->getAllNonAdmin();
     }

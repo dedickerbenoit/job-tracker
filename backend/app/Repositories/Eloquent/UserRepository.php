@@ -4,7 +4,7 @@ namespace App\Repositories\Eloquent;
 
 use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryInterface;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -29,9 +29,9 @@ class UserRepository implements UserRepositoryInterface
         User::where('email', $email)->update(['is_beta_invitation_sent' => true]);
     }
 
-    /** @return Collection<int, User> */
-    public function getAllNonAdmin(): Collection
+    /** @return LengthAwarePaginator<User> */
+    public function getAllNonAdmin(int $perPage = 20): LengthAwarePaginator
     {
-        return User::where('is_admin', false)->orderByDesc('created_at')->get();
+        return User::where('is_admin', false)->orderByDesc('created_at')->paginate($perPage);
     }
 }

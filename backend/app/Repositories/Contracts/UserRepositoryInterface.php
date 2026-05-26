@@ -3,7 +3,7 @@
 namespace App\Repositories\Contracts;
 
 use App\Models\User;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface UserRepositoryInterface
 {
@@ -16,6 +16,6 @@ interface UserRepositoryInterface
 
     public function markBetaInvitationSent(string $email): void;
 
-    /** @return Collection<int, User> */
-    public function getAllNonAdmin(): Collection;
+    /** @return LengthAwarePaginator<User> */
+    public function getAllNonAdmin(int $perPage = 20): LengthAwarePaginator;
 }
