@@ -15,7 +15,7 @@ class BetaSignupRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'email:rfc,dns', 'max:255'],
+            'email' => ['required', 'email:rfc,dns', 'max:255', 'regex:/^[^@]+@gmail\.com$/i'],
         ];
     }
 }
