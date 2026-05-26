@@ -9,6 +9,7 @@ export interface User {
   suspended_at: string | null;
   email_verified_at: string | null;
   is_admin: boolean;
+  is_beta_invitation_sent: boolean;
 }
 
 export interface LoginData {

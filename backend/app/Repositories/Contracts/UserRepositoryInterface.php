@@ -12,4 +12,6 @@ interface UserRepositoryInterface
     public function create(array $data): User;
 
     public function forceDeleteTrashedByEmail(string $email): void;
+
+    public function markBetaInvitationSent(string $email): void;
 }

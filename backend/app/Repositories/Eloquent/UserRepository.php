@@ -22,4 +22,9 @@ class UserRepository implements UserRepositoryInterface
     {
         User::onlyTrashed()->where('email', $email)->forceDelete();
     }
+
+    public function markBetaInvitationSent(string $email): void
+    {
+        User::where('email', $email)->update(['is_beta_invitation_sent' => true]);
+    }
 }

@@ -31,4 +31,9 @@ class BetaInviteRepository implements BetaInviteRepositoryInterface
             ['sent_at' => now()],
         );
     }
+
+    public function emailExists(string $email): bool
+    {
+        return BetaInvite::where('email', $email)->exists();
+    }
 }
