@@ -88,6 +88,7 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
           ) : (
             <button
               onClick={() => setShowBetaModal(true)}
+              aria-label={t.sidebar.extensionRequestAccess}
               className={cn(
                 "flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                 "text-primary hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",

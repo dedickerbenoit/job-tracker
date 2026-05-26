@@ -6,7 +6,6 @@ import type {
   ApplicationEvent,
   ApplicationFilters,
   AuthResponse,
-  BetaInvite,
   Consent,
   CreateApplicationData,
   CreateApplicationResponse,
@@ -195,12 +194,8 @@ export const adminApi = {
     return api.post("/admin/beta-invites", { email }).then((r) => r.data);
   },
 
-  listBetaInvites(): Promise<BetaInvite[]> {
-    return api.get("/admin/beta-invites").then((r) => r.data.data);
-  },
-
-  listUsers(): Promise<AdminUser[]> {
-    return api.get("/admin/users").then((r) => r.data.data);
+  listUsers(page = 1): Promise<PaginatedResponse<AdminUser>> {
+    return api.get("/admin/users", { params: { page } }).then((r) => r.data);
   },
 };
 

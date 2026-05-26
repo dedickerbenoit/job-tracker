@@ -23,7 +23,7 @@ import {
 import { useAuthStore } from "@/stores/authStore";
 import { accountApi, adminApi } from "@/services/api";
 import { t } from "@/lib/i18n";
-import type { AdminUser, Consent } from "@/types";
+import type { AdminUser, Consent, PaginationMeta } from "@/types";
 
 export default function AccountPage() {
   const user = useAuthStore((s) => s.user);
@@ -49,6 +49,9 @@ export default function AccountPage() {
   const [betaEmail, setBetaEmail] = useState("");
   const [sendingInvite, setSendingInvite] = useState(false);
   const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
+  const [adminUsersMeta, setAdminUsersMeta] = useState<PaginationMeta | null>(
+    null,
+  );
 
   const isSuspended = !!user?.suspended_at;
 
@@ -67,10 +70,11 @@ export default function AccountPage() {
     }
   }, []);
 
-  const loadAdminUsers = useCallback(async () => {
+  const loadAdminUsers = useCallback(async (page = 1) => {
     try {
-      const data = await adminApi.listUsers();
+      const { data, meta } = await adminApi.listUsers(page);
       setAdminUsers(data);
+      setAdminUsersMeta(meta);
     } catch {
       toast.error(t.admin.betaInvite.loadError);
     }
@@ -296,6 +300,38 @@ export default function AccountPage() {
                     ))}
                   </tbody>
                 </table>
+              </div>
+            )}
+            {adminUsersMeta && adminUsersMeta.last_page > 1 && (
+              <div className="mt-3 flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">
+                  {t.common.page} {adminUsersMeta.current_page} /{" "}
+                  {adminUsersMeta.last_page}
+                </span>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={adminUsersMeta.current_page <= 1}
+                    onClick={() =>
+                      loadAdminUsers(adminUsersMeta.current_page - 1)
+                    }
+                  >
+                    {t.common.previous}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={
+                      adminUsersMeta.current_page >= adminUsersMeta.last_page
+                    }
+                    onClick={() =>
+                      loadAdminUsers(adminUsersMeta.current_page + 1)
+                    }
+                  >
+                    {t.common.next}
+                  </Button>
+                </div>
               </div>
             )}
           </div>
