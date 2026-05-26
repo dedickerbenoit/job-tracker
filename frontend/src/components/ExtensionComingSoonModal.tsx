@@ -23,12 +23,16 @@ export function ExtensionComingSoonModal({
 }: ExtensionComingSoonModalProps) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<
-    "idle" | "loading" | "success" | "error"
+    "idle" | "loading" | "success" | "error" | "gmail"
   >("idle");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
+    if (!email.trim().toLowerCase().endsWith("@gmail.com")) {
+      setStatus("gmail");
+      return;
+    }
 
     setStatus("loading");
     try {
@@ -80,13 +84,15 @@ export function ExtensionComingSoonModal({
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
-                if (status === "error") setStatus("idle");
+                if (status === "error" || status === "gmail") setStatus("idle");
               }}
               disabled={status === "loading"}
             />
-            {status === "error" && (
+            {(status === "error" || status === "gmail") && (
               <p className="text-center text-xs text-destructive">
-                {t.extension.comingSoon.error}
+                {status === "gmail"
+                  ? t.extension.comingSoon.emailGmailOnly
+                  : t.extension.comingSoon.error}
               </p>
             )}
             <Button

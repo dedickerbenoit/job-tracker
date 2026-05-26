@@ -742,8 +742,10 @@ const fr = {
     comingSoon: {
       title: `L'extension est en beta fermée`,
       description: `Sauvegarde une offre en 1 clic depuis LinkedIn ou Indeed.`,
-      status: "Entre ton email \u2014 on t'envoie l'accès au Chrome Web Store.",
-      emailPlaceholder: "ton@email.com",
+      status:
+        "Entre ton adresse Gmail \u2014 on t'envoie l'accès au Chrome Web Store.",
+      emailPlaceholder: "ton@gmail.com",
+      emailGmailOnly: "Seules les adresses Gmail sont acceptées.",
       submit: "Rejoindre la beta",
       submitting: "Envoi...",
       success: "C'est noté \u2014 on t'envoie l'accès très vite !",
