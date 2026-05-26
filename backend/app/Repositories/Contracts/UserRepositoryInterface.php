@@ -16,6 +16,6 @@ interface UserRepositoryInterface
 
     public function markBetaInvitationSent(string $email): void;
 
-    /** @return LengthAwarePaginator<User> */
+    /** @return LengthAwarePaginator<int, User> */
     public function getAllNonAdmin(int $perPage = 20): LengthAwarePaginator;
 }

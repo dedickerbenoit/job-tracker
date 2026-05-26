@@ -29,7 +29,7 @@ class UserRepository implements UserRepositoryInterface
         User::where('email', $email)->update(['is_beta_invitation_sent' => true]);
     }
 
-    /** @return LengthAwarePaginator<User> */
+    /** @return LengthAwarePaginator<int, User> */
     public function getAllNonAdmin(int $perPage = 20): LengthAwarePaginator
     {
         return User::where('is_admin', false)->orderByDesc('created_at')->paginate($perPage);
