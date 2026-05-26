@@ -11,4 +11,6 @@ interface BetaInviteRepositoryInterface
     public function getAllWithActiveStatus(): Collection;
 
     public function upsertByEmail(string $email): void;
+
+    public function emailExists(string $email): bool;
 }

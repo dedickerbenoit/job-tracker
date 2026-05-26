@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { t } from "@/lib/i18n";
 import { ChromeIcon } from "@/components/icons/ChromeIcon";
 import { useExtensionDetected } from "@/hooks/useExtensionDetected";
+import { useAuthStore } from "@/stores/authStore";
 
 const CHROME_STORE_URL =
   "https://chromewebstore.google.com/detail/jobtracker-beta/bcnfmhkdkhegkobfomeipijlcldjaiad";
@@ -21,6 +22,7 @@ interface SidebarProps {
 
 export function Sidebar({ collapsed = false }: SidebarProps) {
   const extensionDetected = useExtensionDetected();
+  const user = useAuthStore((s) => s.user);
 
   return (
     <aside
@@ -54,33 +56,35 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
         ))}
       </nav>
 
-      <div className="border-t p-3">
-        {extensionDetected ? (
-          <div
-            className={cn(
-              "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-green-600",
-              collapsed && "justify-center px-2",
-            )}
-          >
-            <Check className="h-5 w-5 shrink-0" />
-            {!collapsed && <span>{t.sidebar.extensionInstalled}</span>}
-          </div>
-        ) : (
-          <a
-            href={CHROME_STORE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={cn(
-              "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-              "text-primary hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-              collapsed && "justify-center px-2",
-            )}
-          >
-            <ChromeIcon className="h-5 w-5 shrink-0" />
-            {!collapsed && <span>{t.sidebar.extensionCta}</span>}
-          </a>
-        )}
-      </div>
+      {(extensionDetected || user?.is_beta_invitation_sent) && (
+        <div className="border-t p-3">
+          {extensionDetected ? (
+            <div
+              className={cn(
+                "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-green-600",
+                collapsed && "justify-center px-2",
+              )}
+            >
+              <Check className="h-5 w-5 shrink-0" />
+              {!collapsed && <span>{t.sidebar.extensionInstalled}</span>}
+            </div>
+          ) : (
+            <a
+              href={CHROME_STORE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={cn(
+                "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                "text-primary hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                collapsed && "justify-center px-2",
+              )}
+            >
+              <ChromeIcon className="h-5 w-5 shrink-0" />
+              {!collapsed && <span>{t.sidebar.extensionCta}</span>}
+            </a>
+          )}
+        </div>
+      )}
     </aside>
   );
 }

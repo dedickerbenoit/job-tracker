@@ -9,6 +9,7 @@ use App\Exceptions\Auth\InvalidCredentialsException;
 use App\Exceptions\Auth\InvalidTokenException;
 use App\Exceptions\Auth\TooManyAttempsException;
 use App\Models\User;
+use App\Repositories\Contracts\BetaInviteRepositoryInterface;
 use App\Repositories\Contracts\UserConsentRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Services\Support\SessionTerminator;
@@ -24,6 +25,7 @@ class AuthService
     public function __construct(
         private readonly UserRepositoryInterface $userRepository,
         private readonly UserConsentRepositoryInterface $consentRepository,
+        private readonly BetaInviteRepositoryInterface $betaInviteRepository,
         private readonly SessionTerminator $sessionTerminator,
     ) {}
 
@@ -39,6 +41,10 @@ class AuthService
                 'password' => $data->password,
             ]
         );
+
+        if ($this->betaInviteRepository->emailExists($data->email)) {
+            $user->update(['is_beta_invitation_sent' => true]);
+        }
 
         $this->consentRepository->createInitialConsents($user, $data->ipAddress, $data->userAgent);
 

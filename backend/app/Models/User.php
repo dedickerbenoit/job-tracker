@@ -21,6 +21,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property string|null $password
  * @property Carbon|null $email_verified_at
  * @property bool $is_admin
+ * @property bool $is_beta_invitation_sent
  * @property string|null $remember_token
  * @property Carbon|null $suspended_at
  * @property string|null $google_id
@@ -35,7 +36,7 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @var list<string> */
-    public const API_VISIBLE_FIELDS = ['id', 'first_name', 'last_name', 'email', 'avatar_url', 'suspended_at', 'email_verified_at', 'is_admin'];
+    public const API_VISIBLE_FIELDS = ['id', 'first_name', 'last_name', 'email', 'avatar_url', 'suspended_at', 'email_verified_at', 'is_admin', 'is_beta_invitation_sent'];
 
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
@@ -49,6 +50,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'is_admin' => 'boolean',
+            'is_beta_invitation_sent' => 'boolean',
             'suspended_at' => 'datetime',
             'password' => 'hashed',
         ];
