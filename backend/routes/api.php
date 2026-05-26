@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\BetaInviteController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\AuthController;
@@ -71,6 +72,7 @@ Route::prefix('v1')->group(function () {
 
         // Admin routes — require verified, non-suspended, admin user
         Route::middleware(['verified', 'not-suspended', 'admin'])->prefix('admin')->group(function () {
+            Route::get('/users', [AdminUserController::class, 'index']);
             Route::controller(BetaInviteController::class)->prefix('beta-invites')->group(function () {
                 Route::get('/', 'index');
                 Route::post('/', 'store');

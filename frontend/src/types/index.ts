@@ -85,11 +85,12 @@ export interface StatsData {
 
 // ── Admin ──
 
-export interface BetaInvite {
+export interface AdminUser {
   id: number;
   email: string;
-  sent_at: string;
-  is_active: boolean;
+  first_name: string;
+  last_name: string;
+  is_beta_invitation_sent: boolean;
   created_at: string;
 }
 

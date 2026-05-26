@@ -3,6 +3,7 @@
 namespace App\Repositories\Contracts;
 
 use App\Models\User;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface UserRepositoryInterface
 {
@@ -14,4 +15,7 @@ interface UserRepositoryInterface
     public function forceDeleteTrashedByEmail(string $email): void;
 
     public function markBetaInvitationSent(string $email): void;
+
+    /** @return LengthAwarePaginator<int, User> */
+    public function getAllNonAdmin(int $perPage = 20): LengthAwarePaginator;
 }
