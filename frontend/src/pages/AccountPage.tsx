@@ -23,7 +23,7 @@ import {
 import { useAuthStore } from "@/stores/authStore";
 import { accountApi, adminApi } from "@/services/api";
 import { t } from "@/lib/i18n";
-import type { BetaInvite, Consent } from "@/types";
+import type { AdminUser, Consent } from "@/types";
 
 export default function AccountPage() {
   const user = useAuthStore((s) => s.user);
@@ -48,7 +48,7 @@ export default function AccountPage() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [betaEmail, setBetaEmail] = useState("");
   const [sendingInvite, setSendingInvite] = useState(false);
-  const [betaInvites, setBetaInvites] = useState<BetaInvite[]>([]);
+  const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
 
   const isSuspended = !!user?.suspended_at;
 
@@ -67,10 +67,10 @@ export default function AccountPage() {
     }
   }, []);
 
-  const loadBetaInvites = useCallback(async () => {
+  const loadAdminUsers = useCallback(async () => {
     try {
-      const data = await adminApi.listBetaInvites();
-      setBetaInvites(data);
+      const data = await adminApi.listUsers();
+      setAdminUsers(data);
     } catch {
       toast.error(t.admin.betaInvite.loadError);
     }
@@ -78,8 +78,8 @@ export default function AccountPage() {
 
   useEffect(() => {
     loadConsents();
-    if (user?.is_admin) loadBetaInvites();
-  }, [loadConsents, loadBetaInvites, user?.is_admin]);
+    if (user?.is_admin) loadAdminUsers();
+  }, [loadConsents, loadAdminUsers, user?.is_admin]);
 
   const handleRevoke = async (consentType: "terms" | "privacy") => {
     setRevoking(consentType);
@@ -202,7 +202,7 @@ export default function AccountPage() {
       await adminApi.sendBetaInvite(betaEmail.trim());
       toast.success(t.admin.betaInvite.success);
       setBetaEmail("");
-      loadBetaInvites();
+      loadAdminUsers();
     } catch {
       toast.error(t.admin.betaInvite.error);
     } finally {
@@ -247,12 +247,12 @@ export default function AccountPage() {
             </Button>
           </div>
 
-          {/* Beta invites list */}
+          {/* Registered users list */}
           <div className="mt-6">
             <h3 className="mb-3 text-sm font-semibold">
               {t.admin.betaInvite.listTitle}
             </h3>
-            {betaInvites.length === 0 ? (
+            {adminUsers.length === 0 ? (
               <p className="text-sm text-muted-foreground">
                 {t.admin.betaInvite.empty}
               </p>
@@ -265,31 +265,31 @@ export default function AccountPage() {
                         {t.admin.betaInvite.columnEmail}
                       </th>
                       <th className="px-3 py-2 text-left font-medium">
-                        {t.admin.betaInvite.columnSentAt}
+                        {t.admin.betaInvite.columnName}
                       </th>
                       <th className="px-3 py-2 text-left font-medium">
-                        {t.admin.betaInvite.columnStatus}
+                        {t.admin.betaInvite.columnInvitation}
                       </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {betaInvites.map((invite) => (
-                      <tr key={invite.id} className="border-b last:border-0">
-                        <td className="px-3 py-2">{invite.email}</td>
+                    {adminUsers.map((adminUser) => (
+                      <tr key={adminUser.id} className="border-b last:border-0">
+                        <td className="px-3 py-2">{adminUser.email}</td>
                         <td className="px-3 py-2 text-muted-foreground">
-                          {new Date(invite.sent_at).toLocaleDateString("fr-FR")}
+                          {adminUser.first_name} {adminUser.last_name}
                         </td>
                         <td className="px-3 py-2">
                           <span
                             className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                              invite.is_active
+                              adminUser.is_beta_invitation_sent
                                 ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
                                 : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
                             }`}
                           >
-                            {invite.is_active
-                              ? t.admin.betaInvite.statusActive
-                              : t.admin.betaInvite.statusInactive}
+                            {adminUser.is_beta_invitation_sent
+                              ? t.admin.betaInvite.invitationYes
+                              : t.admin.betaInvite.invitationNo}
                           </span>
                         </td>
                       </tr>

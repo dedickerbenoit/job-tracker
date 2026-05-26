@@ -1,6 +1,7 @@
 import axios from "axios";
 import type { InternalAxiosRequestConfig } from "axios";
 import type {
+  AdminUser,
   Application,
   ApplicationEvent,
   ApplicationFilters,
@@ -196,6 +197,10 @@ export const adminApi = {
 
   listBetaInvites(): Promise<BetaInvite[]> {
     return api.get("/admin/beta-invites").then((r) => r.data.data);
+  },
+
+  listUsers(): Promise<AdminUser[]> {
+    return api.get("/admin/users").then((r) => r.data.data);
   },
 };
 

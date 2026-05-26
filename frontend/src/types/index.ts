@@ -93,6 +93,15 @@ export interface BetaInvite {
   created_at: string;
 }
 
+export interface AdminUser {
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  is_beta_invitation_sent: boolean;
+  created_at: string;
+}
+
 // ── API Types ──
 
 export interface PaginationMeta {
